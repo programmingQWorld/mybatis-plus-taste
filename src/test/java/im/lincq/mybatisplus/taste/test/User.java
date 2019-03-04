@@ -13,7 +13,7 @@ public class User {
     private static final long serialVersionUID = 1L;
 
     /* 主键ID， auto属性true自增 false非自增 默认true */
-    @TableId(auto = true)
+    @TableId(auto = false)
     private long id;
     private String name;
     private int age;

@@ -62,3 +62,13 @@ new AutoSqlInject().inject();
 我一时不了解为什么IDEA编译后，文件没有被复制过去，我只好手动复制UserMapper.xml到target目录下，问题暂时得到解决。
 <br>
 其它的问题是自己的编码问题，注入的sql语句有语法问题。解决方式是到注入位置，把相关sql语句输出查看，就可以很快对比出错误。
+<br>
+也了解到 MyBatis 框架转化配置文件信息到Configuration对象的过程.
+
+---
+[201903041638]
+
+这次版本解决正常添加指定主键对象<br>
+```TableId```注解,若设置为false,需要用户传入ID。<br>
+用户传入id可以使用```IdWorker```产生或者指定其它的ID.<br>
+

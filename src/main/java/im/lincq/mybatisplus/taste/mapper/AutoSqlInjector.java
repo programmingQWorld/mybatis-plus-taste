@@ -89,16 +89,26 @@ public class AutoSqlInjector {
      * @param table                表名
      */
     private void injectInsertSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
-        System.out.println("injectInsertSql called once ...");
+
         KeyGenerator keyGenerator = new NoKeyGenerator();
-        String keyParam = null;
-        if (table.getTableId() != null && table.isAutoIncrement()) {
-            keyGenerator = new Jdbc3KeyGenerator();
-            keyParam =table.getTableId();
-        }
 
         StringBuilder fieldBuilder = new StringBuilder();
         StringBuilder placeholderBuilder = new StringBuilder();
+        String keyParam = null;
+        if (table.getTableId() != null) {
+            /* 自增主键 */
+            if (table.isAutoIncrement()) {
+                keyGenerator = new Jdbc3KeyGenerator();
+                keyParam =table.getTableId();
+            } else {
+                /* 非自增，用户生成 */
+                fieldBuilder.append(table.getTableId()).append(",");
+                placeholderBuilder.append("#{").append(table.getTableId()).append("},");
+            }
+
+        }
+
+
         List<String> fieldLists = table.getFieldList();
 
         int size = fieldLists.size();

@@ -14,7 +14,7 @@ public @interface TableId {
     /**
      * 主键ID，默认true标记数据库主键自增
      * <p>
-     *     若设置为false,会调用AutoMapper使用IdWorker替你产生一个唯一ID
+     *     若设置为false,需要用户传入ID内容，工具包IdWorker可产生全局唯一 ID
      * </p>
      * {@link im.lincq.mybatisplus.taste.toolkit.IdWorker}
      * @return

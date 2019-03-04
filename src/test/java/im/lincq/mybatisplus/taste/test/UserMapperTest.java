@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste.test;
 
 import im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder;
+import im.lincq.mybatisplus.taste.toolkit.IdWorker;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
@@ -16,6 +17,8 @@ public class UserMapperTest {
 
     public static void main(String[] args) {
 
+        System.out.println("IdWorker.getId(): " + IdWorker.getId());
+
         InputStream in = UserMapperTest.class.getClassLoader().getResourceAsStream(RESOUCE);
         // SqlSession session = new SqlSessionFactoryBuilder().build(in).openSession();
         // 此处使用MybatisSessionFactoryBuilder构建SqlSessionFactory,目的是为了引入AutoMapper
@@ -26,8 +29,8 @@ public class UserMapperTest {
         int result = userMapper.deleteByName("test");
         System.out.println("\n------------------deleteByName----------------------\n result=" + result);
 
-        userMapper.insert(new User("test", 18));
         System.out.println("\n------------------insert----------------------\n name=test, age=18");
+        userMapper.insert(new User(IdWorker.getId(), "new lincq", 18));
 
         /*
 		 * 此处的 selectById 被UserMapper.xml中的 selectById 覆盖了
