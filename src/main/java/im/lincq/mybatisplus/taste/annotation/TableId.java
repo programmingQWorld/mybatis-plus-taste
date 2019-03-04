@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface Id {
+public @interface TableId {
     /**
      * 主键ID，默认true标记数据库主键自增
      * <p>

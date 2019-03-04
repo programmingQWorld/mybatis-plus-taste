@@ -1,8 +1,7 @@
 package im.lincq.mybatisplus.taste.mapper;
 
-import im.lincq.mybatisplus.taste.annotation.Id;
-import im.lincq.mybatisplus.taste.annotation.Table;
-import im.lincq.mybatisplus.taste.toolkit.FieldReflectionHelper;
+import im.lincq.mybatisplus.taste.toolkit.TableInfo;
+import im.lincq.mybatisplus.taste.toolkit.TableInfoHelper;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
 import org.apache.ibatis.executor.keygen.KeyGenerator;
@@ -25,12 +24,10 @@ import java.util.List;
 public class AutoSqlInjector {
     private transient Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final String DEFAULT_ID = "id";
-
     // sql语句
     private static final String SQL_DELETE = "DELETE FROM %s WHERE %s = #{ID}";
     private static final String SQL_SELECTONE = "SELECT * FROM %s WHERE %s = #{ID}";
-    private static final String SQL_SELECTALL = "SELECT * FROM FROM %s";
+    private static final String SQL_SELECTALL = "SELECT * FROM %s";
 
     private static final String METHOD_INSERTONE = "insert";
     private static final String METHOD_UPDATEONE = "updateById";
@@ -42,10 +39,6 @@ public class AutoSqlInjector {
     private Configuration configuration;
     private MapperBuilderAssistant assistant;
 
-    /**
-     * 数据库主键
-     */
-    private TID tableID;
 
     public AutoSqlInjector (Configuration configuration) {
         // object父类的构造方法，在这里应该没有什么用处.
@@ -59,27 +52,30 @@ public class AutoSqlInjector {
         assistant.setCurrentNamespace(mapperClass.getName());
 
         Class<?> modelClass  = extractModelClass(mapperClass);
-        String table = this.extractTableName(modelClass);
-        tableID = this.extractTableID(modelClass);
+        TableInfo table = TableInfoHelper.getTableInfo(modelClass);
 
 
         /* 新增 */
         this.injectInsertSql(mapperClass, modelClass, table);
 
         /* 没有指定主键，默认忽略主键修改，删除，查询方法 */
-        if (tableID != null) {
+        if (table.getTableId() != null) {
             /* 根据主键修改，主键名默认未id */
             this.injectUpdateSql(mapperClass, modelClass, table);
 
             /* 根据主键删除，主键名默认未id */
-            SqlSource sqlSource = new RawSqlSource(configuration, String.format(SQL_DELETE, table, tableID.name),
+            SqlSource sqlSource = new RawSqlSource(configuration, String.format(SQL_DELETE, table.getTableName(), table.getTableId()),
                     Object.class);
             this.addMappedStatement(mapperClass, METHOD_DELETEONE, sqlSource, SqlCommandType.DELETE, null);
 
             /*  根据主键查找，主键名默认为id*/
-            sqlSource = new RawSqlSource(configuration, String.format(SQL_SELECTONE, table, tableID.name), Object.class);
+            sqlSource = new RawSqlSource(configuration, String.format(SQL_SELECTONE, table.getTableName(), table.getTableId()), Object.class);
             this.addMappedStatement(mapperClass, METHOD_SELECTONE, sqlSource, SqlCommandType.SELECT, modelClass);
         }
+        /* 查询全部 */
+        SqlSource sqlSource = new RawSqlSource(configuration, String.format(SQL_SELECTALL, table.getTableName()), null);
+        System.out.println("inject select-all sql: " + String.format(SQL_SELECTALL, table.getTableName()));
+        this.addMappedStatement(mapperClass, METHOD_SELECTALL, sqlSource, SqlCommandType.SELECT, modelClass);
     }
 
     public void addMappedStatement (Class<?> mapperClass, String id, SqlSource sqlSource, SqlCommandType sqlCommandType, Class<?> resultType) {
@@ -92,52 +88,50 @@ public class AutoSqlInjector {
      * @param modelClass    MapperClass对应的实体类Class对象
      * @param table                表名
      */
-    private void injectInsertSql (Class<?> mapperClass, Class<?> modelClass, String table) {
+    private void injectInsertSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        System.out.println("injectInsertSql called once ...");
         KeyGenerator keyGenerator = new NoKeyGenerator();
-        // 主键属性，主键字段
-        String keyProperty = null;
-        String keyColumn = null;
+        String keyParam = null;
+        if (table.getTableId() != null && table.isAutoIncrement()) {
+            keyGenerator = new Jdbc3KeyGenerator();
+            keyParam =table.getTableId();
+        }
 
-        List<Field> fields = FieldReflectionHelper.getAllFieldsExcludeTransient(modelClass);
         StringBuilder fieldBuilder = new StringBuilder();
         StringBuilder placeholderBuilder = new StringBuilder();
+        List<String> fieldLists = table.getFieldList();
 
-        int fieldSize = fields.size();
-        for (int i=0; i<fieldSize; i++) {
-            String fieldName = fields.get(i).getName();
-            if (tableID != null && tableID.name.equals(fieldName) && tableID.auto) {
-                keyGenerator = new Jdbc3KeyGenerator();
-                keyProperty = keyColumn = tableID.name;
-                continue;
-            }
+        int size = fieldLists.size();
+        // 拼接出字符串
+        for (int i=0; i<size; i++) {
+            String fieldName = fieldLists.get(i);
             fieldBuilder.append(fieldName);
             placeholderBuilder.append("#{").append(fieldName).append("}");
-            if (i < fieldSize - 1) {
+
+            if (i < size - 1) {
                 fieldBuilder.append(",");
                 placeholderBuilder.append(",");
             }
         }
-        String sql = String.format("insert into %s(%s) values %s", table, fieldBuilder.toString(), placeholderBuilder.toString());
+        String sql = String.format("insert into %s(%s) values (%s)", table.getTableName(), fieldBuilder.toString(), placeholderBuilder.toString());
+        System.out.println("inject insert sql: " + sql);
         SqlSource sqlSource  = new RawSqlSource(configuration, sql, modelClass);
-        this.addInsertMappedStatement(mapperClass, modelClass, METHOD_INSERTONE, sqlSource, keyGenerator, keyProperty, keyColumn);
+        this.addInsertMappedStatement(mapperClass, modelClass, METHOD_INSERTONE, sqlSource, keyGenerator, keyParam, keyParam);
     }
 
-    private void injectUpdateSql (Class<?> mapperClass, Class<?> modelClass, String table) {
-        List<Field> fields = FieldReflectionHelper.getAllFieldsExcludeTransient(modelClass);
-        StringBuilder sqlBuilder = new StringBuilder("UPDATE ").append(table).append(" SET ");
-        int fieldSize = fields.size();
-        for (int i = 0; i < fieldSize; i++) {
-            String fieldName = fields.get(i).getName();
-            // 跳过主键属性
-            if (tableID.name.equals(table)) {
-                continue;
-            }
+    private void injectUpdateSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        StringBuilder sqlBuilder = new StringBuilder("UPDATE ").append(table.getTableName()).append(" SET ");
+        List<String> fieldList = table.getFieldList();
+        int size = fieldList.size();
+        for (int i = 0; i < size; i++) {
+            String fieldName = fieldList.get(i);
             sqlBuilder.append(fieldName).append("=#{").append(fieldName).append("}");
-            if (i < fieldSize - 1) {
+            if (i < size - 1) {
                 sqlBuilder.append(",");
             }
         }
-        sqlBuilder.append(" WHERE ").append(tableID.name).append("=#{").append(tableID.name).append("}");
+        sqlBuilder.append(" WHERE ").append(table.getTableId()).append("=#{").append(table.getTableId()).append("}");
+        System.out.println("inject update sql: " + sqlBuilder.toString());
         SqlSource sqlSource = new RawSqlSource(configuration, sqlBuilder.toString(), mapperClass);
         this.addUpdateMappedStatement(mapperClass, modelClass, METHOD_UPDATEONE, sqlSource);
     }
@@ -194,100 +188,5 @@ public class AutoSqlInjector {
         */
         Type[] parameters = target.getActualTypeArguments();
         return (Class<?>)parameters[0];
-    }
-
-    /***
-     * 功能：提取数据库表名
-     */
-    private String extractTableName (Class<?> modelClass) {
-        Table tableAnno = modelClass.getAnnotation(Table.class);
-        if (tableAnno != null && tableAnno.name().trim().length() > 0) {
-            return tableAnno.name();
-        }
-        return this.camelToUnderline(modelClass.getSimpleName());
-    }
-
-    /**
-     * 提取主键id <br></br>
-     * 对象身上所有的属性中，抽取出TID对象，TID对象描述modelClass中主键主键的属性名称，是否自增. <br></br>
-     * 首先，成员变量身上如果有id注解，可以说明该成员变量对应主键.即：成员变量名称是主键名称，而id主键auto属性值为是否自增值  <br></br>
-     * 如成员变量们都没有id注解，则mybatis-plus默认名为id，类型为long/Long或int/Integer类型的成员属性对应自增主键  <br></br>
-     * @param modelClass    实体类Class 对象
-     * @return                           TID
-     */
-    private TID extractTableID (Class<?> modelClass) {
-        List<Field> fields = FieldReflectionHelper.getAllFieldsExcludeTransient(modelClass);
-        TID tId = null;
-        for (Field field : fields) {
-            Id id = field.getAnnotation(Id.class);
-            if (id != null) {
-                tId = new TID();
-                tId.name = field.getName();
-                tId.auto = id.auto();
-                break;
-            }
-        }
-        if (tId != null) {
-            return tId;
-        }
-        /* 检测是否采用了默认id，作为主键 */
-        for (Field field : fields) {
-            if (this.isDefaultAutoID(field)) {
-                tId = new TID();
-                tId.name = field.getName();
-                tId.auto = true;
-                return tId;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * 判定是否为自增主键id.
-     * @param field 字段属性
-     * @return          判断结果
-     */
-    public boolean isDefaultAutoID (Field field) {
-        String fieldName = field.getName();
-        if (DEFAULT_ID.equals(fieldName)) {
-            // 如果id属性的类型是Long/long/Integer/int类型则判断对象是自增类型
-            Class<?> fieldClass = field.getType();
-            if (fieldClass.equals(Long.class) || fieldClass.equals(long.class) || fieldClass.equals(Integer.class) || fieldClass.equals(int.class)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 功能：驼峰单词转下划线风格
-     * @param camelWord 驼峰单词
-     * @return                        下划线风格字符串
-     */
-    private String camelToUnderline (String camelWord) {
-        if (camelWord == null || camelWord.length() == 0) {
-            return "";
-        }
-        int len = camelWord.length();
-        StringBuilder sb = new StringBuilder();
-        for (int i=0; i<len; i++) {
-            char c = camelWord.charAt(i);
-            if (Character.isUpperCase(c) && i > 0) {
-                sb.append("_");
-                sb.append(Character.toLowerCase(c));
-            } else {
-                sb.append(Character.toLowerCase(c));
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * Table ID
-     */
-    class TID {
-        // id主键属性名称 [是否自增]
-        String name;
-        boolean auto;
     }
 }

@@ -20,6 +20,13 @@ public class MybatisConfiguration extends Configuration {
 
 
     /**
+     * 初始化调用
+     */
+    public MybatisConfiguration() {
+        System.err.println("mybatis-plus init success.");
+    }
+
+    /**
      * Mybatis加载Sql的顺序：<br></br>
      * 1. 加载xml中的sql <br>
      * 2. 加载SqlProvider中的sql <br>

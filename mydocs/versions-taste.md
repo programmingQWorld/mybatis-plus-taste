@@ -46,3 +46,19 @@ SqlSource 类
 RawSqlSource 类
 SqlCommandType 类
 
+---
+
+[2016-6][20190304][f1c8ec42942de0974f2915f3c2abf3b059e21355]
+
+这次的taste中，能感受到的是抽取出TableInfo数据结构。 <br>
+封装更多的细节是提供了更简明的调用方式。 <br>
+
+经过这次尝试，了解了一个SQL的注入过程，注入方式。mybatis-plus通过为每一个 mapperClass 注入常用的sql语句，增强 mapper-class 的能力。<br>
+```java
+new AutoSqlInject().inject();
+```
+
+这次运行测试用例也遇到了一点点困难，首先是 xxxMapper.xml 在运行时target目录中是看不到的，导致最后 xx.getClassLoader().getResourceAsStream("xxx.xml")的方法获取不到对应的inputStream.
+我一时不了解为什么IDEA编译后，文件没有被复制过去，我只好手动复制UserMapper.xml到target目录下，问题暂时得到解决。
+<br>
+其它的问题是自己的编码问题，注入的sql语句有语法问题。解决方式是到注入位置，把相关sql语句输出查看，就可以很快对比出错误。

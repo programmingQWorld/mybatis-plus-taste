@@ -1,7 +1,7 @@
 package im.lincq.mybatisplus.taste.toolkit;
 
-import com.alibaba.druid.support.logging.Log;
-import com.alibaba.druid.support.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -26,7 +26,7 @@ public class IdWorker {
 
     // 根据主机id获取机器码
     private static final IdWorker worker = new IdWorker();
-    private static final Log logger = LogFactory.getLog(IdWorker.class);
+    private static final Logger logger = LoggerFactory.getLogger(IdWorker.class);
 
     // 主机和进程的机器码
     private static final int _genmachine;
