@@ -72,3 +72,112 @@ new AutoSqlInject().inject();
 ```TableId```注解,若设置为false,需要用户传入ID。<br>
 用户传入id可以使用```IdWorker```产生或者指定其它的ID.<br>
 
+---
+[201903041652]
+
+这次的主题是分页插件，使用sql拦截，重写sql的方式来实行```物理分页```，非内存分页。
+<br>
+下面的资料来自mybatis-plus的```Readme.md```文件。
+
+# MyBatis 分页插件
+
+> pagination 是一个简易的MyBatis物理分页插件，使用`org.apache.ibatis.session.RowBounds`及其子类作为分页参数，禁用MyBatis自带的内存分页。
+
+## 分页原理
+简单来说就是通过拦截StatementHandler重写sql语句，实现数据库的物理分页
+
+## 如何使用分页插件
+**mybatis** 配置文件中配置插件 [mybatis-config.xml]
+```
+	<plugins>
+	    <!--
+	     | 分页插件配置
+	     | 插件提供二种方言选择：1、默认方言 2、自定义方言实现类，两者均未配置则抛出异常！
+	     | dialectType 数据库方言
+	     |             默认支持  mysql  oracle  hsql  sqlite  postgre
+	     | dialectClazz 方言实现类
+	     |              自定义需要实现 com.baomidou.mybatisplus.plugin.pagination.IDialect 接口
+	     | -->
+	    <!-- 配置方式一、使用 MybatisPlus 提供方言实现类 -->
+	    <plugin interceptor="com.baomidou.mybatisplus.plugins.PaginationInterceptor">
+	        <property name="dialectType" value="mysql" />
+	    </plugin>
+	    <!-- 配置方式二、使用自定义方言实现类 -->
+	    <plugin interceptor="com.baomidou.mybatisplus.plugins.PaginationInterceptor">
+	        <property name="dialectClazz" value="xxx.dialect.XXDialect" />
+	    </plugin>
+	</plugins>
+```
+
+---
+[201903081426]
+分页对象Pagination继承了RowBounds类.实现了自定义的分页模型。<br>
+在分页拦截器中，拦截器拦截了 StatementHandler 接口实例的 ```prepare``` 方法.<br>
+拦截器首先是根据配置 dbtype 或者 dialectClazz 属性来决定组装分页语句的IDialect实例.<br>
+在 dialectClazz明确情况下，可直接用new创建，否则根据dbtype到DialectFactory中获取相应方言处理分页的实例。<br>
+从StatementHandler接口实例中获取 RowBounds 实例，该实例其实就是我们自定义的分页对象 Pagination 实例。通过它可以查看是否要做总数量查询.该实例目前不存储结果数据集。<br>
+从StatementHandler接口实例中获取 BoundSql 实例，BoundSql实例里面可以找到被拦截到的sql语句，该语句是不包含分页语法的。
+<br>
+把分页插件部分啃了一遍，它的执行流程自己是明白的.<br>
+但是，我还没看到有关这方面的处理：<br>
+解决语句有时需要分页，有时不需要分页的问题.
+也许在后面的taste中会发现。
+
+<br>
+
+---
+[201903112107]
+刚刚发现，Mybatis-plus框架不设置原始的资源Resources目录，而是在test下的Resources目录充当.
+这样说明目前为止，框架自用的资源属于测试中使用。
+[201903112139]
+分支号: 3b6632196b4424cd8f46a8ab67669776c12a2599
+<p>
+这次分支，主要内容对test测试目录下的一些结构层次调整，mybatis-config.xml中加上了分页plugin配置，以及对一些配置文件知识点加以注释。
+<br>
+没有大的文件变化。但是我发现，加上plugin配置之后，test用例方法跑不动了.这时应该看看mybatis加载plugins标签时候，发生了什么事情。不，先仔细看一下配置文件plugins是否配置错了。
+<p>
+调试之后的发现：加载plugin标签时候，会按照配置的拦截器类去 alias 缓存中获取缓存 Class 实例，如果该实例不存在，直接使用反射方式获取拦截器类的 Class实例。接着根据拦截器Class实例实例化处拦截器实例，设置属性值是直接将属性对象传递给拦截器实例的setProperties方法，完成值的设置。
+关键的地方便在于此，我漏写了setProperties，plugin等方法的实现代码，成了空实现，或许这就是异常原因。但是再仔细一想，空实现的方法那也一样是方法，方法内一行代码都没有，那怎么可能引起异常呢，显然不是这种原因。再往下debug调试.真正的原因即将浮出水面。
+
+```Java
+configuration.getInterceptors().add(interceptorInstance);
+```
+上面这句代码引起了java.lang.UnsupportedOperationException
+```
+Caused by: java.lang.UnsupportedOperationException
+	at java.util.Collections$UnmodifiableCollection.add(Collections.java:1055)
+	at im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder.pluginElement(MybatisXmlConfigBuilder.java:206)
+```
+
+java.util.Collections$UnmodifiableCollection.add，我需要百度一下：
+
+<p>
+
+>Collections.unmodifiableCollection这个可以得到一个集合的镜像，它的返回结果不可直接被改变，否则会提示。
+为的就是保护数据不要被改变。另外，修改原Collections时，会同时修改对应的镜像。
+
+<p>
+
+我需要再看一下更详细的实现，下面是configuration.getInterceptors()方法的实现，以及一个转机方法;
+
+```
+public void addInterceptor(Interceptor interceptor) {
+    interceptors.add(interceptor);
+  }
+
+  public List<Interceptor> getInterceptors() {
+    return Collections.unmodifiableList(interceptors);
+  }
+  ```
+
+上面的方法实现跟百度的结果极其对应，所以根本原因就是操作了不可修改的集合镜像，异常。
+<br>
+我认为此时的救命稻草就是上面的转机方法（```addInterceptors方法```），因为它直接操作 interceptors 集合，不会出现问题，试一试吧。
+然后就去睡觉.
+<br>
+哈哈，问题果然解决了.虽然现在又遇到了其它的NPE，但是已经不相关了，明天找时间再看看。明天也要补全漏写的方法。
+<p>
+
+本次配置的是```分页拦截器```，按照 mybatis 的约定，自定义的拦截器类都实现了 ```org.apache.ibatis.plugin.Interceptor``` 接口。
+
+后面打算用文档docx来记录，现在不习惯使用markdown。
