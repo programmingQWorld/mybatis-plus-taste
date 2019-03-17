@@ -1,4 +1,7 @@
-# mybatis-plus (personal taste)
+# mybatis-plus
+
+(personal taste，以下内容均为mybatis-plus官方提供，与本人无关)
+
 mybatis 增强工具包，简化开发基本 CURD 操作。
 
 
