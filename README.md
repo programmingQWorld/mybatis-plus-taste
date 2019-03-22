@@ -4,12 +4,27 @@
 
 mybatis 增强工具包，简化开发基本 CURD 操作。
 
+> mybatis + 只做增强不做改变，这里不提倡 sql 写在代码中。
+
+Maven 坐标
+===========
+```
+<dependency>
+    <groupId>com.baomidou</groupId>
+    <artifactId>mybatis-plus</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
+
 
 功能
 ===========
 1、单表 CURD 自动完成
 
-2、分页插件
+2、分页插件，Count 查询 自动 或 自定义 SQL 查询。
+
+3、Spring 根据不同环境加载不同配置支持
 
 
 Usage

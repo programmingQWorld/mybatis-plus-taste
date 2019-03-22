@@ -12,7 +12,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mysql-connector-java.version>5.1.38</mysql-connector-java.version>
         <slf4j-api.version>1.7.13</slf4j-api.version>
+        <spring.version>4.2.3.RELEASE</spring.version>
         <mybatis.version>3.3.0</mybatis.version>
+        <mybatis-spring.version>1.2.3</mybatis-spring.version>
     </properties>
 
     <dependencies>
@@ -30,6 +32,24 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-connector-java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>${mybatis-spring.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
