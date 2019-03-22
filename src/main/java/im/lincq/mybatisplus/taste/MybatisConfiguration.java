@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public class MybatisConfiguration extends Configuration {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(MybatisConfiguration.class);
 
 
     /**
