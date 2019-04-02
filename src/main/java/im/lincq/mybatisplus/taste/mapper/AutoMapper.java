@@ -10,22 +10,27 @@ import java.util.List;
  */
 public interface AutoMapper<T> {
     /**
-     * 新增
+     * 插入
      * */
     public int insert(T entity);
 
     /**
-     * 根据主键删除，主键名称默认为id
+     * 插入（批量）
+     */
+    int insertBatch(List<T> entityList);
+
+    /**
+     * 根据ID删除
      * */
     public int deleteById(Object id);
 
     /**
-     * 根据主键修改，主键名称默认为id
+     * 根据ID修改
      * */
     public int updateById(T entity);
 
     /**
-     * 根据主键查找，主键名称默认为id
+     * 根据ID查找
      * */
     public T selectById(Object id);
 
