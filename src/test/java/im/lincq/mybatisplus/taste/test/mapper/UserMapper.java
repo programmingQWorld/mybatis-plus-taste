@@ -25,5 +25,4 @@ public interface UserMapper extends AutoMapper<User> {
      */
     List<User> list (RowBounds pagination);
 
-    int deleteByIds (List<Long> ids);
 }

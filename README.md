@@ -6,13 +6,15 @@ mybatis 增强工具包，简化开发基本 CURD 操作。
 
 > mybatis + 只做增强不做改变，这里不提倡 sql 写在代码中。
 
+> 技术讨论 QQ 群 492238239
+
 Maven 坐标
 ===========
 ```
 <dependency>
     <groupId>com.baomidou</groupId>
     <artifactId>mybatis-plus</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ```
 

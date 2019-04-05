@@ -30,9 +30,25 @@ public interface AutoMapper<T> {
     public int updateById(T entity);
 
     /**
-     * 根据ID查找
+     * 删除（批量）
+     */
+    int deleteBatchIds(List idList);
+
+    /**
+     * 修改（批量 ）
+     */
+    int updateBatch(List<T> entityList);
+
+    /**
+     * 查询（批量）
+     */
+    List<T> selectBatchIds(List idList);
+
+    /**
+     * 根据ID查询
      * */
     public T selectById(Object id);
+
 
     /**
      * 查询全部

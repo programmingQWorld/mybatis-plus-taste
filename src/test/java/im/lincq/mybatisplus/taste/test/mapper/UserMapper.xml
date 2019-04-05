@@ -9,12 +9,11 @@
     <delete id="deleteByName" parameterType="java.lang.String">
         DELETE FROM user WHERE name = #{name};
     </delete>
-    <delete id="deleteByIds" parameterType="java.util.List">
-        delete from user where id in
-        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
-            #{item}
-        </foreach>
+
+    <delete id="deleteAll">
+        delete FROM user
     </delete>
+
 
     <select id="list" resultType="User">
         select * from user

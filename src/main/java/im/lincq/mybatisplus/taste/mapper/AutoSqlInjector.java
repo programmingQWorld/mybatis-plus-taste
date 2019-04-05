@@ -29,12 +29,6 @@ public class AutoSqlInjector {
     private Configuration configuration;
     private MapperBuilderAssistant assistant;
 
-    public AutoSqlInjector (Configuration configuration) {
-        // object父类的构造方法，在这里应该没有什么用处.
-        super();
-        this.configuration = configuration;
-    }
-
     public void inject(Class<?> mapperClass) {
         System.out.println("执行sql语句注入方法");
         assistant = new MapperBuilderAssistant(configuration, mapperClass.getName().replaceAll("\\.", "/"));
@@ -44,44 +38,70 @@ public class AutoSqlInjector {
         TableInfo table = TableInfoHelper.getTableInfo(modelClass);
 
 
-        /* 新增 */
+        /* 插入 */
         this.injectInsertSql(false, mapperClass, modelClass, table);
         this.injectInsertSql(true, mapperClass, modelClass, table);
 
-
         /* 没有指定主键，默认忽略主键修改，删除，查询方法 */
         if (table.getTableId() != null) {
-            /* 根据主键修改，主键名默认为id */
+            /* 删除 */
+            this.injectDeleteSql(false, mapperClass, modelClass, table);
+            this.injectDeleteSql(true, mapperClass, modelClass, table);
+            System.out.println("The modelClass is  (User ???)" + modelClass);
+
+            /* 修改 */
             this.injectUpdateSql(mapperClass, modelClass, table);
 
-            /* 根据主键删除，主键名默认为id */
-            SqlSource sqlSource = new RawSqlSource(configuration,
-                    String.format(SqlMethod.DELETE_ONE.getSql(), table.getTableName(), table.getTableId()),
-                    Object.class);
-            this.addMappedStatement(mapperClass,
-                    SqlMethod.DELETE_ONE.getMethod(), sqlSource,
-                    SqlCommandType.DELETE, null);
-
-            /*  根据主键查找，主键名默认为id*/
-            sqlSource = new RawSqlSource(configuration,
-                    String.format(SqlMethod.SELECT_ONE.getSql(), table.getTableName(), table.getTableId()),
-                    Object.class);
-            this.addMappedStatement(mapperClass, SqlMethod.SELECT_ONE.getMethod(),
-                    sqlSource, SqlCommandType.SELECT, modelClass);
+            /* 查询 */
+            this.injectSelectSql(false, mapperClass, modelClass, table);
+            this.injectSelectSql(true, mapperClass, modelClass, table);
         }
         /* 查询全部 */
+        this.injectSelectAllSql(mapperClass, modelClass, table);
+    }
+
+    /**
+     * 注入查询全部 SQL 语句
+     * @param mapperClass
+     * @param modelClass
+     * @param table
+     */
+    private void injectSelectAllSql(Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        SqlMethod sqlMethod = SqlMethod.SELECT_ALL;
         SqlSource sqlSource = new RawSqlSource(configuration,
-                String.format(SqlMethod.SELECT_ALL.getSql(), table.getTableName()),
+                String.format(sqlMethod.getSql(), table.getTableName()),
                 null);
         System.out.println("inject select-all sql: "
                 + String.format(SqlMethod.SELECT_ALL.getSql(), table.getTableName()));
-
-        this.addMappedStatement(mapperClass,
-                SqlMethod.SELECT_ALL.getMethod(), sqlSource,
-                SqlCommandType.SELECT, modelClass);
+        this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.SELECT, modelClass);
     }
 
-    public void addMappedStatement (Class<?> mapperClass, String id, SqlSource sqlSource, SqlCommandType sqlCommandType, Class<?> resultType) {
+    /**
+     * 注入查询SQL语句
+     * @param batch  是否批量查询
+     * @param mapperClass
+     * @param modelClass
+     * @param table
+     */
+    private void injectSelectSql(boolean batch, Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        SqlMethod sqlMethod = SqlMethod.SELECT_ONE;
+        SqlSource sqlSource = null;
+        String sql = null;
+        if (batch) {
+            sqlMethod = SqlMethod.SELECT_BATCH;
+            StringBuilder ids = new StringBuilder();
+            ids.append("\n<foreach collection=\"list\" item=\"item\" index=\"index\" separator=\",\">\n#{item}</foreach>");
+            sql = String.format(sqlMethod.getSql(), table.getTableName(), table.getTableId(), ids.toString());
+            sqlSource = languageDriver.createSqlSource(configuration, sql, mapperClass);
+        } else {
+            sql = String.format(sqlMethod.getSql(), table.getTableName(), table.getTableId(), table.getTableId());
+            sqlSource = new RawSqlSource(configuration, sql, mapperClass);
+        }
+        System.out.println("inject select(batch) sql: " + sql);
+        this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.SELECT, modelClass);
+    }
+
+    private void addMappedStatement (Class<?> mapperClass, String id, SqlSource sqlSource, SqlCommandType sqlCommandType, Class<?> resultType) {
         this.addMappedStatement(mapperClass, id, sqlSource,
                 sqlCommandType, null, resultType,
                 new NoKeyGenerator(), null, null);
@@ -165,25 +185,72 @@ public class AutoSqlInjector {
         this.addInsertMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource, keyGenerator, keyParam, keyParam);
     }
 
+    public AutoSqlInjector (Configuration configuration) {
+        // object父类的构造方法，在这里应该没有什么用处.
+        super();
+        this.configuration = configuration;
+    }
+
     /**
      * <p>注入更新SQL语句</p>
+     * @param mapperClass
+     * @param modelClass
+     * @param table
      */
     private void injectUpdateSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
-        StringBuilder sqlBuilder = new StringBuilder("UPDATE ").append(table.getTableName()).append(" SET ");
+        SqlMethod sqlMethod = SqlMethod.UPDATE_ONE;
+        StringBuilder set = new StringBuilder();
         List<String> fieldList = table.getFieldList();
         int size = fieldList.size();
+
+        /*
+		 * UPDATE table
+		 * <trim prefix="SET" suffixOverrides="," suffix="WHERE id=#{id}" >...</trim>
+		 */
+        set.append("<trim prefix=\"SET\" suffixOverrides=\",\" suffix=\"WHERE ");
+        set.append(table.getTableId()).append("=#{").append(table.getTableId()).append("}\">");
+
         for (int i = 0; i < size; i++) {
             String fieldName = fieldList.get(i);
-            sqlBuilder.append(fieldName).append("=#{").append(fieldName).append("}");
+            set.append("<if test=\"#{").append(fieldName).append(" != null }\">\n");
+            set.append(fieldName).append("=#{").append(fieldName).append("}");
             if (i < size - 1) {
-                sqlBuilder.append(",");
+                set.append(",");
             }
+            set.append("\n</if>");
         }
-        sqlBuilder.append(" WHERE ").append(table.getTableId()).append("=#{").append(table.getTableId()).append("}");
-        System.out.println("inject update sql: " + sqlBuilder.toString());
-        SqlSource sqlSource = new RawSqlSource(configuration, sqlBuilder.toString(), mapperClass);
-        this.addUpdateMappedStatement(mapperClass, modelClass,
-                SqlMethod.UPDATE_ONE.getMethod(), sqlSource);
+        set.append("\n</trim>");
+
+        String sql = String.format(sqlMethod.getSql(), table.getTableName(), set.toString());
+        System.out.println("inject update sql: " + sql);
+        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, mapperClass);
+        this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
+    }
+
+    /**
+     * 注入删除 SQL 语句
+     * @param batch  是否批量
+     * @param mapperClass
+     * @param modelClass
+     * @param table
+     */
+    private void injectDeleteSql(boolean batch, Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        SqlMethod sqlMethod = SqlMethod.DELETE_ONE;
+        SqlSource sqlSource = null;
+        if (batch) {
+            sqlMethod = SqlMethod.DELETE_BATCH;
+            StringBuilder ids = new StringBuilder();
+            ids.append("\n<foreach item=\"item\" index=\"index\" collection=\"list\" separator=\",\">");
+            ids.append("#{item}");
+            ids.append("\n</foreach>");
+            String sql = String.format(sqlMethod.getSql(), table.getTableName(), table.getTableId(), ids.toString());
+            sqlSource = languageDriver.createSqlSource(configuration, sql.toString(), modelClass);
+        } else {
+            String sql = String.format(sqlMethod.getSql(), table.getTableName(), table.getTableId(), table.getTableId());
+            sqlSource = new RawSqlSource(configuration, sql, Object.class);
+        }
+        //System.out.println("inject delete(batch) sql: " + sqlSource.getBoundSql(null).getSql());
+        this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.DELETE, null);
     }
 
     private MappedStatement addMappedStatement(Class<?> mapperClass, SqlMethod sm, SqlSource sqlSource,
