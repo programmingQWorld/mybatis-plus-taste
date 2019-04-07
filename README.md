@@ -1,12 +1,16 @@
-# mybatis-plus
+![mybatis-plus](http://git.oschina.net/uploads/images/2016/0218/124639_f4ea3095_12260.png "mybatis 增强工具包")
 
-(personal taste，以下内容均为mybatis-plus官方提供，与本人无关)
+#mybatis-plus
 
-mybatis 增强工具包，简化开发基本 CURD 操作。
+mybatis 增强工具包，简化 CURD 操作。
 
-> mybatis + 只做增强不做改变，这里不提倡 sql 写在代码中。
+
+> 启动加载 XML 配置时注入单表 SQL 操作 ，为 简化开发工作 提高生产率 而生。
+
+> Mybatis + 只做增强不做改变，这里不提倡 sql 写在代码中。
 
 > 技术讨论 QQ 群 492238239
+
 
 Maven 坐标
 ===========
@@ -19,14 +23,13 @@ Maven 坐标
 ```
 
 
-
 功能
 ===========
-1、单表 CURD 自动完成
+1、单表 CURD （简单 + 批量）操作，自动完成。
 
 2、分页插件，Count 查询 自动 或 自定义 SQL 查询。
 
-3、Spring 根据不同环境加载不同配置支持
+3、Spring 根据不同环境加载不同配置支持。
 
 
 Usage
@@ -38,7 +41,9 @@ com.baomidou.mybatisplus.test.AutoGeneratorTest
 com.baomidou.mybatisplus.test.UserMapperTest
 
 
-[java 基于 Cookie 的 SSO 中间件 kisso](http://git.oschina.net/juapk/kisso")
+http://baomidou.com/
+
+[java 基于 Cookie 的 SSO 中间件 kisso](http://git.oschina.net/juapk/kisso)
 
 
 捐赠 mybatis-plus

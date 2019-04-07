@@ -116,16 +116,27 @@ public class AutoSqlInjector {
      */
     private void injectInsertSql (boolean batch, Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
 
+        /*
+		 * INSERT INTO table
+		 * <trim prefix="(" suffix=")" suffixOverrides=",">
+		 * 		<if test="xx != null">xx,</if>
+		 * </trim>
+		 * <trim prefix="values (" suffix=")" suffixOverrides=",">
+		 * 		<if test="xx != null">#{xx},</if>
+		 * </trim>
+		 */
+
         KeyGenerator keyGenerator = new NoKeyGenerator();
         StringBuilder fieldBuilder = new StringBuilder();
         StringBuilder placeholderBuilder = new StringBuilder();
         SqlMethod sqlMethod = SqlMethod.INSERT_ONE;
         if ( batch ) {
             sqlMethod = SqlMethod.INSERT_BATCH;
-            // 批量增加，使用的是mybatis - mapper文件中的 foreach,
-            // 如果有相关括号的疑问，请不要怀疑，它在下面的builder中将会补充
-            placeholderBuilder.append("\n<foreach item=\"item\" index=\"index\" collection=\"list\" separator=\",\">(");
         }
+
+
+        fieldBuilder.append("\n<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n");
+        placeholderBuilder.append("\n<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n");
 
         String keyParam = null;
         if (table.getTableId() != null) {
@@ -154,34 +165,28 @@ public class AutoSqlInjector {
         // 拼接出字符串
         for (int i=0; i<size; i++) {
             String fieldName = fieldLists.get(i);
-            fieldBuilder.append(fieldName);
 
             // if batch : sql => #{item.xx}
             // or not   : sql => #{xx}
-            placeholderBuilder.append("#{");
-            if ( batch ) {
-                placeholderBuilder.append("item.");
-            }
-            placeholderBuilder.append(fieldName).append("}");
 
-            if (i < size - 1) {
-                fieldBuilder.append(",");
-                placeholderBuilder.append(",");
+            if ( !batch ) {
+                fieldBuilder.append("\n<if test=\"").append(fieldName).append(" != null\">");
+                placeholderBuilder.append("\n<if test=\"").append(fieldName).append(" != null\">");
+            }
+            fieldBuilder.append(fieldName).append(",");
+            placeholderBuilder.append("#{").append(batch?"item.":"").append(fieldName).append("},");
+            if ( !batch ) {
+                fieldBuilder.append("</if>");
+                placeholderBuilder.append("</if>");
             }
         }
 
-        if ( batch ) {
-            placeholderBuilder.append(")\n</foreach>");
-        }
+        fieldBuilder.append("\n</trim>");
+        placeholderBuilder.append("\n</trim>");
 
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), fieldBuilder.toString(), placeholderBuilder.toString());
         System.out.println("inject insert(batch) sql: " + sql);
-        SqlSource sqlSource  = null;
-        if ( batch ) {
-            sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
-        } else {
-            sqlSource = new RawSqlSource(configuration, sql, modelClass);
-        }
+        SqlSource sqlSource  = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addInsertMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource, keyGenerator, keyParam, keyParam);
     }
 
@@ -214,9 +219,6 @@ public class AutoSqlInjector {
             String fieldName = fieldList.get(i);
             set.append("<if test=\"#{").append(fieldName).append(" != null }\">\n");
             set.append(fieldName).append("=#{").append(fieldName).append("}");
-            if (i < size - 1) {
-                set.append(",");
-            }
             set.append("\n</if>");
         }
         set.append("\n</trim>");
