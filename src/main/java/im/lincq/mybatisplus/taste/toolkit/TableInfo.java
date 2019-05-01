@@ -1,11 +1,10 @@
 package im.lincq.mybatisplus.taste.toolkit;
 
-import java.lang.reflect.Field;
+import im.lincq.mybatisplus.taste.toolkit.TableFieldInfo;
 import java.util.List;
-
 /**
  * <p>
- * 字段反射辅助类
+ * 数据库表反射信息
  * </p>
  */
 public class TableInfo {
@@ -18,13 +17,17 @@ public class TableInfo {
      */
     private String tableName;
     /**
-     * 表主键ID
+     * 表主键ID 属性名
      */
-    private String tableId;
+    private String keyProperty;
     /**
-     * 表字段列表
+     * 表主键ID 字段名
      */
-    private List<String> fieldList;
+    private String keyColumn;
+    /**
+     * 表非主键字段列表(TableFieldInfo可以从字段属性为映射)
+     */
+    private List<TableFieldInfo> fieldList;
 
     public boolean isAutoIncrement() {
         return autoIncrement;
@@ -42,19 +45,27 @@ public class TableInfo {
         this.tableName = tableName;
     }
 
-    public String getTableId() {
-        return tableId;
+    public String getKeyProperty() {
+        return keyProperty;
     }
 
-    public void setTableId(String tableId) {
-        this.tableId = tableId;
+    public void setKeyProperty(String keyProperty) {
+        this.keyProperty = keyProperty;
     }
 
-    public List<String> getFieldList() {
+    public String getKeyColumn() {
+        return keyColumn;
+    }
+
+    public void setKeyColumn(String keyColumn) {
+        this.keyColumn = keyColumn;
+    }
+
+    public List<TableFieldInfo> getFieldList() {
         return fieldList;
     }
 
-    public void setFieldList(List<String> fieldList) {
+    public void setFieldList(List<TableFieldInfo> fieldList) {
         this.fieldList = fieldList;
     }
 }

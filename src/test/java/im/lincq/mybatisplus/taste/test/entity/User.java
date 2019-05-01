@@ -18,6 +18,18 @@ public class User {
     private String name;
     private int age;
 
+    public Integer getTestType() {
+        return testType;
+    }
+
+    public void setTestType(Integer testType) {
+        this.testType = testType;
+    }
+
+    /* 测试下划线字段命名类型 */
+    @TableField(value = "test_type")
+    private Integer testType = 0;
+
     public User () {
 
     }

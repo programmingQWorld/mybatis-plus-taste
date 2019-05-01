@@ -43,14 +43,14 @@ public class UserMapperTest {
         userMapper.insert(new User(id, null,18));
         sleep();
 
-        List<User> ul = new ArrayList<User>();
+        /*List<User> ul = new ArrayList<User>();
         ul.add(new User(IdWorker.getId(), "insert-batch-1", 12));
         ul.add(new User(IdWorker.getId(), "insert-batch-2", 13));
         ul.add(new User(IdWorker.getId(), "insert-batch-3", 14));
         ul.add(new User(IdWorker.getId(), "delname", 14));
         int rlt = userMapper.insertBatch(ul);
         System.err.println("\n------------------insertBatch----------------------\n result=" + rlt);
-        sleep();
+        sleep();*/
 
         /* 删除 */
         rlt = userMapper.deleteById(id);

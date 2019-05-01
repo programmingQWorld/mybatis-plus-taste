@@ -17,7 +17,13 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface TableField {
 
-    /**
+	/**
+	 * 字段值（驼峰命名方式，该值可无）
+	 */
+	String value() default "";
+
+
+	/**
 	 * 
 	 * <p>
 	 * 是否为数据库表字段

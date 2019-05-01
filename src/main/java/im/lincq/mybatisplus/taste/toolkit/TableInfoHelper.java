@@ -29,7 +29,7 @@ public class TableInfoHelper {
      * @param clazz  反射对象
      * @return            tableInfo
      */
-    public static TableInfo getTableInfo(Class<?> clazz) {
+    public synchronized static TableInfo getTableInfo(Class<?> clazz) {
         TableInfo ti = tableInfoCache.get(clazz.getName());
         if (ti != null) {
             return ti;
@@ -45,17 +45,35 @@ public class TableInfoHelper {
             tableInfo.setTableName(camelToUnderline(clazz.getSimpleName()));
         }
 
-        List<String> fieldList = new ArrayList<String>();
+        List<TableFieldInfo> fieldList = new ArrayList<TableFieldInfo>();
         for (Field field : list) {
             /* 主键ID */
             TableId tableId = field.getAnnotation(TableId.class);
             if (tableId != null) {
                 tableInfo.setAutoIncrement(tableId.auto());
-                tableInfo.setTableId(field.getName());
+                if (!"".equals(tableId.value())) {
+                    /*主键字段名称可能会和当前属性名称不一样，plus遵循当前的注解value配置主键字段名称*/
+                    tableInfo.setKeyColumn(tableId.value());
+                }
+                tableInfo.setKeyProperty(field.getName());
                 continue;
             }
-            /* 字段 */
-            fieldList.add(field.getName());
+            /* 字段 也支持通过注解自定义映射表字段 */
+            TableField tableField = field.getAnnotation(TableField.class);
+
+            if (!"".equals(tableField.value())) {
+                /* TableFieldInfo 第二个参数,
+                   前面一直认为这里需要对column字段进行驼峰转下划线格式才行,
+                   现在想来是不用的,在注解上完成正确的字段名称填写即可.
+                   在后面的版本中,好像也是按照这样的方式进行的,无需转换就不用做处理,
+                   属性名和字段名对应不上就在注解上填写正确的字段名称.
+                   */
+                fieldList.add(new TableFieldInfo(true, tableField.value(), field.getName()));
+                continue;
+            }
+
+            /* 不需要自定义映射表字段 */
+            fieldList.add(new TableFieldInfo( field.getName() ));
         }
 
         /* 字段列表 */
@@ -83,7 +101,7 @@ public class TableInfoHelper {
     }
 
     /**
-     * 获取该类的所有字符列表
+     * 获取该类的所有属性列表
      * @param clazz 反射对象
      * @return            List<Field>
      */
