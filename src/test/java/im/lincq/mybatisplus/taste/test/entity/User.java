@@ -13,37 +13,32 @@ public class User {
     private static final long serialVersionUID = 1L;
 
     /* 主键ID， auto属性true自增 false非自增 默认true */
-    @TableId(auto = false)
-    private long id;
+    @TableId(value="test_id", auto = false)
+    private Long id;
     private String name;
-    private int age;
-
-    public Integer getTestType() {
-        return testType;
-    }
-
-    public void setTestType(Integer testType) {
-        this.testType = testType;
-    }
+    private Integer age;
 
     /* 测试下划线字段命名类型 */
-    @TableField(value = "test_type")
-    private Integer testType = 0;
+    //@TableField(value = "test_type")
+    //private Integer testType;
+
 
     public User () {
-
+    }
+    public User(String name) {
+        this.name = name;
     }
     public User(String name, int age) {
         this.name = name;
         this.age = age;
     }
-    public User(long id, String name, int age) {
+    public User(Long id, String name, int age) {
         this.id = id;
         this.name = name;
         this.age = age;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -59,7 +54,7 @@ public class User {
         this.name = name;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 

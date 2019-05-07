@@ -35,7 +35,11 @@ public class UserMapperTest {
         SqlSession session = sessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
         System.err.println(" debug run 查询执行 user 表数据变化！ ");
-        session.delete("deleteAll");
+        //session.delete("deleteAll");
+
+        System.err.println("\n------------------selectOne----------------------");
+        User one = userMapper.selectOne(new User("MybatisPlus"));
+        print(one);
 
         /* 插入*/
         System.out.println("\n------------------insert---------name为空-------------\n name=null, age=18");
@@ -51,6 +55,8 @@ public class UserMapperTest {
         int rlt = userMapper.insertBatch(ul);
         System.err.println("\n------------------insertBatch----------------------\n result=" + rlt);
         sleep();*/
+
+        int rlt = 0;
 
         /* 删除 */
         rlt = userMapper.deleteById(id);
@@ -112,6 +118,10 @@ public class UserMapperTest {
      */
     private static void print(User user){
         sleep();
+        if (user == null) {
+            System.out.println("UserMapperTest::print()::当前传入参数为空，无法正常输出");
+            return;
+        }
         System.out.println("名字：" + user.getName() + "年龄：" + user.getAge() + " id" + user.getId());
     }
 

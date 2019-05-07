@@ -51,6 +51,7 @@ public class TableInfoHelper {
             TableId tableId = field.getAnnotation(TableId.class);
             if (tableId != null) {
                 tableInfo.setAutoIncrement(tableId.auto());
+                tableInfo.setKeyColumn(field.getName());
                 if (!"".equals(tableId.value())) {
                     /*主键字段名称可能会和当前属性名称不一样，plus遵循当前的注解value配置主键字段名称*/
                     tableInfo.setKeyColumn(tableId.value());
@@ -61,7 +62,7 @@ public class TableInfoHelper {
             /* 字段 也支持通过注解自定义映射表字段 */
             TableField tableField = field.getAnnotation(TableField.class);
 
-            if (!"".equals(tableField.value())) {
+            if (tableField != null && tableField.value() != null && !"".equals(tableField.value())) {
                 /* TableFieldInfo 第二个参数,
                    前面一直认为这里需要对column字段进行驼峰转下划线格式才行,
                    现在想来是不用的,在注解上完成正确的字段名称填写即可.

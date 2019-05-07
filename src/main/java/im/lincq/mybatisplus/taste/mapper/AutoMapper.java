@@ -42,7 +42,12 @@ public interface AutoMapper<T> {
 
 
     /**
+     * 根据entity查询一条记录
+     */
+    T selectOne(T entity);
+
+    /**
      * 查询全部
      * */
-    public List<T > selectAll ();
+    List<T > selectAll ();
 }
