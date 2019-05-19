@@ -16,7 +16,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MyBatisPlus 测试类
+ *
+ * RUN 测试
+ *
+ * <p>
+ * MybatisPlus 加载 SQL 顺序：
+ * </p>
+ * 1、加载XML中的SQL<br>
+ * 2、加载sqlProvider中的SQL<br>
+ * 3、xmlSql 与 sqlProvider不能包含相同的SQL<br>
+ * <br>
+ * 调整后的SQL优先级：xmlSql > sqlProvider > crudSql
+ * <br>
  */
 public class UserMapperTest {
     private static final String RESOUCE = "mybatis-config.xml";
@@ -37,14 +48,10 @@ public class UserMapperTest {
         System.err.println(" debug run 查询执行 user 表数据变化！ ");
         //session.delete("deleteAll");
 
-        System.err.println("\n------------------selectOne----------------------");
-        User one = userMapper.selectOne(new User("MybatisPlus"));
-        print(one);
-
         /* 插入*/
         System.out.println("\n------------------insert---------name为空-------------\n name=null, age=18");
         Long id = IdWorker.getId();
-        userMapper.insert(new User(id, null,18));
+        userMapper.insert(new User(id, "lincq",18));
         sleep();
 
         /*List<User> ul = new ArrayList<User>();
@@ -74,7 +81,8 @@ public class UserMapperTest {
         sleep();
 
         /* 修改[updateById 是从 AutoMapper 中继承而来的，UserMapper.xml中并没有申明改sql] */
-        User user = userMapper.selectById(12L);
+        User user = new User();
+        user.setId(1);
         user.setName("lin-cq :: MybatisPlus_" + System.currentTimeMillis());
         rlt = userMapper.updateById(user);
         System.err.println("\n------------------updateById----------------------\n result=" + rlt);
@@ -83,8 +91,13 @@ public class UserMapperTest {
         /*
 		 * 此处的 selectById 被UserMapper.xml中的 selectById 覆盖了
 		 */
+        System.err.println("\n------------------selectById----------------------");
         user = userMapper.selectById(user.getId());
         print(user);
+
+        System.err.println("\n------------------selectOne----------------------");
+        User one = userMapper.selectOne(new User("lincq"));
+        print(one);
 
         System.err.println("\n------------------selectBatchIds----------------------");
         List<Object> idList = new ArrayList<Object>();
@@ -93,19 +106,23 @@ public class UserMapperTest {
         List<User> ul1 = userMapper.selectBatchIds(idList);
         ul1.forEach(UserMapperTest::print);
 
-        System.err.println("\n------------------selectAll----------------------");
-        List<User> userList = userMapper.selectAll();
+        System.err.println("\n------------------selectAll_list --- 查询testType = 1 的所有数据----------------------");
+        List<User> userList = userMapper.selectList(RowBounds.DEFAULT, new User(1));
         userList.forEach(UserMapperTest::print);
 
-        System.err.println("\n------------------list 分页查询，查询总数----------------------");
-        Pagination pagination = new Pagination(0, 2);
-        List<User> pageList = userMapper.list(pagination);
-        pageList.forEach(UserMapperTest::print);
-        System.out.println("本次查询的总数是:" + pagination.getTotal());
-        System.out.println(pagination);
+        System.err.println("\n------------------分页查询 --- 查询页中 testType = 1 的所有数据----------------------");
+        Pagination pagination = new Pagination(1, 2);
+        List<User> paginList = userMapper.selectList(pagination, new User(1));
+        paginList.forEach(UserMapperTest::print);
+
+        System.err.println("翻页： " + pagination.toString());
+
+        System.err.println("\n---------------xml---selectListRow 分页查询，不查询总数（此时可自定义 count 查询）----无查询条件--------------");
+        List<User> rowList = userMapper.selectListRow(new RowBounds(0, 2));
+        rowList.forEach(UserMapperTest::print);
 
         /* 删除测试数据 */
-        rlt = session.delete("deleteAll");
+        //rlt = session.delete("deleteAll");
         System.err.println("清空测试数据！ rlt=" + rlt);
 
         // 提交
@@ -122,7 +139,7 @@ public class UserMapperTest {
             System.out.println("UserMapperTest::print()::当前传入参数为空，无法正常输出");
             return;
         }
-        System.out.println("名字：" + user.getName() + "年龄：" + user.getAge() + " id" + user.getId());
+        System.out.println("名字：" + user.getName() + "年龄：" + user.getAge() + " id" + user.getId() + "test_type：" + user.getTestType());
     }
 
     /**

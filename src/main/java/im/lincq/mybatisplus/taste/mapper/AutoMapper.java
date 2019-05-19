@@ -1,5 +1,7 @@
 package im.lincq.mybatisplus.taste.mapper;
 
+import org.apache.ibatis.session.RowBounds;
+
 import java.util.List;
 
 /**
@@ -47,7 +49,9 @@ public interface AutoMapper<T> {
     T selectOne(T entity);
 
     /**
-     * 查询全部
+     * 根据 entity 分页查询全部记录
+     * @param rowBounds  分页查询条件（可以为 null）
+     * @param  entity           实体对象（可以为 null）
      * */
-    List<T > selectAll ();
+    List<T > selectList (RowBounds rowBounds, T entity);
 }

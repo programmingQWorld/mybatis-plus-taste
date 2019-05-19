@@ -58,7 +58,7 @@ public class AutoSqlInjector {
             this.injectSelectSql(false, mapperClass, modelClass, table);
             this.injectSelectSql(true, mapperClass, modelClass, table);
             this.injectSelectByEntitySql(SqlMethod.SELECT_ONE, mapperClass, modelClass, table);
-            this.injectSelectByEntitySql(SqlMethod.SELECT_ALL, mapperClass, modelClass, table);
+            this.injectSelectByEntitySql(SqlMethod.SELECT_LIST, mapperClass, modelClass, table);
 
         } else {
             System.err.println(String.format("%s, The unknown primary key, cannot use the generic method",
@@ -211,7 +211,7 @@ public class AutoSqlInjector {
         for (int i = 0; i < size; i++) {
             TableFieldInfo fieldInfo = fieldList.get(i);
             set.append("<if test=\"#{").append(fieldInfo.getProperty()).append(" != null }\">\n");
-            set.append(fieldInfo.getColumn()).append("=#{").append(fieldInfo.getProperty()).append("}");
+            set.append(fieldInfo.getColumn()).append("=#{").append(fieldInfo.getProperty()).append("}").append(",");
             set.append("\n</if>");
         }
         set.append("\n</trim>");
@@ -349,7 +349,7 @@ public class AutoSqlInjector {
         // 其它成员
         List<TableFieldInfo> fieldList = table.getFieldList();
         for (TableFieldInfo fieldInfo : fieldList) {
-            where.append("\n<if test=\"").append(fieldInfo.getColumn()).append(" != null\">");
+            where.append("\n<if test=\"").append(fieldInfo.getProperty()).append(" != null\">");
             where.append("\nAND  ").append(fieldInfo.getColumn()).append(" = #{").append(fieldInfo.getProperty()).append("}");
             where.append("\n</if>");
         }
@@ -371,7 +371,8 @@ public class AutoSqlInjector {
         }
         /*
         getActualTypeArguments方法：
-        返回Type对象的数组，表示此对象的实际类型参数(type args，指的应该就是泛型参数的实际类型). 注意在某些情况下，返回的数组为空，比如类型无泛型约束
+        返回Type对象的数组，表示此对象的实际类型参数(type args，
+        指的应该就是泛型参数的实际类型). 注意在某些情况下，返回的数组为空，比如类型无泛型约束
         */
         Type[] parameters = target.getActualTypeArguments();
         return (Class<?>)parameters[0];

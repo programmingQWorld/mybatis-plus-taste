@@ -19,11 +19,14 @@ public class User {
     private Integer age;
 
     /* 测试下划线字段命名类型 */
-    //@TableField(value = "test_type")
-    //private Integer testType;
+    @TableField(value = "test_type")
+    private Integer testType;
 
 
     public User () {
+    }
+    public User(Integer testType) {
+        this.testType = testType;
     }
     public User(String name) {
         this.name = name;
@@ -36,6 +39,12 @@ public class User {
         this.id = id;
         this.name = name;
         this.age = age;
+    }
+    public User(Long id, String name, int age, Integer testType) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.testType = testType;
     }
 
     public Long getId() {
@@ -62,7 +71,25 @@ public class User {
         this.age = age;
     }
 
+    public static long getSerialVersionUID() {
+        return serialVersionUID;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public Integer getTestType() {
+        return testType;
+    }
+
+    public void setTestType(Integer testType) {
+        this.testType = testType;
+    }
 
     /**
      * 测试类型

@@ -1,5 +1,6 @@
 package im.lincq.mybatisplus.taste.plugins.pagination;
 
+import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import org.apache.ibatis.session.RowBounds;
 
 /**
@@ -22,32 +23,21 @@ public class Pagination extends RowBounds {
     }
 
     /**
-     * 在不知道总记录条数的情况下，使用该构造函数
-     * 分页插件将会自动查询总记录条数并设置
-     * @param offset  偏移量
-     * @param limit     界限
-     */
-    public Pagination(int offset, int limit) {
-        super(offset, limit);
-        this.size = limit;
-    }
-
-    /**
      * 该构造函数会自动计算偏移量和界限值
      * 请注意：在知道总记录条数的情况下，插件是不会再查询总记录条数的
      * @param current  当前页
      * @param size         每页显示条数
-     * @param total       总条数
      */
-    public Pagination(int current, int size, int total) {
+    public Pagination(int current, int size) {
         super((current - 1) * size, size);
-        this.total = total;
-        this.size = size;
-        this.current = current;
-        this.pages = total | size;
-        if (total % size != 0) {
-            this.pages ++;
+
+        if (current <= 0) {
+            throw new MybatisPlusException("current must be greater than zero.");
         }
+
+        this.current = current;
+        this.size = size;
+
     }
 
     public boolean hasPrevious() {
@@ -64,12 +54,10 @@ public class Pagination extends RowBounds {
 
     public void setTotal (int total) {
         this.total = total;
-        this.size = this.getLimit();
         this.pages = this.total / this.size;
         if (this.total % this.size != 0) {
             this.pages++;
         }
-        this.current = this.getOffset() / this.size + 1;
     }
 
     public int getSize() {

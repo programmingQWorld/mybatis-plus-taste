@@ -23,6 +23,6 @@ public interface UserMapper extends AutoMapper<User> {
      * @param pagination  分页对象，原型为 RowBounds，传递参数包含该属性，mybatis-plus分页拦截器会拦截处理该对象
      * @return 查询结果集
      */
-    List<User> list (RowBounds pagination);
+    List<User> selectListRow (RowBounds pagination);
 
 }
