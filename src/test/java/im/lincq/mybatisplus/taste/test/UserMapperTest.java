@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste.test;
 
 import im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder;
+import im.lincq.mybatisplus.taste.plugins.pagination.Page;
 import im.lincq.mybatisplus.taste.plugins.pagination.Pagination;
 import im.lincq.mybatisplus.taste.test.entity.User;
 import im.lincq.mybatisplus.taste.test.mapper.UserMapper;
@@ -63,6 +64,13 @@ public class UserMapperTest {
         System.err.println("\n------------------insertBatch----------------------\n result=" + rlt);
         sleep();*/
 
+        System.err.println("\n------------------分页page查询 --- 查询页中 testType = 1 的所有数据----------------------");
+        Page<User> page = new Page<>(1, 2);
+        List<User> paginSecList = userMapper.selectList(page, new User(0));
+        page.setRecords(paginSecList);
+        paginSecList.forEach(UserMapperTest::print);
+
+
         int rlt = 0;
 
         /* 删除 */
@@ -110,7 +118,7 @@ public class UserMapperTest {
         List<User> userList = userMapper.selectList(RowBounds.DEFAULT, new User(1));
         userList.forEach(UserMapperTest::print);
 
-        System.err.println("\n------------------分页查询 --- 查询页中 testType = 1 的所有数据----------------------");
+        System.err.println("\n------------------分页pagination查询 --- 查询页中 testType = 1 的所有数据----------------------");
         Pagination pagination = new Pagination(1, 2);
         List<User> paginList = userMapper.selectList(pagination, new User(1));
         paginList.forEach(UserMapperTest::print);
