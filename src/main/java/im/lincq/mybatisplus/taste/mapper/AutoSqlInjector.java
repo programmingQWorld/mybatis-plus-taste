@@ -1,5 +1,6 @@
 package im.lincq.mybatisplus.taste.mapper;
 
+import im.lincq.mybatisplus.taste.annotations.IdType;
 import im.lincq.mybatisplus.taste.toolkit.TableFieldInfo;
 import im.lincq.mybatisplus.taste.toolkit.TableInfo;
 import im.lincq.mybatisplus.taste.toolkit.TableInfoHelper;
@@ -139,7 +140,7 @@ public class AutoSqlInjector {
         String keyColumn = null;
         if (table.getKeyColumn() != null) {
             /* 自增主键 */
-            if (table.isAutoIncrement()) {
+            if (table.getIdType() == IdType.AUTO_INCREMENT) {
                 keyGenerator = new Jdbc3KeyGenerator();
                 keyProperty = table.getKeyProperty();
                 keyColumn = table.getKeyColumn();

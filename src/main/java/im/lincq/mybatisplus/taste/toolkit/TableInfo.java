@@ -1,5 +1,6 @@
 package im.lincq.mybatisplus.taste.toolkit;
 
+import im.lincq.mybatisplus.taste.annotations.IdType;
 import im.lincq.mybatisplus.taste.toolkit.TableFieldInfo;
 import java.util.List;
 /**
@@ -9,9 +10,9 @@ import java.util.List;
  */
 public class TableInfo {
     /**
-     * 表主键ID是否自增
+     * 表主键ID 类型
      */
-    private boolean autoIncrement;
+    private IdType idType;
     /**
      * 表名称
      */
@@ -29,12 +30,12 @@ public class TableInfo {
      */
     private List<TableFieldInfo> fieldList;
 
-    public boolean isAutoIncrement() {
-        return autoIncrement;
+    public IdType getIdType() {
+        return this.idType;
     }
 
-    public void setAutoIncrement(boolean autoIncrement) {
-        this.autoIncrement = autoIncrement;
+    public void setIdType(IdType idType) {
+        this.idType = idType;
     }
 
     public String getTableName() {

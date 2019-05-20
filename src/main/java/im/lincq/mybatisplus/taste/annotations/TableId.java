@@ -19,12 +19,8 @@ public @interface TableId {
 
 
     /**
-     * 主键ID，默认true标记数据库主键自增
-     * <p>
-     *     若设置为false,需要用户传入ID内容，工具包IdWorker可产生全局唯一 ID
-     * </p>
-     * {@link im.lincq.mybatisplus.taste.toolkit.IdWorker}
-     * @return
+     * 主键ID，默认 ID 自增
+     * {@link im.lincq.mybatisplus.taste.annotations.IdType}
      */
-    boolean auto() default true;
+    IdType type() default IdType.AUTO_INCREMENT;
 }
