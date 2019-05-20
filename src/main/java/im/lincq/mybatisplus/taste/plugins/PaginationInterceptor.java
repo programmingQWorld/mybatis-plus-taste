@@ -109,7 +109,7 @@ public class PaginationInterceptor implements Interceptor {
      */
     public void count (String sql, Connection connection, MappedStatement mappedStatement, BoundSql boundSql, Pagination page) {
         // sql: 获取总记录数量
-        StringBuffer countSql = new StringBuffer("SELECT COUNT(0) FROM (");
+        StringBuffer countSql = new StringBuffer("SELECT COUNT(1) FROM (");
         countSql.append(sql.replace(";", "")).append(") AS TOTAL");
 
         /* 不支持 order by 查询 */
@@ -124,8 +124,10 @@ public class PaginationInterceptor implements Interceptor {
         try  {
             pstmt = connection.prepareStatement(countSql.toString());
             // 下面的这2句不太懂意思.或许是跟sql语句参数设置相关.
-            BoundSql countBS = new BoundSql(mappedStatement.getConfiguration(), countSql.toString(), boundSql.getParameterMappings(), boundSql.getParameterObject());
+            BoundSql countBS = new BoundSql(mappedStatement.getConfiguration(), countSql.toString(),
+                    boundSql.getParameterMappings(), boundSql.getParameterObject());
             ParameterHandler parameterHandler = new DefaultParameterHandler(mappedStatement, boundSql.getParameterObject(), countBS);
+            parameterHandler.setParameters(pstmt);
             rs = pstmt.executeQuery();
             int total = 0;
             if (rs.next()) {
