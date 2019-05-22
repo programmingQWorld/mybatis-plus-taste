@@ -17,6 +17,15 @@ public class TableInfo {
      * 表名称
      */
     private String tableName;
+
+    /**
+     * <p>
+     * 主键是否有存在 && 字段名与属性名关联
+     * </p>
+     * true , false
+     */
+    private boolean keyRelated = false;
+
     /**
      * 表主键ID 属性名
      */
@@ -68,5 +77,13 @@ public class TableInfo {
 
     public void setFieldList(List<TableFieldInfo> fieldList) {
         this.fieldList = fieldList;
+    }
+
+    public boolean isKeyRelated() {
+        return keyRelated;
+    }
+
+    public void setKeyRelated(boolean keyRelated) {
+        this.keyRelated = keyRelated;
     }
 }

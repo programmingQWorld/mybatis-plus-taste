@@ -136,25 +136,22 @@ public class AutoSqlInjector {
 
         // keyProperty 主键 属性名
         // keyColumn  主键 字段名
-        String keyProperty = null;
-        String keyColumn = null;
-        if (table.getKeyColumn() != null) {
+        String keyProperty = table.getKeyProperty();
+        String keyColumn = table.getKeyColumn();
+
+        if (table.getIdType() == IdType.AUTO_INCREMENT) {
             /* 自增主键 */
-            if (table.getIdType() == IdType.AUTO_INCREMENT) {
-                keyGenerator = new Jdbc3KeyGenerator();
-                keyProperty = table.getKeyProperty();
-                keyColumn = table.getKeyColumn();
-                if (keyColumn == null) {
-                    keyColumn = table.getKeyProperty();
-                }
-            } else {
-                /* 非自增，用户生成 */
-                fieldBuilder.append(table.getKeyColumn()).append(",");
-                placeholderBuilder.append("#{").append(table.getKeyProperty()).append("},");
-            }
-
+            keyGenerator = new Jdbc3KeyGenerator();
+        } else if (table.getIdType() == IdType.ID_WORKER) {
+                /* IdWorker生成全局唯一ID */
+            keyGenerator = new IdWorkerKeyGenerator();
+        } else {
+                /* key 属性置空，用户输入ID*/
+            keyColumn = null;
+            keyProperty = null;
+            fieldBuilder.append(table.getKeyColumn()).append(",");
+            placeholderBuilder.append("#{").append(table.getKeyProperty()).append("},");
         }
-
 
         List<TableFieldInfo> fieldLists = table.getFieldList();
 
@@ -320,7 +317,7 @@ public class AutoSqlInjector {
 
         // 获取主键,属性
         StringBuilder columns = new StringBuilder();
-        if (table.getKeyColumn() != null) {
+        if (table.isKeyRelated()) {
             columns.append(table.getKeyColumn()).append(" AS ").append(table.getKeyProperty());
         } else {
             columns.append(table.getKeyProperty());

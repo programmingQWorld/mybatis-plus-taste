@@ -50,11 +50,12 @@ public class TableInfoHelper {
             /* 主键ID */
             TableId tableId = field.getAnnotation(TableId.class);
             if (tableId != null) {
-                tableInfo.setIdType(tableId.type());
-                tableInfo.setKeyColumn(field.getName());
                 if (!"".equals(tableId.value())) {
                     /*主键字段名称可能会和当前属性名称不一样，plus遵循当前的注解value配置主键字段名称*/
                     tableInfo.setKeyColumn(tableId.value());
+                    tableInfo.setKeyRelated(true);
+                } else {
+                    tableInfo.setKeyColumn(field.getName());
                 }
                 tableInfo.setKeyProperty(field.getName());
                 continue;
