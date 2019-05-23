@@ -9,7 +9,6 @@ public enum IdType {
     /* ... */
     AUTO_INCREMENT("0", "数据库ID自增"),
     ID_INPUT("1", "用户输入ID"),
-    ID_WORKER("2", "IdWorkerKeyGenerator生成全局唯一ID工具类");
     ;
 
     /** 主键 */
