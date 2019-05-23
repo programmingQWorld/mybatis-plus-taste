@@ -22,5 +22,5 @@ public @interface TableId {
      * 主键ID，默认 ID 自增
      * {@link im.lincq.mybatisplus.taste.annotations.IdType}
      */
-    IdType type() default IdType.AUTO_INCREMENT;
+    IdType type() default IdType.AUTO;
 }

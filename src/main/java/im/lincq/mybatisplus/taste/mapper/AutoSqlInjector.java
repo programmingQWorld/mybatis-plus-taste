@@ -139,13 +139,13 @@ public class AutoSqlInjector {
         String keyProperty = table.getKeyProperty();
         String keyColumn = table.getKeyColumn();
 
-        if (table.getIdType() == IdType.AUTO_INCREMENT) {
+        if (table.getIdType() == IdType.AUTO) {
             /* 自增主键 */
             keyGenerator = new Jdbc3KeyGenerator();
+            keyColumn = table.getKeyColumn();
+            keyProperty = table.getKeyProperty();
         } else {
-                /* key 属性置空，用户输入ID*/
-            keyColumn = null;
-            keyProperty = null;
+            /* 用户输入ID*/
             fieldBuilder.append(table.getKeyColumn()).append(",");
             placeholderBuilder.append("#{").append(table.getKeyProperty()).append("},");
         }
