@@ -112,12 +112,6 @@ public class PaginationInterceptor implements Interceptor {
         StringBuffer countSql = new StringBuffer("SELECT COUNT(1) FROM (");
         countSql.append(sql.replace(";", "")).append(") AS TOTAL");
 
-        /* 不支持 order by 查询 */
-        if (sql == null || sql.toUpperCase().contains("ORDER BY")) {
-            System.out.println("Execute SQL: " + countSql.toString());
-            new MybatisPlusException("Consider SQL Performance Not Support ORDER BY");
-        }
-
         PreparedStatement pstmt = null;
         ResultSet rs = null;
 

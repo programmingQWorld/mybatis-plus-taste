@@ -1,4 +1,6 @@
-package im.lincq.mybatisplus.taste.plugins.pagination;
+package im.lincq.mybatisplus.taste.plugins;
+
+import im.lincq.mybatisplus.taste.plugins.pagination.Pagination;
 
 import java.util.Collections;
 import java.util.List;

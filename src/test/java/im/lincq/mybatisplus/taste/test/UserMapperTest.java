@@ -1,7 +1,7 @@
 package im.lincq.mybatisplus.taste.test;
 
 import im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder;
-import im.lincq.mybatisplus.taste.plugins.pagination.Page;
+import im.lincq.mybatisplus.taste.plugins.Page;
 import im.lincq.mybatisplus.taste.plugins.pagination.Pagination;
 import im.lincq.mybatisplus.taste.test.entity.User;
 import im.lincq.mybatisplus.taste.test.mapper.UserMapper;
