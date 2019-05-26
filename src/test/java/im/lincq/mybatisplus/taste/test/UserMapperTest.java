@@ -84,8 +84,10 @@ public class UserMapperTest {
         rlt = userMapper.deleteBatchIds(ids);
         System.err.println("\n------------------deleteBatchIds----------------------\n result=" + rlt);
 
-        rlt = userMapper.deleteByName("delname");
-        System.err.println("\n------------------deleteByName----------------------\n result=" + rlt);
+        User deleteSelective = new User();
+        deleteSelective.setName("lincq");
+        rlt = userMapper.deleteSelective(deleteSelective);
+        System.err.println("\n------------------deleteBySelective----------------------\n result=" + rlt);
         sleep();
 
         /* 修改[updateById 是从 AutoMapper 中继承而来的，UserMapper.xml中并没有申明改sql] */

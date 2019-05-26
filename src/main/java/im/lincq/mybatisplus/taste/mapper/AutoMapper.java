@@ -22,6 +22,11 @@ public interface AutoMapper<T> {
     public int deleteById(Object id);
 
     /**
+     * 根据 entity 条件删除记录
+     */
+    public int deleteSelective(T record);
+
+    /**
      * 根据ID修改
      * */
     public int updateById(T entity);

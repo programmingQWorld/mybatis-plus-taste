@@ -2,10 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="im.lincq.mybatisplus.taste.test.mapper.UserMapper">
 
-    <delete id="deleteByName" parameterType="java.lang.String">
-        DELETE FROM user WHERE name = #{name};
-    </delete>
-
     <!-- 建议字段，采用驼峰命名方法，不然很麻烦（lincq:大佬应该也是遇到和我上回一致的问题，不然他应该早就做sql注入了） -->
     <select id="selectListRow" resultType="User">
         select test_id AS id,name,age,test_type AS testType from user

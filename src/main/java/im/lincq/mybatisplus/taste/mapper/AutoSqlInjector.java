@@ -48,6 +48,7 @@ public class AutoSqlInjector {
             this.injectInsertSql(mapperClass, modelClass, table);
 
             /* 删除 */
+            this.injectDeleteSelectiveSql(mapperClass, modelClass, table);
             this.injectDeleteSql(false, mapperClass, modelClass, table);
             this.injectDeleteSql(true, mapperClass, modelClass, table);
             System.out.println("The modelClass is  (User ???)" + modelClass);
@@ -203,8 +204,7 @@ public class AutoSqlInjector {
         set.append("<trim prefix=\"SET\" suffixOverrides=\",\" suffix=\"WHERE ");
         set.append(table.getKeyColumn()).append("=#{").append(table.getKeyProperty()).append("}\">");
 
-        for (int i = 0; i < size; i++) {
-            TableFieldInfo fieldInfo = fieldList.get(i);
+        for (TableFieldInfo fieldInfo : fieldList) {
             set.append("<if test=\"#{").append(fieldInfo.getProperty()).append(" != null }\">\n");
             set.append(fieldInfo.getColumn()).append("=#{").append(fieldInfo.getProperty()).append("}").append(",");
             set.append("\n</if>");
@@ -217,12 +217,17 @@ public class AutoSqlInjector {
         this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
     }
 
+    private void injectDeleteSelectiveSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        SqlMethod sqlMethod = SqlMethod.DELETE_SELECTIVE;
+        String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhere(table));
+        logger.info("inject delete selective sql : {}", sql);
+        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
+        this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.DELETE, null);
+    }
+
     /**
      * 注入删除 SQL 语句
      * @param batch  是否批量
-     * @param mapperClass
-     * @param modelClass
-     * @param table
      */
     private void injectDeleteSql(boolean batch, Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
         SqlMethod sqlMethod = SqlMethod.DELETE_BY_ID;

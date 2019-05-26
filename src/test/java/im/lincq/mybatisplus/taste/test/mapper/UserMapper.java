@@ -12,13 +12,6 @@ import java.util.List;
 public interface UserMapper extends AutoMapper<User> {
 
     /**
-     * 根据用户名删除用户
-     * @param name 用户名
-     * @return             row
-     */
-    int deleteByName(String name);
-
-    /**
      * 用户列表，分页显示
      * @param pagination  分页对象，原型为 RowBounds，传递参数包含该属性，mybatis-plus分页拦截器会拦截处理该对象
      * @return 查询结果集
