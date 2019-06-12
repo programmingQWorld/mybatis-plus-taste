@@ -55,14 +55,14 @@ public class UserMapperTest {
         userMapper.insert(new User(id, "lincq",18));
         sleep();
 
-        /*List<User> ul = new ArrayList<User>();
-        ul.add(new User(IdWorker.getId(), "insert-batch-1", 12));
-        ul.add(new User(IdWorker.getId(), "insert-batch-2", 13));
-        ul.add(new User(IdWorker.getId(), "insert-batch-3", 14));
-        ul.add(new User(IdWorker.getId(), "delname", 14));
+        List<User> ul = new ArrayList<User>();
+        ul.add(new User("insert-batch-1", 12, 0));
+        ul.add(new User( "insert-batch-2", 13, 9));
+        ul.add(new User( "insert-batch-3", 14, 9));
+        ul.add(new User( "delname", 14, 6));
         int rlt = userMapper.insertBatch(ul);
-        System.err.println("\n------------------insertBatch----------------------\n result=" + rlt);
-        sleep();*/
+        System.err.println("\n------------------insertBatch----------------------\n \n\n\n" + rlt);
+        sleep();
 
         System.err.println("\n------------------分页page查询 --- 查询页中 testType = 1 的所有数据----------------------");
         Page<User> page = new Page<>(1, 2);
@@ -71,7 +71,7 @@ public class UserMapperTest {
         paginSecList.forEach(UserMapperTest::print);
 
 
-        int rlt = 0;
+        rlt = 0;
 
         /* 删除 */
         rlt = userMapper.deleteById(id);
@@ -128,12 +128,15 @@ public class UserMapperTest {
         System.err.println("翻页： " + pagination.toString());
 
         System.err.println("\n---------------xml---selectListRow 分页查询，不查询总数（此时可自定义 count 查询）----无查询条件--------------");
-        List<User> rowList = userMapper.selectListRow(new RowBounds(0, 2));
-        rowList.forEach(UserMapperTest::print);
+        //List<User> rowList = userMapper.selectListRow(new RowBounds(0, 2));
+        //rowList.forEach(UserMapperTest::print);
 
         /* 删除测试数据 */
         //rlt = session.delete("deleteAll");
         System.err.println("清空测试数据！ rlt=" + rlt);
+
+        System.err.println("\n------------------insertBatch----------------------\n \n\n\n" + userMapper.insertBatch(ul));
+        sleep();
 
         // 提交
         session.commit();

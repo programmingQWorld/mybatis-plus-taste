@@ -45,7 +45,8 @@ public class AutoSqlInjector {
         if (table.getKeyProperty() != null) {
 
             /* 插入 */
-            this.injectInsertSql(mapperClass, modelClass, table);
+            this.injectInsertSql(false, mapperClass, modelClass, table);
+            this.injectInsertSql(true, mapperClass, modelClass, table);
 
             /* 删除 */
             this.injectDeleteSelectiveSql(mapperClass, modelClass, table);
@@ -112,11 +113,12 @@ public class AutoSqlInjector {
 
     /**
      * 注入 insert sql语句
+     * @param batch               是否为批量插入
      * @param mapperClass  Mapper Class对象
      * @param modelClass    MapperClass对应的实体类Class对象
      * @param table                表名
      */
-    private void injectInsertSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+    private void injectInsertSql (boolean batch, Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
 
         /*
 		 * INSERT INTO table
@@ -132,6 +134,10 @@ public class AutoSqlInjector {
         StringBuilder fieldBuilder = new StringBuilder();
         StringBuilder placeholderBuilder = new StringBuilder();
         SqlMethod sqlMethod = SqlMethod.INSERT_ONE;
+        if (batch) {
+            sqlMethod = SqlMethod.INSERT_BATCH;
+        }
+
         fieldBuilder.append("\n<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n");
         placeholderBuilder.append("\n<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n");
 
@@ -148,30 +154,45 @@ public class AutoSqlInjector {
         } else {
             /* 用户输入ID*/
             fieldBuilder.append(table.getKeyColumn()).append(",");
-            placeholderBuilder.append("#{").append(table.getKeyProperty()).append("},");
+            placeholderBuilder.append("#{").append(batch ? "item." : "");
+            placeholderBuilder.append(table.getKeyProperty()).append("},");
         }
 
         List<TableFieldInfo> fieldLists = table.getFieldList();
 
         int size = fieldLists.size();
         // 拼接出字符串
-        for (int i=0; i<size; i++) {
-            TableFieldInfo fieldInfo = fieldLists.get(i);
-
+        for (TableFieldInfo fieldInfo : fieldLists) {
             // xxx if batch : sql => #{item.xx}
             // xxx or not   : sql => #{xx}
+            // 这里还有一个逻辑，我在前阵子写过自己的代码生成，看到这里的变化，有一些明白
+            // if batch 所有的字段都会使用，不进行实体属性空判断。（因为我们没办法保证每个实体中，成员变量都是一致空或非空）
+            // or not    进行属性空判断。
 
-            fieldBuilder.append("\n<if test=\"").append(fieldInfo.getProperty()).append(" != null\">");
+            if (!batch) {
+                // # 字段
+                fieldBuilder
+                        .append("\n<if test=\"").append(fieldInfo.getProperty()).append(" != null\">");
+                // # 占位符
+                placeholderBuilder
+                        .append("\n<if test=\"").append(fieldInfo.getProperty()).append(" != null\">");
+            }
+
             fieldBuilder.append(fieldInfo.getColumn()).append(",");
-            fieldBuilder.append("</if>");
+            placeholderBuilder.append("#{").append(batch ? "item." : "");
+            placeholderBuilder.append(fieldInfo.getProperty()).append("},");
 
-            placeholderBuilder.append("\n<if test=\"").append(fieldInfo.getProperty()).append(" != null\">");
-            placeholderBuilder.append("#{").append(fieldInfo.getProperty()).append("},");
-            placeholderBuilder.append("</if>");
+            if (!batch) {
+                fieldBuilder
+                        .append("</if>");
+                placeholderBuilder
+                        .append("</if>\n");
+            }
+
         }
 
-        fieldBuilder.append("\n</trim>");
-        placeholderBuilder.append("\n</trim>");
+        fieldBuilder.append("\n</trim>\n");
+        placeholderBuilder.append("\n</trim>\n");
 
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), fieldBuilder.toString(), placeholderBuilder.toString());
         System.out.println("inject insert(batch) sql: " + sql);

@@ -18,4 +18,6 @@ public interface UserMapper extends AutoMapper<User> {
      */
     List<User> selectListRow (RowBounds pagination);
 
+    int insertAbc(User user);
+
 }

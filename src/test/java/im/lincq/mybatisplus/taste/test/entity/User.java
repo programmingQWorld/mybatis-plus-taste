@@ -14,7 +14,7 @@ public class User {
     private static final long serialVersionUID = 1L;
 
     /* 主键ID， auto属性true自增 false非自增 默认true */
-    @TableId(value="test_id", type = IdType.INPUT)
+    @TableId(value="test_id", type = IdType.ID_WORKER)
     private Long id;
     private String name;
     private Integer age;
@@ -43,6 +43,12 @@ public class User {
     }
     public User(Long id, String name, int age, Integer testType) {
         this.id = id;
+        this.name = name;
+        this.age = age;
+        this.testType = testType;
+    }
+
+    public User(String name, Integer age, Integer testType) {
         this.name = name;
         this.age = age;
         this.testType = testType;

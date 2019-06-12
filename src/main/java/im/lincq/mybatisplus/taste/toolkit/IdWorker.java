@@ -46,7 +46,7 @@ public class IdWorker {
                     machinePiece = sb.toString().hashCode() << 16;
                 } catch (Throwable e) {
                     // exception sometimes happens with IBM JVM, use random
-                    logger.error(e.getMessage(), e);
+                    logger.error("IdWorker error.", e.getMessage(), e);
                     machinePiece = new Random().nextInt() << 16;
                     e.printStackTrace();
                     logger.debug("machine piece post : " + Integer.toHexString(machinePiece));
@@ -114,7 +114,7 @@ public class IdWorker {
                 throw new Exception(String.format("Clock moved backwards.  Refusing to generate id for %d milliseconds",
                         lastTimestamp - timestamp));
             } catch ( Exception e ) {
-                logger.error(e.getMessage(), e);
+                logger.error("IdWorker error.", e.getMessage(), e);
             }
         }
         lastTimestamp = timestamp;

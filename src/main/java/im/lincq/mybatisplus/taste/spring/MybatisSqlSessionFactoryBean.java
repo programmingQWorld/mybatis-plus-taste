@@ -11,6 +11,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import im.lincq.mybatisplus.taste.MybatisConfiguration;
 import im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.executor.ErrorContext;
@@ -365,7 +366,8 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
             if ( LOGGER.isDebugEnabled() ) {
                 LOGGER.debug("Property 'configLocation' not specified, using default MyBatis Configuration");
             }
-            configuration = new Configuration();
+            // todo 使用自定义配置.
+            configuration = new MybatisConfiguration();
             configuration.setVariables(this.configurationProperties);
         }
 

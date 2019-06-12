@@ -11,52 +11,97 @@ import java.util.List;
  * @Date 20190121
  */
 public interface AutoMapper<T> {
-    /**
-     * 插入
-     * */
-    public int insert(T entity);
 
     /**
-     * 根据ID删除
+     * <p>
+     * 插入一条记录
+     * </p>
+     * @ param entity 对象实体
+     * @ return             int
      * */
-    public int deleteById(Object id);
+    int insert(T entity);
 
     /**
-     * 根据 entity 条件删除记录
+     * <p>
+     *  插入（批量），该方法不适合Oracle
+     * </p>
+     * @param entityList 实体对象列表
+     * @return                   int
      */
-    public int deleteSelective(T entity);
+    int insertBatch(List<T> entityList) ;
 
     /**
+     * <p>
+     * 根据ID删除
+     * </p>
+     * @param id 主键ID
+     * @return       int
+     * */
+    int deleteById(Object id);
+
+    /**
+     * <p>
+     * 根据 entity 条件,删除记录
+     * </p>
+     * @param entity 实体对象
+     * @return int
+     */
+    int deleteSelective(T entity);
+
+    /**
+     * <p>
      * 根据ID修改
+     * </p>
+     * @param entity 实体对象
+     * @return int
      * */
     public int updateById(T entity);
 
     /**
+     * <p>
      * 删除（批量）
+     * </p>
+     * @param idList 主键ID列表
+     * @return List<T>
      */
     int deleteBatchIds(List idList);
 
 
     /**
+     * <p>
      * 查询（批量）
+     * </p>
+     * @param idList 主键ID列表
+     * @return List<T>
      */
     List<T> selectBatchIds(List idList);
 
     /**
+     * <p>
      * 根据ID查询
+     * </p>
+     * @param id 主键ID
+     * @return List<T>
      * */
     public T selectById(Object id);
 
 
     /**
+     * <p>
      * 根据entity查询一条记录
+     * </p>
+     * @param entity 对象实体
+     * @return T
      */
     T selectOne(T entity);
 
     /**
-     * 根据 entity 分页查询全部记录
-     * @param rowBounds  分页查询条件（可以为 null）
+     * <p>
+     * 根据 entity 分页，查询全部记录
+     * </p>
+     * @param rowBounds  分页查询条件（可以为 RowBounds.DEFAULT）
      * @param  entity           实体对象（可以为 null）
+     * @return List<T>
      * */
     List<T > selectList (RowBounds rowBounds, T entity);
 }
