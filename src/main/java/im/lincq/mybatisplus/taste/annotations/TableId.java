@@ -19,8 +19,8 @@ public @interface TableId {
 
 
     /**
-     * 主键ID，默认 ID 自增
+     * 主键ID，默认 ID 生成
      * {@link im.lincq.mybatisplus.taste.annotations.IdType}
      */
-    IdType type() default IdType.AUTO;
+    IdType type() default IdType.ID_WORKER;
 }

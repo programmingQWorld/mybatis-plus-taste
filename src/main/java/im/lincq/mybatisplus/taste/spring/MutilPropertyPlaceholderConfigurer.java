@@ -8,6 +8,18 @@ import java.util.Properties;
 public class MutilPropertyPlaceholderConfigurer extends PropertyPlaceholderConfigurer {
 
     /**
+     * --------------------   使用配置       -------------------------
+     * <bean id="placeholder" class="com.baomidou.mybatisplus.spring.MutilPropertyPlaceholderConfigurer">
+     * 	  <property name="locations">
+     * 		 <list>
+     * 			<value>classpath:jdbc.properties</value>
+     * 			<value>classpath*:*-placeholder.properties</value>
+     * 		 </list>
+     * 	  </property>
+     * </bean>
+     * -------------------------------------------------------
+     * </p>
+     *
      * <p>
      * 运行环境<br>
      * online 线上 ， dev 开发 ， test 测试

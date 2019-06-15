@@ -4,6 +4,7 @@ import im.lincq.mybatisplus.taste.mapper.AutoMapper;
 import im.lincq.mybatisplus.taste.mapper.AutoSqlInjector;
 import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
 import org.slf4j.Logger;
@@ -31,6 +32,8 @@ public class MybatisConfiguration extends Configuration {
      * 1. 加载xml中的sql <br>
      * 2. 加载SqlProvider中的sql <br>
      * 3. xml sql 与 sqlprovider 不能包含相同的sql id <br>
+     *
+     * 调整后的sql优先级: xmlSql ->sqlProvider ->crudSql <br>
      * @param ms
      */
     @Override
@@ -42,6 +45,21 @@ public class MybatisConfiguration extends Configuration {
             return;
         }
         super.addMappedStatement(ms);
+    }
+
+    @Override
+    public void setDefaultScriptingLanguage(Class<?> driver) {
+        if (driver == null) {
+            /* 设置自定义driver */
+            driver = MybatisXmlLanguageDriver.class;
+        }
+        super.setDefaultScriptingLanguage(driver);
+    }
+
+    @Override
+    public LanguageDriver getDefaultScriptingLanuageInstance() {
+        /* 设置自定义 driver */
+        return languageRegistry.getDriver(MybatisXmlLanguageDriver.class);
     }
 
     @Override

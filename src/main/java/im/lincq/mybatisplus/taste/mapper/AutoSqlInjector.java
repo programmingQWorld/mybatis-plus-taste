@@ -24,7 +24,11 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * <p>
+ *SQL自动注入器
+ * </p>
+ */
 public class AutoSqlInjector {
     private transient Logger logger = LoggerFactory.getLogger(getClass());
     private static final XMLLanguageDriver languageDriver = new XMLLanguageDriver();
@@ -33,6 +37,10 @@ public class AutoSqlInjector {
     private Configuration configuration;
     private MapperBuilderAssistant assistant;
 
+    /**
+     * 注入单点SQL
+     * @param mapperClass
+     */
     public void inject(Class<?> mapperClass) {
         System.out.println("执行sql语句注入方法");
         assistant = new MapperBuilderAssistant(configuration, mapperClass.getName().replaceAll("\\.", "/"));
@@ -64,8 +72,11 @@ public class AutoSqlInjector {
             this.injectSelectByEntitySql(SqlMethod.SELECT_LIST, mapperClass, modelClass, table);
 
         } else {
+            /*
+             *  提示:主键属性未知
+             *  */
             System.err.println(String.format("%s, The unknown primary key, cannot use the generic method",
-                    mapperClass));
+                    mapperClass.toString()));
         }
 
     }
@@ -112,8 +123,11 @@ public class AutoSqlInjector {
     }
 
     /**
-     * 注入 insert sql语句
-     * @param batch               是否为批量插入
+     * <p>
+     *     注入 insert sql语句
+     * </p>
+     *
+     * @param batch                是否为批量插入
      * @param mapperClass  Mapper Class对象
      * @param modelClass    MapperClass对应的实体类Class对象
      * @param table                表名
@@ -125,6 +139,7 @@ public class AutoSqlInjector {
 		 * <trim prefix="(" suffix=")" suffixOverrides=",">
 		 * 		<if test="xx != null">xx,</if>
 		 * </trim>
+		 * VALUES
 		 * <trim prefix="values (" suffix=")" suffixOverrides=",">
 		 * 		<if test="xx != null">#{xx},</if>
 		 * </trim>
@@ -384,8 +399,7 @@ public class AutoSqlInjector {
         ParameterizedType target = null;
         for (Type type : types) {
             // 1. 有泛型参数 && 类型为AutoMapper.class
-            if (type instanceof ParameterizedType
-                    && ((ParameterizedType)type).getRawType().equals(AutoMapper.class) ) {
+            if (type instanceof ParameterizedType && ((ParameterizedType)type).getRawType().equals(AutoMapper.class) ) {
                 target = (ParameterizedType)type;
                 break;
             }
