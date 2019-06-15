@@ -15,6 +15,7 @@ import im.lincq.mybatisplus.taste.MybatisConfiguration;
 import im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.executor.ErrorContext;
+import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
@@ -86,6 +87,8 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
     //issue #19. No default provider.
     private DatabaseIdProvider databaseIdProvider;
 
+    private Class<? extends VFS> vfs;
+
     private ObjectFactory objectFactory;
 
     private ObjectWrapperFactory objectWrapperFactory;
@@ -135,6 +138,14 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
         this.databaseIdProvider = databaseIdProvider;
     }
 
+    public Class<? extends VFS> getVfs() {
+        return this.vfs;
+    }
+
+
+    public void setVfs( Class<? extends VFS> vfs ) {
+        this.vfs = vfs;
+    }
 
     /**
      * Mybatis plugin list.
@@ -427,6 +438,18 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
                     LOGGER.debug("Registered type handler: '" + typeHandler + "'");
                 }
             }
+        }
+
+        if (this.databaseIdProvider != null) {//fix #64 set databaseId before parse mapper xmls
+            try {
+                configuration.setDatabaseId(this.databaseIdProvider.getDatabaseId(this.dataSource));
+            } catch (SQLException e) {
+                throw new NestedIOException("Failed getting a databaseId", e);
+            }
+        }
+
+        if (this.vfs == null) {
+            configuration.setVfsImpl(this.vfs);
         }
 
         if ( xmlConfigBuilder != null ) {

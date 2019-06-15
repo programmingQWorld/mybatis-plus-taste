@@ -7,17 +7,16 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * replace default Configuration class
  */
 public class MybatisConfiguration extends Configuration {
 
-    private Logger logger = LoggerFactory.getLogger(MybatisConfiguration.class);
+    protected Logger logger = Logger.getLogger("MybatisConfiguration");
 
 
     /**
@@ -41,7 +40,7 @@ public class MybatisConfiguration extends Configuration {
 
         if (this.mappedStatements.containsKey(ms.getId())) {
             // 说明已经加载了xml中的节点,忽略mapper中的SqlProvider数据.
-            logger.warn("mapper[{}] is ignored, because it's exists, maybe from xml file", ms.getId());
+            logger.severe("mapper["+ ms.getId() +"] is ignored, because it's exists, maybe from xml file");
             return;
         }
         super.addMappedStatement(ms);

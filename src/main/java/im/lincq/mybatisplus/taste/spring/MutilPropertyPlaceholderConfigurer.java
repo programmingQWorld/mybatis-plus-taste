@@ -55,11 +55,23 @@ public class MutilPropertyPlaceholderConfigurer extends PropertyPlaceholderConfi
                 mode = DEV;
             } else if ( TEST.equals(mode) ) {
                 mode = TEST;
+                /**
+                 * 其他使用自定义 mode 类型，使用 IP 例如 mode = 30
+                 * 配置为  jdb.url_30_mode = xxxxx
+                 */
             } else {
-                mode = DEV;
+
+                /*  plus 认为 windows 是开发环境 */
+                String OS = System.getProperty("os.name").toLowerCase();
+                logger.info("os.name: " + OS);
+                if (OS != null && OS.contains("windows")) {
+                    mode = DEV;
+                } else {
+                    mode = ONLINE;
+                }
             }
         }
-        System.err.println("\n system " + mode + " mode.");
+        System.err.println("\n current system " + mode + " mode.");
         return mode;
     }
 
