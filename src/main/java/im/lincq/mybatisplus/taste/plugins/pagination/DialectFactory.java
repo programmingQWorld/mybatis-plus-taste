@@ -17,6 +17,8 @@ public class DialectFactory {
             return new SQLiteDialect();
         } else if ("postgre".equalsIgnoreCase(dbtype)) {
             return new PostgreDialect();
+        } else if ("sqlserver".equalsIgnoreCase(dbtype)) {
+            return new SQLServerDialect();
         } else {
             return null;
         }
