@@ -11,10 +11,10 @@ import java.util.List;
  * @author lincq
  * @date 2019/6/16 23:09
  */
-public class SuperServiceImpl<T> {
+public class SuperServiceImpl<T, M extends AutoMapper<T>> {
 
     @Autowired
-    protected AutoMapper<T> autoMapper;
+    protected M autoMapper;
 
     public boolean retBool (int result) {
         return result >= 1;
