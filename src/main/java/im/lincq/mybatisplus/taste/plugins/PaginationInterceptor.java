@@ -71,28 +71,25 @@ public class PaginationInterceptor implements Interceptor {
             if (dialect == null) {
                 throw new MybatisPlusException("The value of the dialect property in mybatis configuration.xml is not defined.");
             }
-                /* 获取待分页sql语句进行分页组装 */
+            /* 获取待分页sql语句进行分页组装 */
             BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql");
             String originalSql = boundSql.getSql();
             String paginationSql = dialect.buildPaginationSql(originalSql, rowBounds.getOffset(), rowBounds.getLimit());
-                /* 将组装分页后的sql写回对应的statementhandler */
+            /* 将组装分页后的sql写回对应的statementhandler */
             metaStatementHandler.setValue("delegate.boundSql.sql", paginationSql);
 
-                /* 禁用内存分页 */
+            /* 禁用内存分页  （内存分页会查询所有结果出来，这个是很吓人的，如果结果变化频繁，这个数据还会不准）*/
             metaStatementHandler.setValue("delegate.rowBounds.offset", RowBounds.NO_ROW_OFFSET);
             metaStatementHandler.setValue("delegate.rowBounds.limit", RowBounds.NO_ROW_LIMIT);
 
-                /* 判断是否需要查询总记录条数 */
+            /* 判断是否需要查询总记录条数 */
             if (rowBounds instanceof Pagination) {
-                Pagination pagination = (Pagination)rowBounds;
-                if (pagination.getTotal() == 0) {
-                    // invocation.getTarget();    // 获取被拦截的类当前实例
-                    // invocation.getMethod(); // 获取被拦截的方法的方法对象
-                    // invocation.getArgs();       // 获取被拦截方法的方法参数
-                    MappedStatement mappedStatement = (MappedStatement)metaStatementHandler.getValue("delegate.mappedStatement");
-                    Connection connection = (Connection)invocation.getArgs()[0];
-                    this.count(originalSql, connection, mappedStatement, boundSql, pagination);
-                }
+                // invocation.getTarget();    // 获取被拦截的类当前实例
+                // invocation.getMethod(); // 获取被拦截的方法的方法对象
+                // invocation.getArgs();       // 获取被拦截方法的方法参数
+                MappedStatement mappedStatement = (MappedStatement)metaStatementHandler.getValue("delegate.mappedStatement");
+                Connection connection = (Connection)invocation.getArgs()[0];
+                this.count(originalSql, connection, mappedStatement, boundSql, (Pagination)rowBounds);
             }
 
         }
