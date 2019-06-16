@@ -1,5 +1,6 @@
 package im.lincq.mybatisplus.taste.mapper;
 
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
@@ -16,8 +17,8 @@ public interface AutoMapper<T> {
      * <p>
      * 插入一条记录
      * </p>
-     * @ param entity 对象实体
-     * @ return             int
+     * @param entity 对象实体
+     * @return             int
      * */
     int insert(T entity);
 
@@ -104,4 +105,6 @@ public interface AutoMapper<T> {
      * @return List<T>
      * */
     List<T > selectList (RowBounds rowBounds, T entity);
+
+    List<T> selectList(RowBounds rowBounds, @Param("ew")EntityWrapper<T> entityWrapper);
 }

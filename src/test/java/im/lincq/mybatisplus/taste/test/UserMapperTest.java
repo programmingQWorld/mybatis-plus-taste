@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste.test;
 
 import im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder;
+import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import im.lincq.mybatisplus.taste.plugins.Page;
 import im.lincq.mybatisplus.taste.plugins.pagination.Pagination;
 import im.lincq.mybatisplus.taste.test.entity.User;
@@ -50,7 +51,7 @@ public class UserMapperTest {
         //session.delete("deleteAll");
 
         /* 插入*/
-        System.out.println("\n------------------insert---------name为空-------------\n name=null, age=18");
+        System.out.println("\n------------------insert-----------------\n , age=18");
         Long id = IdWorker.getId();
         userMapper.insert(new User(id, "lincq",18));
         sleep();
@@ -61,14 +62,9 @@ public class UserMapperTest {
         ul.add(new User( "insert-batch-3", 14, 9));
         ul.add(new User( "delname", 14, 6));
         int rlt = userMapper.insertBatch(ul);
+
         System.err.println("\n------------------insertBatch----------------------\n \n\n\n" + rlt);
         sleep();
-
-        System.err.println("\n------------------分页page查询 --- 查询页中 testType = 1 的所有数据----------------------");
-        Page<User> page = new Page<>(1, 2);
-        List<User> paginSecList = userMapper.selectList(page, new User(0));
-        page.setRecords(paginSecList);
-        paginSecList.forEach(UserMapperTest::print);
 
 
         rlt = 0;
@@ -106,8 +102,13 @@ public class UserMapperTest {
         print(user);
 
         System.err.println("\n------------------selectOne----------------------");
-        User one = userMapper.selectOne(new User("lincq"));
+        User one = userMapper.selectOne(new User("lincq33"));
         print(one);
+
+        System.err.println("\n------------------selectList--------(id DESC)--------------");
+        EntityWrapper<User> ew = new EntityWrapper<>(new User("insert-batch-2"), "id desc");
+        List<User> ewUserList = userMapper.selectList(RowBounds.DEFAULT, ew);
+        ewUserList.forEach(UserMapperTest::print);
 
         System.err.println("\n------------------selectBatchIds----------------------");
         List<Object> idList = new ArrayList<Object>();
@@ -116,15 +117,10 @@ public class UserMapperTest {
         List<User> ul1 = userMapper.selectBatchIds(idList);
         ul1.forEach(UserMapperTest::print);
 
-        System.err.println("\n------------------selectAll_list --- 查询testType = 1 的所有数据----------------------");
-        List<User> userList = userMapper.selectList(RowBounds.DEFAULT, new User(1));
-        userList.forEach(UserMapperTest::print);
-
         System.err.println("\n------------------分页pagination查询 --- 查询页中 testType = 1 的所有数据----------------------");
         Pagination pagination = new Pagination(1, 2);
-        List<User> paginList = userMapper.selectList(pagination, new User(1));
+        List<User> paginList = userMapper.selectList(pagination, ew);
         paginList.forEach(UserMapperTest::print);
-
         System.err.println("翻页： " + pagination.toString());
 
         System.err.println("\n---------------xml---selectListRow 分页查询，不查询总数（此时可自定义 count 查询）----无查询条件--------------");

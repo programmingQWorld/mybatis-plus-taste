@@ -15,13 +15,8 @@ import org.apache.ibatis.mapping.StatementType;
 import org.apache.ibatis.scripting.defaults.RawSqlSource;
 import org.apache.ibatis.scripting.xmltags.XMLLanguageDriver;
 import org.apache.ibatis.session.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.ref.PhantomReference;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +25,6 @@ import java.util.List;
  * </p>
  */
 public class AutoSqlInjector {
-    private transient Logger logger = LoggerFactory.getLogger(getClass());
     private static final XMLLanguageDriver languageDriver = new XMLLanguageDriver();
 
     /** mybatis配置类对象， 还有一个小助理*/
@@ -68,8 +62,8 @@ public class AutoSqlInjector {
             /* 查询 */
             this.injectSelectSql(false, mapperClass, modelClass, table);
             this.injectSelectSql(true, mapperClass, modelClass, table);
-            this.injectSelectByEntitySql(SqlMethod.SELECT_ONE, mapperClass, modelClass, table);
-            this.injectSelectByEntitySql(SqlMethod.SELECT_LIST, mapperClass, modelClass, table);
+            this.injectSelectOneSql(mapperClass, modelClass, table);
+            this.injectSelectListSql(mapperClass, modelClass, table);
 
         } else {
             /*
@@ -109,11 +103,51 @@ public class AutoSqlInjector {
     /**
      * 注入实体查询 SQL 语句
      */
-    private void injectSelectByEntitySql (SqlMethod sqlMethod, Class<?> mapperClass, Class<?> modelClass, TableInfo tableI) {
-        String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(tableI), tableI.getTableName(), sqlWhere(tableI));
-        System.out.println("inject sql("+ sqlMethod.getMethod() +")：" + sql);
+    private void injectSelectOneSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        SqlMethod sqlMethod = SqlMethod.SELECT_ONE;
+        String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table), table.getTableName(), sqlWhere(table));
+        System.out.println("inject select (one) sql("+ sqlMethod.getMethod() +")：" + sql);
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource,SqlCommandType.SELECT, modelClass);
+    }
+
+    /**
+     * <p>注入实体查询记录列表SQL语句</p>
+     *
+     * @param mapperClass       接口类型
+     * @param modelClass          实体类型
+     * @param table                     表
+     */
+    private void injectSelectListSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        SqlMethod sqlMethod = SqlMethod.SELECT_LIST;
+        StringBuilder where = new StringBuilder("\n<if test = \"ew != null\">");
+        where .append("<if test = \"ew.table != null\"");
+
+        where.append("\n<where>\n");
+        // # 主键         条件拼接
+        where .append("<if test = \"ew.entity.").append(table.getKeyProperty()).append("!= null\">");
+        where.append(table.getKeyColumn()).append("#{ew.entity.").append(table.getKeyProperty()).append("}");
+        where .append("\n</if>\n");
+
+        // # 对象属性  条件拼接
+        List<TableFieldInfo> fieldList = table.getFieldList();
+        for (TableFieldInfo fieldInfo : fieldList) {
+            where .append("<if test = \"ew.entity.").append(fieldInfo.getProperty()).append("!= null\">");
+            where.append(fieldInfo.getColumn()).append("=#{ew.entity.").append(fieldInfo.getProperty()).append("}");
+            where .append("</if>\n");
+        }
+
+        where.append("</where>\n");
+
+        // # order by  拼接
+        where.append("<if test = \"ew.orderByField != null\"> ORDER BY #{ew.orderByField}</if>\n");
+        where.append("\n</if>");
+        where .append("\n</if>");
+        String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table), table.getTableName(), where.toString());
+        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
+        System.out.println("inject select (list by ew) : " + sql);
+        this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.SELECT, modelClass);
+
     }
 
     private void addMappedStatement (Class<?> mapperClass, String id, SqlSource sqlSource, SqlCommandType sqlCommandType, Class<?> resultType) {
@@ -256,7 +290,7 @@ public class AutoSqlInjector {
     private void injectDeleteSelectiveSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
         SqlMethod sqlMethod = SqlMethod.DELETE_SELECTIVE;
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhere(table));
-        logger.info("inject delete selective sql : {}", sql);
+        System.out.println("inject delete selective sql : " + sql);
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.DELETE, null);
     }
@@ -310,7 +344,7 @@ public class AutoSqlInjector {
                                      Class<?> parameterClass, Class<?> resultType, KeyGenerator keyGenerator, String keyProperty, String keyColumn ) {
         String statementName = mapperClass.getName() + "." + id;
         if (configuration.hasStatement(statementName)) {
-            logger.warn("{}, Has been loaded by XML or SqlProvider, ignoring the injection of the SQL.", statementName);
+            System.err.println(statementName + ", Has been loaded by XML or SqlProvider, ignoring the injection of the SQL.");
             return null;
         }
         return assistant.addMappedStatement(id, sqlSource, StatementType.PREPARED, sqlCommandType, null, null, null,
@@ -337,7 +371,7 @@ public class AutoSqlInjector {
     private void addInsertMappedStatement (Class<?> mapperClass, String id, SqlSource source, SqlCommandType sqlCommandType, Class<?> parameterClass,  Class<?> resultType, KeyGenerator keyGenerator, String keyProperty, String keyColumn) {
         String statementName = mapperClass.getName() + "." + id;
         if (configuration.hasStatement(statementName)) {
-            logger.warn("{}, 已通过Xml或SqlProvider加载了,忽略该SQL的注入", statementName);
+            System.err.println(statementName + "已通过Xml或SqlProvider加载了,忽略该SQL的注入");
             return;
         }
 
