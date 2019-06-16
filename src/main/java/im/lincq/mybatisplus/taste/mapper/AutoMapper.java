@@ -96,15 +96,16 @@ public interface AutoMapper<T> {
      */
     T selectOne(T entity);
 
+
+
     /**
      * <p>
      * 根据 entity 分页，查询全部记录
      * </p>
-     * @param rowBounds  分页查询条件（可以为 RowBounds.DEFAULT）
-     * @param  entity           实体对象（可以为 null）
+     * @param rowBounds       分页查询条件（可以为 RowBounds.DEFAULT）
+     * @param  entityWrapper 实体对象封装操作类（可以为 null）
      * @return List<T>
      * */
-    List<T > selectList (RowBounds rowBounds, T entity);
-
     List<T> selectList(RowBounds rowBounds, @Param("ew")EntityWrapper<T> entityWrapper);
+
 }
