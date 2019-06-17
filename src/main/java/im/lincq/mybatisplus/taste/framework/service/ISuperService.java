@@ -9,7 +9,7 @@ import java.util.List;
  * @author lincq
  * @date 2019/6/16 22:57
  */
-public interface ISuperService<T, I> {
+public interface ISuperService<T> {
 
     /**
      * 插入一条记录
@@ -33,7 +33,7 @@ public interface ISuperService<T, I> {
      * @param id 主键ID
      * @return boolean
      */
-    boolean deleteById( I id );
+    boolean deleteById( Long id );
 
     /**
      * 根据 entity 条件删除，删除记录
@@ -48,7 +48,7 @@ public interface ISuperService<T, I> {
      * @param idList 主键ID集合
      * @return boolean
      */
-    boolean deleteBatchIds(List<I> idList);
+    boolean deleteBatchIds(List<Long> idList);
 
     /**
      * 根据ID修改
@@ -64,7 +64,7 @@ public interface ISuperService<T, I> {
      * @param id 主键ID
      * @return boolean
      */
-    T selectById(I id);
+    T selectById(Long id);
 
     /**
      * 查询（根据ID 批量查询）
@@ -72,7 +72,7 @@ public interface ISuperService<T, I> {
      * @param idList 主键ID列表
      * @return boolean
      */
-    List<T> selectBatchIds( List<I> idList );
+    List<T> selectBatchIds( List<Long> idList );
 
     /**
      * 根据entity条件，查询一条记录

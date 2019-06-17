@@ -14,7 +14,7 @@ import java.util.List;
  * @author lincq
  * @date 2019/6/16 23:09
  */
-public class SuperServiceImpl<M extends AutoMapper<T, I>, T, I> implements ISuperService<T, I> {
+public class SuperServiceImpl<M extends AutoMapper<T>, T> implements ISuperService<T> {
 
     @Autowired
     protected M autoMapper;
@@ -34,7 +34,7 @@ public class SuperServiceImpl<M extends AutoMapper<T, I>, T, I> implements ISupe
     }
 
     @Override
-    public boolean deleteById(I id) {
+    public boolean deleteById(Long id) {
         return retBool(autoMapper.deleteById(id));
     }
 
@@ -44,7 +44,7 @@ public class SuperServiceImpl<M extends AutoMapper<T, I>, T, I> implements ISupe
     }
 
     @Override
-    public boolean deleteBatchIds(List<I> idList) {
+    public boolean deleteBatchIds(List<Long> idList) {
         return retBool(autoMapper.deleteBatchIds(idList));
     }
 
@@ -54,12 +54,12 @@ public class SuperServiceImpl<M extends AutoMapper<T, I>, T, I> implements ISupe
     }
 
     @Override
-    public T selectById(I id) {
+    public T selectById(Long id) {
         return autoMapper.selectById(id);
     }
 
     @Override
-    public List<T> selectBatchIds(List<I> idList) {
+    public List<T> selectBatchIds(List<Long> idList) {
         return autoMapper.selectBatchIds(idList);
     }
 
