@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 /**
- * 抽象Service实现类，（泛型: M是Mapper对象，T是实体，I是实体表id类型）
+ * 抽象Service实现类，（泛型: M是Mapper对象，T是实体）
  *
  * @author lincq
  * @date 2019/6/16 23:09
