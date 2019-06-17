@@ -1,5 +1,6 @@
 package im.lincq.mybatisplus.taste.framework.service.impl;
 
+import im.lincq.mybatisplus.taste.framework.service.ISuperService;
 import im.lincq.mybatisplus.taste.mapper.AutoMapper;
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import org.apache.ibatis.session.RowBounds;
@@ -8,10 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 /**
+ * 抽象Service实现类，（泛型: M是Mapper对象，T是实体，I是实体表id类型）
+ *
  * @author lincq
  * @date 2019/6/16 23:09
  */
-public class SuperServiceImpl<T, M extends AutoMapper<T>> {
+public class SuperServiceImpl<M extends AutoMapper<T, I>, T, I> implements ISuperService<T, I> {
 
     @Autowired
     protected M autoMapper;
@@ -20,42 +23,52 @@ public class SuperServiceImpl<T, M extends AutoMapper<T>> {
         return result >= 1;
     }
 
+    @Override
     public boolean insert(T entity) {
         return retBool(autoMapper.insert(entity));
     }
 
+    @Override
     public boolean insertBatch (List<T> entityList) {
         return retBool(autoMapper.insertBatch(entityList));
     }
 
-    public boolean deleteById(Object id) {
+    @Override
+    public boolean deleteById(I id) {
         return retBool(autoMapper.deleteById(id));
     }
 
+    @Override
     public boolean deleteSelective(T entity) {
         return retBool(autoMapper.deleteSelective(entity));
     }
 
-    public boolean deleteBatchIds(List<Object> idList) {
+    @Override
+    public boolean deleteBatchIds(List<I> idList) {
         return retBool(autoMapper.deleteBatchIds(idList));
     }
 
+    @Override
     public boolean updateById (T entity) {
         return retBool(autoMapper.updateById(entity));
     }
 
-    public T selectById(Object id) {
+    @Override
+    public T selectById(I id) {
         return autoMapper.selectById(id);
     }
 
-    public List<T> selectBatchIds(List<Object> idList) {
+    @Override
+    public List<T> selectBatchIds(List<I> idList) {
         return autoMapper.selectBatchIds(idList);
     }
 
+    @Override
     public T selectOne(T entity) {
         return autoMapper.selectOne(entity);
     }
 
+    @Override
     public List<T> selectList(RowBounds rowBounds, EntityWrapper<T> entityWrapper) {
         return autoMapper.selectList(rowBounds, entityWrapper);
     }

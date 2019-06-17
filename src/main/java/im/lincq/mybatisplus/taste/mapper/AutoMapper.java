@@ -11,7 +11,7 @@ import java.util.List;
  * </p>
  * @Date 20190121
  */
-public interface AutoMapper<T> {
+public interface AutoMapper<T, I> {
 
     /**
      * <p>
@@ -38,7 +38,7 @@ public interface AutoMapper<T> {
      * @param id 主键ID
      * @return       int
      * */
-    int deleteById(Object id);
+    int deleteById(I id);
 
     /**
      * <p>
@@ -65,7 +65,7 @@ public interface AutoMapper<T> {
      * @param idList 主键ID列表
      * @return List<T>
      */
-    int deleteBatchIds(List idList);
+    int deleteBatchIds(List<I> idList);
 
 
     /**
@@ -75,7 +75,7 @@ public interface AutoMapper<T> {
      * @param idList 主键ID列表
      * @return List<T>
      */
-    List<T> selectBatchIds(List idList);
+    List<T> selectBatchIds(List<I> idList);
 
     /**
      * <p>
@@ -84,7 +84,7 @@ public interface AutoMapper<T> {
      * @param id 主键ID
      * @return List<T>
      * */
-    public T selectById(Object id);
+    public T selectById(I id);
 
 
     /**

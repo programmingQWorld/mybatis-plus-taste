@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * 继承AutoMapper类，就拥有CRUD方法
  */
-public interface UserMapper extends AutoMapper<User> {
+public interface UserMapper extends AutoMapper<User, Long> {
 
     /**
      * 用户列表，分页显示

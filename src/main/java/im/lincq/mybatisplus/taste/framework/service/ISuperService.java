@@ -9,15 +9,7 @@ import java.util.List;
  * @author lincq
  * @date 2019/6/16 22:57
  */
-public interface ISuperService<T> {
-
-    /**
-     * 判断数据库是否操作成功
-     *
-     * @param result 数据库操作返回影响条数
-     * @return            数据库是否操作成功
-     */
-    boolean retBool( int result );
+public interface ISuperService<T, I> {
 
     /**
      * 插入一条记录
@@ -41,7 +33,7 @@ public interface ISuperService<T> {
      * @param id 主键ID
      * @return boolean
      */
-    boolean deleteById( Object id );
+    boolean deleteById( I id );
 
     /**
      * 根据 entity 条件删除，删除记录
@@ -56,7 +48,7 @@ public interface ISuperService<T> {
      * @param idList 主键ID集合
      * @return boolean
      */
-    boolean deleteBatchIds(List<Object> idList);
+    boolean deleteBatchIds(List<I> idList);
 
     /**
      * 根据ID修改
@@ -72,7 +64,7 @@ public interface ISuperService<T> {
      * @param id 主键ID
      * @return boolean
      */
-    T selectById(Object id);
+    T selectById(I id);
 
     /**
      * 查询（根据ID 批量查询）
@@ -80,7 +72,7 @@ public interface ISuperService<T> {
      * @param idList 主键ID列表
      * @return boolean
      */
-    List<T> selectBatchIds( List<Object> idList );
+    List<T> selectBatchIds( List<I> idList );
 
     /**
      * 根据entity条件，查询一条记录

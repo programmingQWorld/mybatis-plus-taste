@@ -121,7 +121,7 @@ public class AutoSqlInjector {
     private void injectSelectListSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
         SqlMethod sqlMethod = SqlMethod.SELECT_LIST;
         StringBuilder where = new StringBuilder("\n<if test = \"ew != null\">");
-        where .append("<if test = \"ew.table != null\"");
+        where .append("<if test = \"ew.entity != null\">");
 
         where.append("\n<where>\n");
         // # 主键         条件拼接

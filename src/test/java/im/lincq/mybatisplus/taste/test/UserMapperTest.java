@@ -111,7 +111,7 @@ public class UserMapperTest {
         ewUserList.forEach(UserMapperTest::print);
 
         System.err.println("\n------------------selectBatchIds----------------------");
-        List<Object> idList = new ArrayList<Object>();
+        List<Long> idList = new ArrayList<>();
         idList.add(11L);
         idList.add(12L);
         List<User> ul1 = userMapper.selectBatchIds(idList);
