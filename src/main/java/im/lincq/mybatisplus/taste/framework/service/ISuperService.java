@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste.framework.service;
 
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
+import im.lincq.mybatisplus.taste.plugins.Page;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
@@ -90,4 +91,27 @@ public interface ISuperService<T> {
      * @return boolean
      */
     List<T> selectList(RowBounds rowBounds, EntityWrapper<T> ew);
+
+    /**
+     * <p>查询列表</p>
+     *
+     * @param entity                实体对象
+     * @param orderByField    对应 EntityWrapper 类中 orderByField 字段 {@link EntityWrapper }
+     * @return                            数据结果集
+     */
+    List<T> selectList(T entity, String orderByField);
+
+    List<T> selectList(T entity);
+
+    /**
+     * <p>翻页查询</p>
+     *
+     * @param page      翻页对象
+     * @param entity     实体对象
+     * @param orderByField       对应 EntityWrapper 类中 orderByField 字段
+     * @return                数据结果集
+     */
+    Page<T> selectPage(Page<T>page, T entity, String orderByField);
+
+    Page<T> selectPage(Page<T> page, T entity);
 }

@@ -3,6 +3,7 @@ package im.lincq.mybatisplus.taste.framework.service.impl;
 import im.lincq.mybatisplus.taste.framework.service.ISuperService;
 import im.lincq.mybatisplus.taste.mapper.AutoMapper;
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
+import im.lincq.mybatisplus.taste.plugins.Page;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -71,6 +72,28 @@ public class SuperServiceImpl<M extends AutoMapper<T>, T> implements ISuperServi
     @Override
     public List<T> selectList(RowBounds rowBounds, EntityWrapper<T> entityWrapper) {
         return autoMapper.selectList(rowBounds, entityWrapper);
+    }
+
+    @Override
+    public List<T> selectList (T entity, String orderByField) {
+        return autoMapper.selectList(RowBounds.DEFAULT, new EntityWrapper<T>(entity, orderByField));
+    }
+
+    @Override
+    public List<T> selectList(T entity) {
+        return autoMapper.selectList(RowBounds.DEFAULT, new EntityWrapper<T>(entity, null));
+    }
+
+    @Override
+    public Page<T > selectPage (Page<T> page, T entity, String orderByField) {
+        page.setRecords(autoMapper.selectList(page, new EntityWrapper<T>(entity, orderByField)));
+        return page;
+    }
+
+    @Override
+    public Page<T> selectPage (Page<T> page, T entity) {
+        page.setRecords(autoMapper.selectList(page, new EntityWrapper<T>(entity, null)));
+        return page;
     }
 
 }
