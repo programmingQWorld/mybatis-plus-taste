@@ -16,7 +16,7 @@ public class Pagination extends RowBounds {
     /** 总记录页数*/
     private int pages;
     /** 当前页 */
-    private int current;
+    private int current = 1;
 
     public Pagination () {
         super();
@@ -29,15 +29,17 @@ public class Pagination extends RowBounds {
      * @param size         每页显示条数
      */
     public Pagination(int current, int size) {
-        super((current - 1) * size, size);
+        super(offsetCurrent(current ) * size, size);
 
-        if (current <= 0) {
-            throw new MybatisPlusException("current must be greater than zero.");
+        if (current > 1) {
+            this.current = current;
         }
-
-        this.current = current;
         this.size = size;
 
+    }
+
+    protected static int offsetCurrent(int current) {
+        return (current > 0) ? current - 1 : 0;
     }
 
     public boolean hasPrevious() {
@@ -58,6 +60,10 @@ public class Pagination extends RowBounds {
         if (this.total % this.size != 0) {
             this.pages++;
         }
+        if (this.current > this.pages) {
+            /* 当前页大于总页数，当前页设置为第一页 */
+            this.current = 1;
+        }
     }
 
     public int getSize() {
@@ -70,6 +76,10 @@ public class Pagination extends RowBounds {
 
     public int getCurrent() {
         return current;
+    }
+
+    public int getCurrentOffset() {
+        return this.current - 1;
     }
 
     @Override

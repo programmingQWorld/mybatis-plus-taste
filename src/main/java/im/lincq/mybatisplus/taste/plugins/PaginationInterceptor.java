@@ -74,25 +74,31 @@ public class PaginationInterceptor implements Interceptor {
             /* 获取待分页sql语句进行分页组装 */
             BoundSql boundSql = (BoundSql) metaStatementHandler.getValue("delegate.boundSql");
             String originalSql = boundSql.getSql();
-            String paginationSql = dialect.buildPaginationSql(originalSql, rowBounds.getOffset(), rowBounds.getLimit());
-            /* 将组装分页后的sql写回对应的statementhandler */
-            metaStatementHandler.setValue("delegate.boundSql.sql", paginationSql);
 
             /* 禁用内存分页  （内存分页会查询所有结果出来，这个是很吓人的，如果结果变化频繁，这个数据还会不准）*/
             metaStatementHandler.setValue("delegate.rowBounds.offset", RowBounds.NO_ROW_OFFSET);
             metaStatementHandler.setValue("delegate.rowBounds.limit", RowBounds.NO_ROW_LIMIT);
 
             /* 判断是否需要查询总记录条数 */
+            String paginationSql = null;
             if (rowBounds instanceof Pagination) {
                 // invocation.getTarget();    // 获取被拦截的类当前实例
                 // invocation.getMethod(); // 获取被拦截的方法的方法对象
                 // invocation.getArgs();       // 获取被拦截方法的方法参数
+                // # 定义分页查询（Pagination→count()）
                 MappedStatement mappedStatement = (MappedStatement)metaStatementHandler.getValue("delegate.mappedStatement");
                 Connection connection = (Connection)invocation.getArgs()[0];
-                this.count(originalSql, connection, mappedStatement, boundSql, (Pagination)rowBounds);
+                Pagination page = this.count(originalSql, connection, mappedStatement, boundSql, (Pagination)rowBounds);
+                paginationSql = dialect.buildPaginationSql(originalSql, page.getCurrentOffset(), page.getSize());
+                /* 将组装分页后的sql写回对应的statementhandler */
+            } else {
+                // # 普通列表查询（RowBounds→No count()）
+                paginationSql = dialect.buildPaginationSql(originalSql, rowBounds.getOffset(), rowBounds.getLimit());
             }
 
+            metaStatementHandler.setValue("delegate.boundSql.sql", paginationSql);
         }
+
         // proceed 继续进行.
         return invocation.proceed();
     }
@@ -104,7 +110,7 @@ public class PaginationInterceptor implements Interceptor {
      * @param mappedStatement
      * @param boundSql
      */
-    public void count (String sql, Connection connection, MappedStatement mappedStatement, BoundSql boundSql, Pagination page) {
+    public Pagination count (String sql, Connection connection, MappedStatement mappedStatement, BoundSql boundSql, Pagination page) {
 
         String sqlUse = sql;
         int order_by = sql.toUpperCase().indexOf("ORDER BY");
@@ -113,7 +119,7 @@ public class PaginationInterceptor implements Interceptor {
         }
         // sql: 获取总记录数量
         StringBuffer countSql = new StringBuffer("SELECT COUNT(1) FROM (");
-        countSql.append(sqlUse.replace(";", "")).append(") AS TOTAL");
+        countSql.append(sqlUse).append(") AS TOTAL");
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -131,6 +137,14 @@ public class PaginationInterceptor implements Interceptor {
                 total = rs.getInt(1);
             }
             page.setTotal(total);
+
+            /**
+             * 当前页大于总页数，当前页设置为第一页
+             */
+            if (page.getCurrent() > page.getTotal()) {
+                page = new Page(1, page.getSize());
+                page.setTotal(total);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -141,6 +155,7 @@ public class PaginationInterceptor implements Interceptor {
                  e.printStackTrace();;
              }
         }
+        return page;
     }
 
     @Override
