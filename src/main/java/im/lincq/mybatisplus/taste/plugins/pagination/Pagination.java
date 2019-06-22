@@ -29,7 +29,7 @@ public class Pagination extends RowBounds {
      * @param size         每页显示条数
      */
     public Pagination(int current, int size) {
-        super(offsetCurrent(current ) * size, size);
+        super(offsetCurrent(current ,size), size);
 
         if (current > 1) {
             this.current = current;
@@ -38,8 +38,12 @@ public class Pagination extends RowBounds {
 
     }
 
-    protected static int offsetCurrent(int current) {
-        return (current > 0) ? current - 1 : 0;
+    public int getOffsetCurrent() {
+        return offsetCurrent(this.current, this.size);
+    }
+
+    protected static int offsetCurrent(int current, int size) {
+        return (current > 0) ? (current - 1) * size : 0;
     }
 
     public boolean hasPrevious() {
@@ -78,9 +82,6 @@ public class Pagination extends RowBounds {
         return current;
     }
 
-    public int getCurrentOffset() {
-        return this.current - 1;
-    }
 
     @Override
     public String toString() {

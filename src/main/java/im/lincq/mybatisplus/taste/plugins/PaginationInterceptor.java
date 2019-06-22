@@ -79,8 +79,7 @@ public class PaginationInterceptor implements Interceptor {
             metaStatementHandler.setValue("delegate.rowBounds.offset", RowBounds.NO_ROW_OFFSET);
             metaStatementHandler.setValue("delegate.rowBounds.limit", RowBounds.NO_ROW_LIMIT);
 
-            /* 判断是否需要查询总记录条数 */
-            String paginationSql = null;
+            /* <p>分页逻辑</p> 判断是否需要查询总记录条数  count */
             if (rowBounds instanceof Pagination) {
                 // invocation.getTarget();    // 获取被拦截的类当前实例
                 // invocation.getMethod(); // 获取被拦截的方法的方法对象
@@ -89,14 +88,10 @@ public class PaginationInterceptor implements Interceptor {
                 MappedStatement mappedStatement = (MappedStatement)metaStatementHandler.getValue("delegate.mappedStatement");
                 Connection connection = (Connection)invocation.getArgs()[0];
                 Pagination page = this.count(originalSql, connection, mappedStatement, boundSql, (Pagination)rowBounds);
-                paginationSql = dialect.buildPaginationSql(originalSql, page.getCurrentOffset(), page.getSize());
-                /* 将组装分页后的sql写回对应的statementhandler */
-            } else {
-                // # 普通列表查询（RowBounds→No count()）
-                paginationSql = dialect.buildPaginationSql(originalSql, rowBounds.getOffset(), rowBounds.getLimit());
+                originalSql = dialect.buildPaginationSql(originalSql, page.getOffsetCurrent(), page.getSize());
             }
-
-            metaStatementHandler.setValue("delegate.boundSql.sql", paginationSql);
+            /* 将组装分页后的sql写回对应的statementhandler */
+            metaStatementHandler.setValue("delegate.boundSql.sql", originalSql);
         }
 
         // proceed 继续进行.
