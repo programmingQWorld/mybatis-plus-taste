@@ -32,6 +32,10 @@ public class User {
     public User(String name) {
         this.name = name;
     }
+    public User (Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
     public User(String name, int age) {
         this.name = name;
         this.age = age;

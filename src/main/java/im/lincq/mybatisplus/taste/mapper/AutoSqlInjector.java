@@ -316,8 +316,9 @@ public class AutoSqlInjector {
      * @param table                table
      */
     private void injectUpdateByIdSql (boolean selective, Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
-        SqlMethod sqlMethod = (selective) ? SqlMethod.UPDATE_SELECTIVE : SqlMethod.UPDATE_BY_ID;
+        SqlMethod sqlMethod = (selective) ? SqlMethod.UPDATE_SELECTIVE_BY_ID : SqlMethod.UPDATE_BY_ID;
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlSet(selective, table), table.getKeyColumn(), table.getKeyProperty());
+        System.out.println("\ninject "+ sqlMethod.getMethod() +" ("+ (selective ? "" : " not ") +"selective) sql " + sql);
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
     }
@@ -361,7 +362,7 @@ public class AutoSqlInjector {
         List<TableFieldInfo> fieldList = table.getFieldList();
         for (TableFieldInfo fieldInfo : fieldList) {
             if (selective) {
-                set.append("<if test=\"#{et.").append(fieldInfo.getProperty()).append(" != null }\">");
+                set.append("<if test=\"et.").append(fieldInfo.getProperty()).append(" != null\">");
             }
             set.append(fieldInfo.getColumn()).append("=#{et.").append(fieldInfo.getProperty()).append("}").append(",");
             if (selective) {

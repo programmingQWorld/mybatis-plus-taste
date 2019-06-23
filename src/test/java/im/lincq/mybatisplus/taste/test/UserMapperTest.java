@@ -92,11 +92,23 @@ public class UserMapperTest {
         sleep();
 
         /* 修改[updateById 是从 AutoMapper 中继承而来的，UserMapper.xml中并没有申明改sql] */
+        rlt = userMapper.updateSelectiveById(new User(3347303938708733957L, "MybatisPlus", 123, 1));
+        System.err.println("------------------updateSelectiveById---------------------- result=" + rlt + "\n\n");
+        sleep();
+
         User user = new User();
         user.setId(1);
         user.setName("lin-cq :: MybatisPlus_" + System.currentTimeMillis());
         rlt = userMapper.updateById(user);
         System.err.println("\n------------------updateById----------------------\n result=" + rlt);
+        sleep();
+
+        rlt = userMapper.update(new User("55", 55, 5), new User(15L, "5"));
+        System.err.println("------------------update---------------------- result=" + rlt + "\n\n");
+        sleep();
+
+        rlt = userMapper.updateSelective(new User("00"), new User(15L, "55"));
+        System.err.println("------------------updateSelective---------------------- result=" + rlt + "\n\n");
         sleep();
 
         /*
