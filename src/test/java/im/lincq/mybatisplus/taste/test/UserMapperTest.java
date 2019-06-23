@@ -124,7 +124,7 @@ public class UserMapperTest {
 
         System.err.println("\n------------------selectList--------(id DESC)--------------");
         EntityWrapper<User> ew = new EntityWrapper<>(new User("insert-batch-2"), "id desc");
-        List<User> ewUserList = userMapper.selectList(RowBounds.DEFAULT, ew);
+        List<User> ewUserList = userMapper.selectList(ew);
         ewUserList.forEach(UserMapperTest::print);
 
         System.err.println("\n------------------selectBatchIds----------------------");
@@ -135,10 +135,10 @@ public class UserMapperTest {
         ul1.forEach(UserMapperTest::print);
 
         System.err.println("\n------------------分页pagination查询 --- 查询页中 testType = 1 的所有数据----------------------");
-        Pagination pagination = new Pagination(1, 2);
-        List<User> paginList = userMapper.selectList(pagination, ew);
+        Page<User> page = new Page<User>(1, 2);
+        List<User> paginList = userMapper.selectPage(page, ew);
         paginList.forEach(UserMapperTest::print);
-        System.err.println("翻页： " + pagination.toString());
+        System.err.println("翻页： " + page.toString());
 
         System.err.println("\n---------------xml---selectListRow 分页查询，不查询总数（此时可自定义 count 查询）----无查询条件--------------");
         //List<User> rowList = userMapper.selectListRow(new RowBounds(0, 2));

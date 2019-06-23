@@ -89,30 +89,29 @@ public class SuperServiceImpl<M extends AutoMapper<T>, T> implements ISuperServi
         return autoMapper.selectOne(entity);
     }
 
-    @Override
-    public List<T> selectList(RowBounds rowBounds, EntityWrapper<T> entityWrapper) {
-        return autoMapper.selectList(rowBounds, entityWrapper);
-    }
+    // # 下面2组方法，是orderByField的区别
 
     @Override
     public List<T> selectList (T entity, String orderByField) {
-        return autoMapper.selectList(RowBounds.DEFAULT, new EntityWrapper<T>(entity, orderByField));
+        return autoMapper.selectList(new EntityWrapper<T>(entity, orderByField));
     }
 
     @Override
     public List<T> selectList(T entity) {
-        return autoMapper.selectList(RowBounds.DEFAULT, new EntityWrapper<T>(entity, null));
+        return autoMapper.selectList(new EntityWrapper<T>(entity, null));
     }
+
+    // # 下面2组方法，是 orderByField 的区别
 
     @Override
     public Page<T > selectPage (Page<T> page, T entity, String orderByField) {
-        page.setRecords(autoMapper.selectList(page, new EntityWrapper<T>(entity, orderByField)));
+        page.setRecords(autoMapper.selectPage(page, new EntityWrapper<T>(entity, orderByField)));
         return page;
     }
 
     @Override
     public Page<T> selectPage (Page<T> page, T entity) {
-        page.setRecords(autoMapper.selectList(page, new EntityWrapper<T>(entity, null)));
+        page.setRecords(autoMapper.selectPage(page, new EntityWrapper<T>(entity, null)));
         return page;
     }
 
