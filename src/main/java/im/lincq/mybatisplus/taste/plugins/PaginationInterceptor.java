@@ -108,10 +108,12 @@ public class PaginationInterceptor implements Interceptor {
     public Pagination count (String sql, Connection connection, MappedStatement mappedStatement, BoundSql boundSql, Pagination page) {
 
         String sqlUse = sql;
-        int order_by = sql.toUpperCase().indexOf("ORDER BY");
+
+        /* 这部分优化影响了count函数的正常执行 */
+        /*int order_by = sql.toUpperCase().indexOf("ORDER BY");
         if (order_by > -1) {
             sqlUse = sql.substring(0, order_by);
-        }
+        }*/
         // sql: 获取总记录数量
         StringBuffer countSql = new StringBuffer("SELECT COUNT(1) FROM (");
         countSql.append(sqlUse).append(") AS TOTAL");

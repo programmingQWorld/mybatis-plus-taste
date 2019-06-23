@@ -2,6 +2,7 @@ package im.lincq.mybatisplus.taste.framework.service;
 
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import im.lincq.mybatisplus.taste.plugins.Page;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
@@ -29,6 +30,14 @@ public interface ISuperService<T> {
     boolean insertBatch(List<T> entityList);
 
     /**
+     * <p>插入一条记录（选择字段， null 字段不插入）</p>
+     *
+     * @param entity 实体对象
+     * @return int
+     */
+    boolean insertSelective(T entity);
+
+    /**
      * 根据ID删除
      *
      * @param id 主键ID
@@ -52,12 +61,39 @@ public interface ISuperService<T> {
     boolean deleteBatchIds(List<Long> idList);
 
     /**
+     * <p>
      * 根据ID修改
+     * </p>
+     * @param entity 实体对象
+     * @return boolean
+     * */
+    boolean updateById(@Param("et") T entity);
+
+    /**
+     * <p>根据 ID 选择修改</p>
      *
      * @param entity 实体对象
      * @return boolean
      */
-    boolean updateById( T entity );
+    boolean updateSelectiveById(@Param("et") T entity);
+
+    /**
+     * <p>根据 whereEntity 条件，更新记录</p>
+     *
+     * @param entity 实体对象（实际修改部分）
+     * @param whereEntity 实体查询条件
+     * @return boolean
+     */
+    boolean update(@Param("et")T entity, @Param("ew") T whereEntity);
+
+    /**
+     * <p>根据 whereEntity 条件，选择更新记录</p>
+     *
+     * @param entity  实体对象
+     * @param whereEntity 实体查询条件
+     * @return boolean
+     */
+    boolean updateSelective( @Param("et" ) T entity, @Param("ew") T whereEntity);
 
     /**
      * 根据ID查询

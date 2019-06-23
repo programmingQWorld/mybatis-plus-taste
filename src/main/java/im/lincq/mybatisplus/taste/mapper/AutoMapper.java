@@ -23,6 +23,14 @@ public interface AutoMapper<T> {
     int insert(T entity);
 
     /**
+     * <p>插入一条记录（选择字段， null 字段不插入）</p>
+     *
+     * @param entity 实体对象
+     * @return int
+     */
+    int insertSelective(T entity);
+
+    /**
      * <p>
      *  插入（批量），该方法不适合Oracle
      * </p>
@@ -47,7 +55,7 @@ public interface AutoMapper<T> {
      * @param entity 实体对象
      * @return int
      */
-    int deleteSelective(T entity);
+    int deleteSelective(@Param("ew") T entity);
 
     /**
      * <p>
@@ -56,7 +64,33 @@ public interface AutoMapper<T> {
      * @param entity 实体对象
      * @return int
      * */
-    public int updateById(T entity);
+    public int updateById(@Param("et") T entity);
+
+    /**
+     * <p>根据 ID 选择修改</p>
+     *
+     * @param entity 实体对象
+     * @return int
+     */
+    int updateSelectiveById(@Param("et") T entity);
+
+    /**
+     * <p>根据 whereEntity 条件，更新记录</p>
+     *
+     * @param entity 实体对象（实际修改部分）
+     * @param whereEntity 实体查询条件
+     * @return
+     */
+    int update(@Param("et")T entity, @Param("ew") T whereEntity);
+
+    /**
+     * <p>根据 whereEntity 条件，选择更新记录</p>
+     *
+     * @param entity  实体对象
+     * @param whereEntity 实体查询条件
+     * @return int
+     */
+    int updateSelective( @Param("et" ) T entity, @Param("ew") T whereEntity);
 
     /**
      * <p>
@@ -94,7 +128,7 @@ public interface AutoMapper<T> {
      * @param entity 对象实体
      * @return T
      */
-    T selectOne(T entity);
+    T selectOne(@Param("ew") T entity);
 
 
 

@@ -47,8 +47,10 @@ public class AutoSqlInjector {
         if (table.getKeyProperty() != null) {
 
             /* 插入 */
-            this.injectInsertSql(false, mapperClass, modelClass, table);
-            this.injectInsertSql(true, mapperClass, modelClass, table);
+            // todo : 补充注释
+            this.injectInsertOneSql(false, mapperClass, modelClass, table);
+            this.injectInsertOneSql(true, mapperClass, modelClass, table);
+            this.injectInsertBatchSql(mapperClass, modelClass, table);
 
             /* 删除 */
             this.injectDeleteSelectiveSql(mapperClass, modelClass, table);
@@ -57,7 +59,12 @@ public class AutoSqlInjector {
             System.out.println("The modelClass is  (User ???)" + modelClass);
 
             /* 修改 */
-            this.injectUpdateSql(mapperClass, modelClass, table);
+            this.injectUpdateSql(false, mapperClass, modelClass, table);
+            this.injectUpdateSql(true, mapperClass, modelClass, table);
+            this.injectUpdateByIdSql(false, mapperClass, modelClass, table);
+            this.injectUpdateByIdSql(true, mapperClass, modelClass, table);
+
+
 
             /* 查询 */
             this.injectSelectSql(false, mapperClass, modelClass, table);
@@ -76,7 +83,7 @@ public class AutoSqlInjector {
     }
 
     /**
-     * 注入查询SQL语句
+     * 注入查询SQL语句 （主要是根据ID查询）
      * @param batch  是否批量查询
      * @param mapperClass
      * @param modelClass
@@ -89,7 +96,7 @@ public class AutoSqlInjector {
         if (batch) {
             sqlMethod = SqlMethod.SELECT_BATCH;
             StringBuilder ids = new StringBuilder();
-            ids.append("\n<foreach collection=\"list\" item=\"item\" index=\"index\" separator=\",\">\n#{item}</foreach>");
+            ids.append("\n<foreach collection=\"list\" item=\"item\" index=\"index\" separator=\",\">\n\t#{item}\n</foreach>");
             sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table), table.getTableName(), table.getKeyColumn(), ids.toString());
             sqlSource = languageDriver.createSqlSource(configuration, sql, mapperClass);
         } else {
@@ -121,27 +128,27 @@ public class AutoSqlInjector {
     private void injectSelectListSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
         SqlMethod sqlMethod = SqlMethod.SELECT_LIST;
         StringBuilder where = new StringBuilder("\n<if test = \"ew != null\">");
-        where .append("<if test = \"ew.entity != null\">");
+        where.append("\n\t").append("<if test = \"ew.entity != null\">");
 
-        where.append("\n<where>\n");
+        where.append("\n\t\t").append("<where>");
         // # 主键         条件拼接
-        where .append("<if test = \"ew.entity.").append(table.getKeyProperty()).append("!= null\">");
-        where.append(table.getKeyColumn()).append("#{ew.entity.").append(table.getKeyProperty()).append("}");
-        where .append("\n</if>\n");
+        where.append("\n\t\t\t").append("<if test = \"ew.entity.").append(table.getKeyProperty()).append("!= null\">");
+        where.append("\t\t\t").append(table.getKeyColumn()).append("#{ew.entity.").append(table.getKeyProperty()).append("}");
+        where .append("\t\t</if>");
 
         // # 对象属性  条件拼接
         List<TableFieldInfo> fieldList = table.getFieldList();
         for (TableFieldInfo fieldInfo : fieldList) {
-            where .append("<if test = \"ew.entity.").append(fieldInfo.getProperty()).append("!= null\">");
-            where.append(fieldInfo.getColumn()).append("=#{ew.entity.").append(fieldInfo.getProperty()).append("}");
-            where .append("</if>\n");
+            where.append("\n\t\t\t").append("<if test = \"ew.entity.").append(fieldInfo.getProperty()).append("!= null\">");
+            where.append("\t\t\t").append(fieldInfo.getColumn()).append("=#{ew.entity.").append(fieldInfo.getProperty()).append("}");
+            where.append("\t\t").append("</if>");
         }
 
-        where.append("</where>\n");
+        where.append("\n\t\t").append("</where>");
 
         // # order by  拼接
-        where.append("<if test = \"ew.orderByField != null\"> ORDER BY #{ew.orderByField}</if>\n");
-        where.append("\n</if>");
+        where.append("\n\t\t<if test = \"ew.orderByField != null\"> ORDER BY #{ew.orderByField}</if>");
+        where.append("\n\t</if>");
         where .append("\n</if>");
         String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table), table.getTableName(), where.toString());
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
@@ -160,13 +167,16 @@ public class AutoSqlInjector {
      * <p>
      *     注入 insert sql语句
      * </p>
+     *  <p>
+     *     应用SQLMethod : INSERT_ONE or INSERT_ONE_SELECTIVE
+     * </p>
      *
-     * @param batch                是否为批量插入
+     * @param selective          是否选择插入（选择对象非空字段拼接insert sql）
      * @param mapperClass  Mapper Class对象
      * @param modelClass    MapperClass对应的实体类Class对象
      * @param table                表名
      */
-    private void injectInsertSql (boolean batch, Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+    private void injectInsertOneSql (boolean selective, Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
 
         /*
 		 * INSERT INTO table
@@ -183,8 +193,8 @@ public class AutoSqlInjector {
         StringBuilder fieldBuilder = new StringBuilder();
         StringBuilder placeholderBuilder = new StringBuilder();
         SqlMethod sqlMethod = SqlMethod.INSERT_ONE;
-        if (batch) {
-            sqlMethod = SqlMethod.INSERT_BATCH;
+        if (selective) {
+            sqlMethod = SqlMethod.INSERT_ONE_SELECTIVE;
         }
 
         fieldBuilder.append("\n<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n");
@@ -202,9 +212,8 @@ public class AutoSqlInjector {
             keyProperty = table.getKeyProperty();
         } else {
             /* 用户输入ID*/
-            fieldBuilder.append(table.getKeyColumn()).append(",");
-            placeholderBuilder.append("#{").append(batch ? "item." : "");
-            placeholderBuilder.append(table.getKeyProperty()).append("},");
+            fieldBuilder.append("\t").append(table.getKeyColumn()).append(",");
+            placeholderBuilder.append("\t").append("#{").append(table.getKeyProperty()).append("},");
         }
 
         List<TableFieldInfo> fieldLists = table.getFieldList();
@@ -218,7 +227,7 @@ public class AutoSqlInjector {
             // if batch 所有的字段都会使用，不进行实体属性空判断。（因为我们没办法保证每个实体中，成员变量都是一致空或非空）
             // or not    进行属性空判断。
 
-            if (!batch) {
+            if (selective) {
                 // # 字段
                 fieldBuilder
                         .append("\n<if test=\"").append(fieldInfo.getProperty()).append(" != null\">");
@@ -228,14 +237,13 @@ public class AutoSqlInjector {
             }
 
             fieldBuilder.append(fieldInfo.getColumn()).append(",");
-            placeholderBuilder.append("#{").append(batch ? "item." : "");
-            placeholderBuilder.append(fieldInfo.getProperty()).append("},");
+            placeholderBuilder.append("#{").append(fieldInfo.getProperty()).append("},");
 
-            if (!batch) {
+            if (selective) {
                 fieldBuilder
                         .append("</if>");
                 placeholderBuilder
-                        .append("</if>\n");
+                        .append("</if>");
             }
 
         }
@@ -249,6 +257,51 @@ public class AutoSqlInjector {
         this.addInsertMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource, keyGenerator, keyProperty, keyColumn);
     }
 
+    /**
+     * 注入批量插入SQL语句
+     * @param mapperClass mapperClass
+     * @param modelClass modelClass
+     * @param table table
+     */
+    private void injectInsertBatchSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        /*
+        insert into table <trim prefix = "(" suffix=")" suffixOverrides=",">
+        <if test = "xx != null">xx,</if>...
+        </trim>
+        */
+        KeyGenerator keyGenerator = new NoKeyGenerator();
+        StringBuilder fieldBuilder = new StringBuilder();
+        StringBuilder placeholderBuilder = new StringBuilder();
+        SqlMethod sqlMethod = SqlMethod.INSERT_BATCH;
+
+        fieldBuilder.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n");
+        placeholderBuilder.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n");
+
+        String keyProperty = null;
+        String keyColumn = null;
+        if (table.getIdType() == IdType.AUTO) {
+            /* 自增主键 */
+            keyGenerator = new Jdbc3KeyGenerator();
+            keyProperty = table.getKeyProperty();
+            keyColumn = table.getKeyColumn();
+        } else {
+            /* 用户输入自定义ID */
+            fieldBuilder.append(table.getKeyColumn()).append(",");
+            placeholderBuilder.append("#{item.").append(table.getKeyProperty()).append("}").append(",");
+        }
+        List<TableFieldInfo> fieldList = table.getFieldList();
+        for (TableFieldInfo fieldInfo : fieldList) {
+            fieldBuilder.append(fieldInfo.getColumn()).append(",");
+            placeholderBuilder.append("#{item.").append(fieldInfo.getProperty()).append("}").append(",");
+        }
+        fieldBuilder.append("\n</trim>");
+        placeholderBuilder.append("\n</trim>");
+        String sql = String.format(sqlMethod.getSql(), table.getTableName(), fieldBuilder.toString(), placeholderBuilder.toString());
+        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
+        this.addInsertMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource, keyGenerator,
+                keyProperty, keyColumn);
+    }
+
     public AutoSqlInjector (Configuration configuration) {
         // object父类的构造方法，在这里应该没有什么用处.
         super();
@@ -257,33 +310,15 @@ public class AutoSqlInjector {
 
     /**
      * <p>注入更新SQL语句</p>
-     * @param mapperClass
-     * @param modelClass
-     * @param table
+     * @param selective          是否选择更新
+     * @param mapperClass    mapperClass
+     * @param modelClass      modelClass
+     * @param table                table
      */
-    private void injectUpdateSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
-        SqlMethod sqlMethod = SqlMethod.UPDATE_BY_ID;
-        StringBuilder set = new StringBuilder();
-        List<TableFieldInfo> fieldList = table.getFieldList();
-        int size = fieldList.size();
-
-        /*
-		 * UPDATE table
-		 * <trim prefix="SET" suffixOverrides="," suffix="WHERE id=#{id}" >...</trim>
-		 */
-        set.append("<trim prefix=\"SET\" suffixOverrides=\",\" suffix=\"WHERE ");
-        set.append(table.getKeyColumn()).append("=#{").append(table.getKeyProperty()).append("}\">");
-
-        for (TableFieldInfo fieldInfo : fieldList) {
-            set.append("<if test=\"#{").append(fieldInfo.getProperty()).append(" != null }\">\n");
-            set.append(fieldInfo.getColumn()).append("=#{").append(fieldInfo.getProperty()).append("}").append(",");
-            set.append("\n</if>");
-        }
-        set.append("\n</trim>");
-
-        String sql = String.format(sqlMethod.getSql(), table.getTableName(), set.toString());
-        System.out.println("inject update sql: " + sql);
-        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, mapperClass);
+    private void injectUpdateByIdSql (boolean selective, Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        SqlMethod sqlMethod = (selective) ? SqlMethod.UPDATE_SELECTIVE : SqlMethod.UPDATE_BY_ID;
+        String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlSet(selective, table), table.getKeyColumn(), table.getKeyProperty());
+        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
     }
 
@@ -293,6 +328,48 @@ public class AutoSqlInjector {
         System.out.println("inject delete selective sql : " + sql);
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.DELETE, null);
+    }
+
+    /**
+     * 注入更新SQL语句，按实体非空成员条件更新.
+     * @param selective
+     * @param mapperClass
+     * @param modelClass
+     * @param table
+     */
+    private void injectUpdateSql (boolean selective, Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        SqlMethod sqlMethod = (selective) ? SqlMethod.UPDATE_SELECTIVE : SqlMethod.UPDATE;
+        String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlSet(selective, table), sqlWhere(table));
+        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
+        this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
+    }
+
+    /**
+     * Sql更新语句set部分
+     * @return
+     */
+    private String sqlSet (boolean selective, TableInfo table) {
+        /*
+		 * UPDATE table
+		 * <trim prefix="SET" suffixOverrides="," suffix="WHERE id=#{id}" >...</trim>
+		 */
+        StringBuilder set = new StringBuilder();
+        set.append("<trim prefix=\"SET\" suffixOverrides=\",\">\n");
+
+        set.append(table.getKeyColumn()).append("=#{et.").append(table.getKeyProperty()).append("}").append(",");
+
+        List<TableFieldInfo> fieldList = table.getFieldList();
+        for (TableFieldInfo fieldInfo : fieldList) {
+            if (selective) {
+                set.append("<if test=\"#{et.").append(fieldInfo.getProperty()).append(" != null }\">");
+            }
+            set.append(fieldInfo.getColumn()).append("=#{et.").append(fieldInfo.getProperty()).append("}").append(",");
+            if (selective) {
+                set.append("</if>\n");
+            }
+        }
+        set.append("\n</trim>");
+        return set.toString();
     }
 
     /**
@@ -410,20 +487,20 @@ public class AutoSqlInjector {
      */
     private String sqlWhere (TableInfo table) {
         StringBuilder where = new StringBuilder();
-        where.append("<where>");
+        where.append("\n<where>");
         // # 遍历成员属性
         // 主键成员
-        where.append("\n<if test=\"").append(table.getKeyProperty()).append(" != null\">");
-        where.append("\n").append(table.getKeyColumn()).append(" = #{").append(table.getKeyProperty()).append("}");
-        where.append("\n</if>");
+        where.append("\n\t<if test=\"ew.").append(table.getKeyProperty()).append(" != null\">");
+        where.append("\t\t").append(table.getKeyColumn()).append(" = #{ew.").append(table.getKeyProperty()).append("}");
+        where.append("</if>");
         // 其它成员
         List<TableFieldInfo> fieldList = table.getFieldList();
         for (TableFieldInfo fieldInfo : fieldList) {
-            where.append("\n<if test=\"").append(fieldInfo.getProperty()).append(" != null\">");
-            where.append("\nAND  ").append(fieldInfo.getColumn()).append(" = #{").append(fieldInfo.getProperty()).append("}");
-            where.append("\n</if>");
+            where.append("\n\t<if test=\"ew.").append(fieldInfo.getProperty()).append(" != null\">");
+            where.append("\t\t\tAND  ").append(fieldInfo.getColumn()).append(" = #{ew.").append(fieldInfo.getProperty()).append("}");
+            where.append("</if>");
         }
-        where.append("</where>");
+        where.append("\n</where>");
         return where.toString();
     }
 

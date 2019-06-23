@@ -51,17 +51,22 @@ public class UserMapperTest {
         //session.delete("deleteAll");
 
         /* 插入*/
-        System.out.println("\n------------------insert-----------------\n , age=18");
+        System.out.println("\n------------------insert----------------- age=18");
         Long id = IdWorker.getId();
-        userMapper.insert(new User(id, "lincq",18));
+        int rlt = userMapper.insert(new User(id, "lincq",18, 12));
         sleep();
+
+        rlt = userMapper.insertSelective(new User("abc", 18));
+        System.err.println("\n--------------insertSelective-------" + rlt);
+        sleep();
+
 
         List<User> ul = new ArrayList<User>();
         ul.add(new User("insert-batch-1", 12, 0));
         ul.add(new User( "insert-batch-2", 13, 9));
         ul.add(new User( "insert-batch-3", 14, 9));
         ul.add(new User( "delname", 14, 6));
-        int rlt = userMapper.insertBatch(ul);
+        rlt = userMapper.insertBatch(ul);
 
         System.err.println("\n------------------insertBatch----------------------\n \n\n\n" + rlt);
         sleep();
