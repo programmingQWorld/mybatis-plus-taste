@@ -120,20 +120,11 @@ public interface ISuperService<T> {
     T selectOne(T entity);
 
     /**
-     * 根据entity条件，查询全部记录
-     *
-     * @param rowBounds 分页查询条件（可以为RowBounds.DEFAULT，即不分页）
-     * @param ew  实体对象封装类（可以为null）
-     * @return boolean
-     */
-    List<T> selectList(RowBounds rowBounds, EntityWrapper<T> ew);
-
-    /**
      * <p>查询列表</p>
      *
-     * @param entity                实体对象
+     * @param entity          实体对象
      * @param orderByField    对应 EntityWrapper 类中 orderByField 字段 {@link EntityWrapper }
-     * @return                            数据结果集
+     * @return                数据结果集
      */
     List<T> selectList(T entity, String orderByField);
 
@@ -142,10 +133,10 @@ public interface ISuperService<T> {
     /**
      * <p>翻页查询</p>
      *
-     * @param page      翻页对象
-     * @param entity     实体对象
-     * @param orderByField       对应 EntityWrapper 类中 orderByField 字段
-     * @return                数据结果集
+     * @param page          翻页对象
+     * @param entity        实体对象
+     * @param orderByField  对应 EntityWrapper 类中 orderByField 字段
+     * @return              数据结果集
      */
     Page<T> selectPage(Page<T>page, T entity, String orderByField);
 
