@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 
 import im.lincq.mybatisplus.taste.MybatisConfiguration;
 import im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder;
+import im.lincq.mybatisplus.taste.mapper.DBType;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.io.VFS;
@@ -93,6 +94,17 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
 
     private ObjectWrapperFactory objectWrapperFactory;
 
+    /**
+     * 数据库类型（默认 MySql）
+     */
+    public static DBType DB_TYPE = DBType.MYSQL;
+
+    /*
+	 * 注入数据库类型
+	 */
+    public void setDbType(String dbType) {
+        DB_TYPE = DBType.getDBType(dbType);
+    }
 
     /**
      * Sets the ObjectFactory.

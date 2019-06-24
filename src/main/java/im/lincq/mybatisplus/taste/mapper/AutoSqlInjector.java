@@ -31,6 +31,15 @@ public class AutoSqlInjector {
     private Configuration configuration;
     private MapperBuilderAssistant assistant;
 
+    private DBType dbType;
+
+    protected AutoSqlInjector () {}
+
+    public AutoSqlInjector (Configuration configuration, DBType dbType) {
+        this.configuration = configuration;
+        this.dbType = dbType;
+    }
+
     /**
      * 注入单点SQL
      * @param mapperClass
@@ -300,12 +309,6 @@ public class AutoSqlInjector {
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addInsertMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource, keyGenerator,
                 keyProperty, keyColumn);
-    }
-
-    public AutoSqlInjector (Configuration configuration) {
-        // object父类的构造方法，在这里应该没有什么用处.
-        super();
-        this.configuration = configuration;
     }
 
     /**

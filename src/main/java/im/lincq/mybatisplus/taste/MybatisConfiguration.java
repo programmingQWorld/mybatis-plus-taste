@@ -2,6 +2,7 @@ package im.lincq.mybatisplus.taste;
 
 import im.lincq.mybatisplus.taste.mapper.AutoMapper;
 import im.lincq.mybatisplus.taste.mapper.AutoSqlInjector;
+import im.lincq.mybatisplus.taste.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.scripting.LanguageDriver;
@@ -78,7 +79,7 @@ public class MybatisConfiguration extends Configuration {
             return;
         }
         /* 自动注入SQL */
-        new AutoSqlInjector(this).inject(type);
+        new AutoSqlInjector(this, MybatisSqlSessionFactoryBean.DB_TYPE).inject(type);
     }
 
     @Override
