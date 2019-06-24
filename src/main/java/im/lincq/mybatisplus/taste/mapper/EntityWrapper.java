@@ -22,8 +22,10 @@ public class EntityWrapper<T> {
     private String orderByField = null;
 
     /**  基本保护EntityWrapper对象. */
-    protected EntityWrapper () {
+    protected EntityWrapper () {}
 
+    public EntityWrapper (T entity) {
+        this.entity = entity;
     }
 
     public EntityWrapper (T entity, String orderByField) {
