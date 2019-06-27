@@ -55,6 +55,13 @@
 
 	int rlt = userMapper.updateById(new User(12L, "MybatisPlus"));
 
+> 	根据ID 批量更新
+
+	List<User> userList = new ArrayList<User>();
+	userList.add(new User(11L, "updateBatchById-1", 1, 1));
+	userList.add(new User(12L, "updateBatchById-2", 2, 2));
+	userList.add(new User(13L, "updateBatchById-3", 3, 3));
+	int rlt = userMapper.updateBatchById(userList);
 
 
 # 查询

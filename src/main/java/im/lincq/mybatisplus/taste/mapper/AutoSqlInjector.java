@@ -31,7 +31,7 @@ public class AutoSqlInjector {
     private Configuration configuration;
     private MapperBuilderAssistant assistant;
 
-    private DBType dbType;
+    private DBType dbType = DBType.MYSQL;
 
     protected AutoSqlInjector () {}
 
@@ -72,7 +72,7 @@ public class AutoSqlInjector {
             this.injectUpdateSql(true, mapperClass, modelClass, table);
             this.injectUpdateByIdSql(false, mapperClass, modelClass, table);
             this.injectUpdateByIdSql(true, mapperClass, modelClass, table);
-
+            this.injectUpdateBatchById(mapperClass, modelClass, table);
 
 
             /* 查询 */
@@ -281,10 +281,15 @@ public class AutoSqlInjector {
         KeyGenerator keyGenerator = new NoKeyGenerator();
         StringBuilder fieldBuilder = new StringBuilder();
         StringBuilder placeholderBuilder = new StringBuilder();
-        SqlMethod sqlMethod = SqlMethod.INSERT_BATCH;
+        SqlMethod sqlMethod = SqlMethod.INSERT_BATCH_MYSQL;
 
+        if (DBType.ORACLE == dbType) {
+            sqlMethod = SqlMethod.INSERT_BATCH_ORACLE;
+            placeholderBuilder.append("\n<trim prefix=\"(SELECT \" suffix=\" FROM DUAL)\" suffixOverrides=\",\">\n");
+        } else {
+            placeholderBuilder.append("\n<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n");
+        }
         fieldBuilder.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n");
-        placeholderBuilder.append("<trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\n");
 
         String keyProperty = null;
         String keyColumn = null;
@@ -332,6 +337,42 @@ public class AutoSqlInjector {
         System.out.println("inject delete selective sql : " + sql);
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.DELETE, null);
+    }
+
+    /**
+     * <p>注入批量更新 SQL 语句</p>
+     */
+    private void injectUpdateBatchById(Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        StringBuilder set = new StringBuilder();
+        set.append("<trim prefix=\"SET\" suffixOverrides=\",\">\n");
+        SqlMethod sqlMethod = SqlMethod.UPDATE_BATCH_BY_ID_MYSQL;
+        if (DBType.ORACLE == dbType) {
+            sqlMethod = SqlMethod.UPDATE_BATCH_BY_ID_ORACLE;
+            List<TableFieldInfo> fieldList = table.getFieldList();
+            for (TableFieldInfo fieldInfo : fieldList) {
+                set.append(fieldInfo.getColumn()).append("=#{item.").append(fieldInfo.getProperty()).append("},");
+            }
+        } else if (DBType.MYSQL == dbType) {
+            List<TableFieldInfo> fieldList = table.getFieldList();
+            for (TableFieldInfo fieldInfo : fieldList) {
+                set.append("\n<trim prefix=\"").append(fieldInfo.getColumn()).append("=CASE ");
+                set.append(table.getKeyColumn()).append("\" suffix=\"END,\">");
+                set.append("\n<foreach collection=\"list\" item=\"i\" index=\"index\">");
+                set.append("\n<if test=\"i.").append(fieldInfo.getProperty()).append("!=null\">");
+                set.append("\nWHEN ").append("#{i.").append(table.getKeyProperty());
+                set.append("} THEN #{i.").append(fieldInfo.getProperty()).append("}");
+                set.append("\n</if>");
+                set.append("\n</foreach>");
+                set.append("\n</trim>");
+            }
+        }
+        set.append("\n</trim>");
+
+        String sql = String.format(sqlMethod.getSql(), table.getTableName(), set.toString(), table.getKeyColumn(),
+                table.getKeyProperty());
+        System.out.println("inject sql (updateBatchById) - "+ dbType.name()  + " - " + sql);
+        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
+        this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
     }
 
     /**

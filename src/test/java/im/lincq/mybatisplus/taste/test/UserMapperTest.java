@@ -111,6 +111,14 @@ public class UserMapperTest {
         System.err.println("------------------updateSelective---------------------- result=" + rlt + "\n\n");
         sleep();
 
+        List<User> userList = new ArrayList<User>();
+        userList.add(new User(11L, "updateBatchById-1", 1, 1));
+        userList.add(new User(12L, "updateBatchById-2", 2, 2));
+        userList.add(new User(13L, "updateBatchById-3", 3, 3));
+        rlt = userMapper.updateBatchById(userList);
+        System.err.println("------------------updateBatchById---------------------- result=" + rlt + "\n\n");
+        sleep();
+
         /*
 		 * 此处的 selectById 被UserMapper.xml中的 selectById 覆盖了
 		 */
