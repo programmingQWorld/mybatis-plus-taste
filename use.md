@@ -55,6 +55,14 @@
 
 	int rlt = userMapper.updateById(new User(12L, "MybatisPlus"));
 
+> 根据whereEntity条件，更新记录（支持null查询无条件更新）
+
+    int rlt = userMapper.update(new User("55", 55, 5), new User(15L, "5"));
+
+> 根据whereEntity条件，更新记录（支持null查询无条件更新）
+
+    int rlt = userMapper.updateSelective(new User("00"), new User(15L, "55"));
+
 > 	根据ID 批量更新
 
 	List<User> userList = new ArrayList<User>();
@@ -80,6 +88,10 @@
 > 	根据条件查询
 
 	User userOne = userMapper.selectOne(new User("MybatisPlus"));
+
+> 	根据条件查询总记录数（支持 null 查询无条件查询）
+
+    int count = userMapper.selectCount(null);
 
 > 	查询列表 id 排序
 

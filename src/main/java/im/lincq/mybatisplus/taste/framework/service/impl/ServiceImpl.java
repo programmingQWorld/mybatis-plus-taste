@@ -92,6 +92,11 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
         return autoMapper.selectOne(entity);
     }
 
+    @Override
+    public int selectCount(T entity) {
+        return autoMapper.selectCount(entity);
+    }
+
     // # 下面2组方法，是orderByField的区别
 
     @Override

@@ -1,5 +1,6 @@
 package im.lincq.mybatisplus.taste.mapper;
 
+import com.sun.org.apache.bcel.internal.generic.TABLESWITCH;
 import im.lincq.mybatisplus.taste.annotations.IdType;
 import im.lincq.mybatisplus.taste.toolkit.TableFieldInfo;
 import im.lincq.mybatisplus.taste.toolkit.TableInfo;
@@ -79,6 +80,7 @@ public class AutoSqlInjector {
             this.injectSelectSql(false, mapperClass, modelClass, table);
             this.injectSelectSql(true, mapperClass, modelClass, table);
             this.injectSelectOneSql(mapperClass, modelClass, table);
+            this.injectSelectCountSql(mapperClass, modelClass, table);
             this.injectSelectListSql(SqlMethod.SELECT_LIST, mapperClass, modelClass, table);
             this.injectSelectListSql(SqlMethod.SELECT_PAGE, mapperClass, modelClass, table);
 
@@ -126,6 +128,16 @@ public class AutoSqlInjector {
         System.out.println("inject select (one) sql("+ sqlMethod.getMethod() +")：" + sql);
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource,SqlCommandType.SELECT, modelClass);
+    }
+
+    /**
+     * <p>注入实体查询总记录数 SQL 语句</p>
+     */
+    private void injectSelectCountSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        SqlMethod sqlMethod = SqlMethod.SELECT_COUNT;
+        String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhere(table, true));
+        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
+        this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.SELECT, modelClass);
     }
 
     /**
@@ -458,7 +470,7 @@ public class AutoSqlInjector {
 
 
     private void addUpdateMappedStatement (Class<?> mapperClass, Class<?> modelClass, String id, SqlSource sqlSource) {
-        this.addMappedStatement(mapperClass, id, sqlSource, SqlCommandType.UPDATE, modelClass, null,
+        this.addMappedStatement(mapperClass, id, sqlSource, SqlCommandType.UPDATE, modelClass, Integer.class,
                 new NoKeyGenerator(), null, null);
     }
 
@@ -475,7 +487,7 @@ public class AutoSqlInjector {
     }
 
     private void addInsertMappedStatement(Class<?> mapperClass, Class<?> modelClass, String id, SqlSource source, KeyGenerator keyGenerator, String keyProperty, String keyColumn) {
-        this.addInsertMappedStatement(mapperClass, id, source, SqlCommandType.INSERT, modelClass, null, keyGenerator, keyProperty, keyColumn);
+        this.addInsertMappedStatement(mapperClass, id, source, SqlCommandType.INSERT, modelClass, Integer.class, keyGenerator, keyProperty, keyColumn);
     }
 
     /**
@@ -529,11 +541,11 @@ public class AutoSqlInjector {
 
     /**
      * SQL 查询条件
-     * @param update 是否为更新（支持无条件更新）
+     * @param space 该变量标记是否拼接 ew 参数的空判断.
      */
-    private String sqlWhere (TableInfo table, boolean update) {
+    private String sqlWhere (TableInfo table, boolean space) {
         StringBuilder where = new StringBuilder();
-        if ( update ) {
+        if ( space ) {
             where.append("\n<if test=\"ew!=null\">");
         }
         where.append("\n<where>");
@@ -550,7 +562,7 @@ public class AutoSqlInjector {
             where.append("</if>");
         }
         where.append("\n</where>");
-        if ( update ) {
+        if ( space ) {
             where.append("\n</if>");
         }
         return where.toString();

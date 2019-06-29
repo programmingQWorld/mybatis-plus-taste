@@ -127,6 +127,13 @@ public interface IService<T, I> {
     T selectOne(T entity);
 
     /**
+     * <p>根据 entity 条件，查询总记录数</p>
+     * @param entity 实体对象
+     * @return int
+     */
+    int selectCount( @Param("ew" ) T entity);
+
+    /**
      * <p>查询列表</p>
      *
      * @param entity          实体对象
