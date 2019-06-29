@@ -78,16 +78,27 @@ public class MybatisDefaultParameterHandler extends DefaultParameterHandler {
     protected static Object populateKeys (MappedStatement ms, Object parameterObject) {
         if (ms.getSqlCommandType() == SqlCommandType.INSERT) {
             TableInfo tableInfo = TableInfoHelper.getTableInfo(parameterObject.getClass());
-            if (tableInfo != null && tableInfo.getIdType() != null && tableInfo.getIdType() == IdType.ID_WORKER) {
+            if (tableInfo != null && tableInfo.getIdType() != null && tableInfo.getIdType().getKey() >= 2) {
                 MetaObject metaParam = ms.getConfiguration().newMetaObject(parameterObject);
                 Object idValue = metaParam.getValue(tableInfo.getKeyProperty());
                 if (idValue == null) {
-                    metaParam.setValue(tableInfo.getKeyProperty(), IdWorker.getId());
+                    if ( tableInfo.getIdType() == IdType.ID_WORKER ) {
+                        metaParam.setValue(tableInfo.getKeyProperty(), IdWorker.getId());
+                    } else if ( tableInfo.getIdType() == IdType.UUID ) {
+                        metaParam.setValue(tableInfo.getKeyProperty(), get32UUID());
+                    }
                 }
                 return metaParam.getOriginalObject();
             }
         }
         return parameterObject;
+    }
+
+    /**
+     * <p>获取去掉"-" UUID</p>
+     */
+    protected static String get32UUID () {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 
 }
