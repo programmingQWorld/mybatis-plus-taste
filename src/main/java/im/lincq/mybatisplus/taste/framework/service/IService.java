@@ -80,7 +80,7 @@ public interface IService<T, I> {
      * <p>根据 whereEntity 条件，更新记录</p>
      *
      * @param entity 实体对象（实际修改部分）
-     * @param whereEntity 实体查询条件
+     * @param whereEntity 实体查询条件 （可以为空，为空时候，匹配到全部数据）
      * @return boolean
      */
     boolean update(@Param("et")T entity, @Param("ew") T whereEntity);
@@ -89,7 +89,7 @@ public interface IService<T, I> {
      * <p>根据 whereEntity 条件，选择更新记录</p>
      *
      * @param entity  实体对象
-     * @param whereEntity 实体查询条件
+     * @param whereEntity 实体查询条件 （可以为空，为空时候，匹配到全部数据）
      * @return boolean
      */
     boolean updateSelective( @Param("et" ) T entity, @Param("ew") T whereEntity);

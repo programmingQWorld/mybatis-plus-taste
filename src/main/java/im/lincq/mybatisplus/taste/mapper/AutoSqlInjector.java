@@ -122,7 +122,7 @@ public class AutoSqlInjector {
      */
     private void injectSelectOneSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
         SqlMethod sqlMethod = SqlMethod.SELECT_ONE;
-        String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table), table.getTableName(), sqlWhere(table));
+        String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table), table.getTableName(), sqlWhere(table, false));
         System.out.println("inject select (one) sql("+ sqlMethod.getMethod() +")：" + sql);
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource,SqlCommandType.SELECT, modelClass);
@@ -333,7 +333,7 @@ public class AutoSqlInjector {
 
     private void injectDeleteSelectiveSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
         SqlMethod sqlMethod = SqlMethod.DELETE_SELECTIVE;
-        String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhere(table));
+        String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhere(table, false));
         System.out.println("inject delete selective sql : " + sql);
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.DELETE, null);
@@ -384,7 +384,7 @@ public class AutoSqlInjector {
      */
     private void injectUpdateSql (boolean selective, Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
         SqlMethod sqlMethod = (selective) ? SqlMethod.UPDATE_SELECTIVE : SqlMethod.UPDATE;
-        String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlSet(selective, table), sqlWhere(table));
+        String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlSet(selective, table), sqlWhere(table, true));
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
     }
@@ -529,9 +529,13 @@ public class AutoSqlInjector {
 
     /**
      * SQL 查询条件
+     * @param update 是否为更新（支持无条件更新）
      */
-    private String sqlWhere (TableInfo table) {
+    private String sqlWhere (TableInfo table, boolean update) {
         StringBuilder where = new StringBuilder();
+        if ( update ) {
+            where.append("\n<if test=\"ew!=null\">");
+        }
         where.append("\n<where>");
         // # 遍历成员属性
         // 主键成员
@@ -546,6 +550,9 @@ public class AutoSqlInjector {
             where.append("</if>");
         }
         where.append("\n</where>");
+        if ( update ) {
+            where.append("\n</if>");
+        }
         return where.toString();
     }
 
