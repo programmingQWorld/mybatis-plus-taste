@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste.spring;
 
 import static org.springframework.util.Assert.notNull;
+import static org.springframework.util.Assert.state;
 import static org.springframework.util.ObjectUtils.isEmpty;
 import static org.springframework.util.StringUtils.hasLength;
 import static org.springframework.util.StringUtils.tokenizeToStringArray;
@@ -12,9 +13,10 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import im.lincq.mybatisplus.taste.MybatisConfiguration;
-import im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder;
+import im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder;
 import im.lincq.mybatisplus.taste.mapper.DBType;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
+import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.io.VFS;
 import org.apache.ibatis.logging.Log;
@@ -44,7 +46,7 @@ import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 /**
  * <p>
  * 拷贝类 org.mybatis.spring.SqlSessionFactoryBean 修改方法 buildSqlSessionFactory()
- * 加载自定义 MybatisXmlConfigBuilder
+ * 加载自定义 MybatisXMLConfigBuilder
  * </p>
  *
  * @author hubin
@@ -58,6 +60,8 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
 
     private Resource[] mapperLocations;
 
+    private Configuration configuration;
+
     private DataSource dataSource;
 
     private TransactionFactory transactionFactory;
@@ -68,7 +72,7 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
 
     private SqlSessionFactory sqlSessionFactory;
 
-    //EnvironmentAware requires spring 3.1
+    // EnvironmentAware requires spring 3.1
     private String environment = MybatisSqlSessionFactoryBean.class.getSimpleName();
 
     private boolean failFast;
@@ -89,6 +93,8 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
     private DatabaseIdProvider databaseIdProvider;
 
     private Class<? extends VFS> vfs;
+
+    private Cache cache;
 
     private ObjectFactory objectFactory;
 
@@ -115,7 +121,6 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
     public void setObjectFactory( ObjectFactory objectFactory ) {
         this.objectFactory = objectFactory;
     }
-
 
     /**
      * Sets the ObjectWrapperFactory.
@@ -157,6 +162,14 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
 
     public void setVfs( Class<? extends VFS> vfs ) {
         this.vfs = vfs;
+    }
+
+    public Cache getCache() {
+        return this.cache;
+    }
+
+    public void setCache(Cache cache) {
+        this.cache = cache;
     }
 
     /**
@@ -258,6 +271,13 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
         this.configLocation = configLocation;
     }
 
+    /**
+     * Set a customized MyBatis configuration.
+     * @param configuration MyBatis configuration
+     */
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
 
     /**
      * Set locations of MyBatis mapper files that are going to be merged into the {@code SqlSessionFactory}
@@ -356,10 +376,12 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
     /**
      * {@inheritDoc}
      */
+    @Override
     public void afterPropertiesSet() throws Exception {
         notNull(dataSource, "Property 'dataSource' is required");
         notNull(sqlSessionFactoryBuilder, "Property 'sqlSessionFactoryBuilder' is required");
-
+        state((configuration == null && configLocation == null) || !(configuration != null && configLocation != null),
+                "Property 'configuration' and 'configLocation' can not specified with together");
         this.sqlSessionFactory = buildSqlSessionFactory();
     }
 
@@ -377,17 +399,22 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
 
         Configuration configuration;
 
-        /**
-         *TODO 加载自定义 MybatisXmlConfigBuilder
-         */
-        MybatisXmlConfigBuilder xmlConfigBuilder = null;
-        if ( this.configLocation != null ) {
-            xmlConfigBuilder = new MybatisXmlConfigBuilder(this.configLocation.getInputStream(), null,
+        /** TODO 加载自定义 MybatisXMLConfigBuilder */
+        MybatisXMLConfigBuilder xmlConfigBuilder = null;
+        if (this.configuration != null) {
+            configuration = this.configuration;
+            if (configuration.getVariables() == null) {
+                configuration.setVariables(this.configurationProperties);
+            } else if (this.configurationProperties != null) {
+                configuration.getVariables().putAll(this.configurationProperties);
+            }
+        } else if ( this.configLocation != null ) {
+            xmlConfigBuilder = new MybatisXMLConfigBuilder(this.configLocation.getInputStream(), null,
                     this.configurationProperties);
             configuration = xmlConfigBuilder.getConfiguration();
         } else {
             if ( LOGGER.isDebugEnabled() ) {
-                LOGGER.debug("Property 'configLocation' not specified, using default MyBatis Configuration");
+                LOGGER.debug("Property 'configLocation' or 'configLocation' not specified, using default MyBatis Configuration");
             }
             // todo 使用自定义配置.
             configuration = new MybatisConfiguration();
@@ -400,6 +427,10 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
 
         if ( this.objectWrapperFactory != null ) {
             configuration.setObjectWrapperFactory(this.objectWrapperFactory);
+        }
+
+        if (this.vfs != null) {
+            configuration.setVfsImpl(this.vfs);
         }
 
         if ( hasLength(this.typeAliasesPackage) ) {
@@ -460,8 +491,8 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
             }
         }
 
-        if (this.vfs == null) {
-            configuration.setVfsImpl(this.vfs);
+        if (this.cache == null) {
+            configuration.addCache(this.cache);
         }
 
         if ( xmlConfigBuilder != null ) {
@@ -525,6 +556,7 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
     /**
      * {@inheritDoc}
      */
+    @Override
     public SqlSessionFactory getObject() throws Exception {
         if ( this.sqlSessionFactory == null ) {
             afterPropertiesSet();
@@ -537,6 +569,7 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
     /**
      * {@inheritDoc}
      */
+    @Override
     public Class<? extends SqlSessionFactory> getObjectType() {
         return this.sqlSessionFactory == null ? SqlSessionFactory.class : this.sqlSessionFactory.getClass();
     }
@@ -545,6 +578,7 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean isSingleton() {
         return true;
     }
@@ -553,7 +587,8 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
     /**
      * {@inheritDoc}
      */
-    public void onApplicationEvent( ApplicationEvent event ) {
+    @Override
+    public void onApplicationEvent(ApplicationEvent event ) {
         if ( failFast && event instanceof ContextRefreshedEvent ) {
             // fail-fast -> check all statements are completed
             this.sqlSessionFactory.getConfiguration().getMappedStatementNames();

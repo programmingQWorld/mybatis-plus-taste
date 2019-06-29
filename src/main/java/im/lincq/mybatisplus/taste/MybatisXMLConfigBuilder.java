@@ -13,7 +13,9 @@ import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaClass;
+import org.apache.ibatis.reflection.ReflectorFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 import org.apache.ibatis.session.AutoMappingBehavior;
@@ -30,41 +32,42 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.Properties;
 
-public class MybatisXmlConfigBuilder extends BaseBuilder {
+public class MybatisXMLConfigBuilder extends BaseBuilder {
 
     private transient Logger logger = LoggerFactory.getLogger(getClass());
 
     private boolean parsed;
     private XPathParser parser;
     private String environment;
+    private ReflectorFactory localReflectorFactory = new DefaultReflectorFactory();
 
-    public MybatisXmlConfigBuilder(Configuration configuration) {
+    public MybatisXMLConfigBuilder(Configuration configuration) {
         super(configuration);
     }
 
-    public MybatisXmlConfigBuilder(Reader reader) {
+    public MybatisXMLConfigBuilder(Reader reader) {
         this(reader, null, null);
     }
 
-    public MybatisXmlConfigBuilder(Reader reader, String environment) {
+    public MybatisXMLConfigBuilder(Reader reader, String environment) {
         this(reader, environment, null);
     }
 
-    public MybatisXmlConfigBuilder(Reader reader, String environment, Properties props) {
+    public MybatisXMLConfigBuilder(Reader reader, String environment, Properties props) {
         this(new XPathParser(reader, true, props, new XMLMapperEntityResolver()), environment, props);
     }
-    public MybatisXmlConfigBuilder(InputStream inputStream){
+    public MybatisXMLConfigBuilder(InputStream inputStream){
         this(inputStream, null, null);
     }
-    public MybatisXmlConfigBuilder(InputStream inputStream, String environment){
+    public MybatisXMLConfigBuilder(InputStream inputStream, String environment){
         this(inputStream, environment, null);
     }
 
-    public MybatisXmlConfigBuilder(InputStream inputStream, String environment, Properties properties) {
+    public MybatisXMLConfigBuilder(InputStream inputStream, String environment, Properties properties) {
         this(new XPathParser(inputStream, true, properties, new XMLMapperEntityResolver()), environment, properties);
     }
 
-    public MybatisXmlConfigBuilder(XPathParser xPathParser, String environment, Properties properties) {
+    public MybatisXMLConfigBuilder(XPathParser xPathParser, String environment, Properties properties) {
         // replace default Configuration class;
         super(new MybatisConfiguration());
         ErrorContext.instance().resource("SQL Mapper Configuration");
@@ -79,7 +82,7 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
     // 具体转换逻辑在本类parseConfiguration方法中，
     // 该方法对本类configuration对象的属性数据初始化.
     public Configuration parse () {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         if (this.parsed) {
             throw new BuilderException("Each XMLConfigBuilder can only be used once.");
         }
@@ -88,17 +91,20 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
         return configuration;
     }
 
-    public void parseConfiguration(XNode root) {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+    private void parseConfiguration(XNode root) {
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         try {
+            Properties settings = settingsAsPropertiess(root.evalNode("settings"));
             //issue #117 read properties first
             propertiesElement(root.evalNode("properties"));
+            loadCustomVfs(settings);
             typeAliasesElement(root.evalNode("typeAliases"));
             pluginElement(root.evalNode("plugins"));
             objectFactoryElement(root.evalNode("objectFactory"));
             objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
-            //reflectionFactoryElement(root.evalNode("reflectionFactory"));
-            settingsElement(root.evalNode("settings"));
+            reflectionFactoryElement(root.evalNode("reflectionFactory"));
+            settingsElement(settings);
+            //settingsElement(root.evalNode("settings"));
             // read it after objectFactory and objectWrapperFactory issue #631
             environmentsElement(root.evalNode("environments"));
             databaseIdProviderElement(root.evalNode("databaseIdProvider"));
@@ -110,6 +116,33 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
         }
     }
 
+    private Properties settingsAsPropertiess (XNode context) {
+        if (context == null) {
+            return new Properties();
+        }
+        Properties props = context.getChildrenAsProperties();
+        // Check that all settings are known to the configuration class
+        MetaClass metaConfig = MetaClass.forClass(Configuration.class, localReflectorFactory);
+        for (Object key : props.keySet()) {
+            if (!metaConfig.hasSetter(String.valueOf(key))) {
+                throw new BuilderException(
+                        "The setting " + key + " is not known.  Make sure you spelled it correctly (case sensitive).");
+            }
+        }
+        return props;
+    }
+
+    private void loadCustomVfs(Properties props) throws ClassNotFoundException {
+        String value = props.getProperty("vfsImpl");
+        if (value != null) {
+            String[] clazzes = value.split(",");
+            for (String clazz : clazzes) {
+                if (!clazz.isEmpty()) {
+                    configuration.setVfsImpl(Resources.classForName(clazz));
+                }
+            }
+        }
+    }
     /**
      *
      * <properties resource="jdbc.property" url = "123.property">
@@ -118,7 +151,7 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
      * @param context
      */
     private void propertiesElement (XNode context) throws Exception {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         // 获取properties标签下声明的属性,作为基本的 map 容器 -- defaults
         // 获取properties标签的属性值: resource url ,加载其中指定的属性文件数据到defaults中
         if (context != null) {
@@ -152,7 +185,7 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
      * @param parent
      */
     private void typeAliasesElement (XNode parent) {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         if (parent != null) {
             for (XNode child : parent.getChildren()) {
                 if ("package".equals(child.getName())) {
@@ -195,7 +228,7 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
      * @param parent
      */
     private void pluginElement (XNode parent) throws Exception {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#pluginElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#pluginElement");
         if (parent != null) {
             for (XNode child : parent.getChildren()) {
                 String interceptor = child.getStringAttribute("interceptor");
@@ -218,7 +251,7 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
      * @param context
      */
     private void objectFactoryElement (XNode context) throws Exception {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         if (context != null) {
             String type = context.getStringAttribute("type");
             Properties properties = context.getChildrenAsProperties();
@@ -235,7 +268,7 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
      * @param context
      */
     private void objectWrapperFactoryElement (XNode context) throws Exception {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         if (context != null) {
             String type = context.getStringAttribute("type");
             ObjectWrapperFactory objectWrapperFactory = (ObjectWrapperFactory)resolveClass(type).newInstance();
@@ -246,10 +279,15 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
 
     /**
      * dtd 文件中好像没有这个标签定义reflectionFactory
-     * @param context
+     * @param context reflectionFactory
      */
-    private void reflectionFactoryElement (XNode context) {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+    private void reflectionFactoryElement (XNode context) throws IllegalAccessException, InstantiationException {
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
+        if (context != null) {
+            String type = context.getStringAttribute("type");
+            ReflectorFactory factory = (ReflectorFactory) resolveClass(type).newInstance();
+            configuration.setReflectorFactory(factory);
+        }
     }
 
 
@@ -271,42 +309,34 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
      *   <setting name="jdbcTypeForNull" value="OTHER"/>
      *   <setting name="lazyLoadTriggerMethods" value="equals,clone,hashCode,toString"/>
      * </settings>
-     * @param context
+     * @param props
      */
-    private void settingsElement (XNode context) {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
-        if (context != null) {
-
-            Properties props = context.getChildrenAsProperties();
-            // Check that all settings are known to the configuration class.
-            MetaClass metaConfig = MetaClass.forClass(Configuration.class, configuration.getReflectorFactory());
-            for (Object key : props.keySet()) {
-                if (!metaConfig.hasSetter(String.valueOf(key))) {
-                    throw new  BuilderException("The setting " + key + " is not known. Make sure you spelled  it correctly.(case sensitive).");
-                }
-            }
-            configuration.setAutoMappingBehavior(AutoMappingBehavior.valueOf(props.getProperty("autoMappingBehavior")));
-            configuration.setCacheEnabled(booleanValueOf(props.getProperty("cacheEnabled"), true));
-            configuration.setProxyFactory((ProxyFactory)createInstance(props.getProperty("proxyFactory")));
-            configuration.setLazyLoadingEnabled(booleanValueOf(props.getProperty("lazyLoadingEnabled"), false));
-            configuration.setAggressiveLazyLoading(booleanValueOf(props.getProperty("aggressiveLazyLoading"), true));
-            configuration.setMultipleResultSetsEnabled(booleanValueOf(props.getProperty("multipleResultSetsEnabled"), true));
-            configuration.setUseColumnLabel(booleanValueOf(props.getProperty("useColumnLabel"), true));
-            configuration.setUseGeneratedKeys(booleanValueOf(props.getProperty("useGeneratedKeys"), false));
-            configuration.setDefaultExecutorType(ExecutorType.valueOf(props.getProperty("defaultExecutorType", "SIMPLE")));
-            configuration.setDefaultStatementTimeout(integerValueOf(props.getProperty("defaultStatementTimeout"), null));
-            configuration.setMapUnderscoreToCamelCase(booleanValueOf(props.getProperty("mapUnderscoreToCamelCase"), false));
-            configuration.setSafeRowBoundsEnabled(booleanValueOf(props.getProperty("safeRowBoundsEnabled"), false));
-            configuration.setLocalCacheScope(LocalCacheScope.valueOf(props.getProperty("localCacheScope", "SESSION")));
-            configuration.setJdbcTypeForNull(JdbcType.valueOf(props.getProperty("jdbcTypeForNull", "OTHER")));
-            configuration.setLazyLoadTriggerMethods(stringSetValueOf(props.getProperty("lazyLoadTriggerMethods"), "equals,clone,hashCode,toString"));
-            configuration.setSafeResultHandlerEnabled(booleanValueOf(props.getProperty("safeResultHandlerEnabled"), true));
-            configuration.setDefaultScriptingLanguage(resolveClass(props.getProperty("defaultScriptingLanguage")));
-            configuration.setCallSettersOnNulls(booleanValueOf(props.getProperty("callSettersOnNulls"), false));
-            configuration.setLogPrefix(props.getProperty("logPrefix"));
-            configuration.setLogImpl(resolveClass(props.getProperty("logImpl")));
-            configuration.setConfigurationFactory(resolveClass(props.getProperty("configurationFactory")));
-        }
+    private void settingsElement (Properties props) {
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
+        configuration.setAutoMappingBehavior(AutoMappingBehavior.valueOf(props.getProperty("autoMappingBehavior", "PARTIAL")));
+        configuration.setAutoMappingUnknownColumnBehavior(AutoMappingUnknownColumnBehavior
+                .valueOf(props.getProperty("autoMappingUnknownColumnBehavior", "NONE")));
+        configuration.setCacheEnabled(booleanValueOf(props.getProperty("cacheEnabled"), true));
+        configuration.setProxyFactory((ProxyFactory)createInstance(props.getProperty("proxyFactory")));
+        configuration.setLazyLoadingEnabled(booleanValueOf(props.getProperty("lazyLoadingEnabled"), false));
+        configuration.setAggressiveLazyLoading(booleanValueOf(props.getProperty("aggressiveLazyLoading"), true));
+        configuration.setMultipleResultSetsEnabled(booleanValueOf(props.getProperty("multipleResultSetsEnabled"), true));
+        configuration.setUseColumnLabel(booleanValueOf(props.getProperty("useColumnLabel"), true));
+        configuration.setUseGeneratedKeys(booleanValueOf(props.getProperty("useGeneratedKeys"), false));
+        configuration.setDefaultExecutorType(ExecutorType.valueOf(props.getProperty("defaultExecutorType", "SIMPLE")));
+        configuration.setDefaultStatementTimeout(integerValueOf(props.getProperty("defaultStatementTimeout"), null));
+        configuration.setDefaultFetchSize(integerValueOf(props.getProperty("defaultFetchSize"), null));
+        configuration.setMapUnderscoreToCamelCase(booleanValueOf(props.getProperty("mapUnderscoreToCamelCase"), false));
+        configuration.setSafeRowBoundsEnabled(booleanValueOf(props.getProperty("safeRowBoundsEnabled"), false));
+        configuration.setLocalCacheScope(LocalCacheScope.valueOf(props.getProperty("localCacheScope", "SESSION")));
+        configuration.setJdbcTypeForNull(JdbcType.valueOf(props.getProperty("jdbcTypeForNull", "OTHER")));
+        configuration.setLazyLoadTriggerMethods(stringSetValueOf(props.getProperty("lazyLoadTriggerMethods"), "equals,clone,hashCode,toString"));
+        configuration.setSafeResultHandlerEnabled(booleanValueOf(props.getProperty("safeResultHandlerEnabled"), true));
+        configuration.setDefaultScriptingLanguage(resolveClass(props.getProperty("defaultScriptingLanguage")));
+        configuration.setCallSettersOnNulls(booleanValueOf(props.getProperty("callSettersOnNulls"), false));
+        configuration.setLogPrefix(props.getProperty("logPrefix"));
+        configuration.setLogImpl(resolveClass(props.getProperty("logImpl")));
+        configuration.setConfigurationFactory(resolveClass(props.getProperty("configurationFactory")));
     }
 
     /**
@@ -324,7 +354,7 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
      * @param context
      */
     private void environmentsElement (XNode context) throws Exception {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         // 如果当前 env 未设置,则设置环境. 并且找到对应 env 初始化env信息
         if (context != null) {
             if (environment == null) {
@@ -353,12 +383,12 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
      * @param context
      */
     private void databaseIdProviderElement (XNode context) throws Exception {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         DatabaseIdProvider databaseIdProvider = null;
         if (context != null) {
             String type = context.getStringAttribute("type");
+            // awful patch to keep backward
             if ("VENDOR".equals(type)) {
-                // awful patch to keep backward
                 type = "DB_VENDOR";
             }
             Properties properties = context.getChildrenAsProperties();
@@ -378,7 +408,7 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
      * @param context
      */
     private void typeHandlerElement (XNode context) {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         if (context != null) {
             for (XNode child : context.getChildren()) {
                 if ("package".equals(child.getName())) {
@@ -433,7 +463,7 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
      * @param context
      */
     private void mapperElement (XNode context) throws Exception {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         if (context != null) {
             for (XNode child : context.getChildren()) {
                 if ("package".equals(child.getName())) {
@@ -465,7 +495,7 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
     }
 
     private boolean isSpecifiedEnvironment (String id) {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         if (environment == null) {
             throw new BuilderException("No environment specified.");
         } else if (id == null) {
@@ -476,7 +506,7 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
     }
 
     private TransactionFactory transactionManagerElement(XNode context) throws Exception {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         if (context != null) {
             String type = context.getStringAttribute("type");
             Properties props = context.getChildrenAsProperties();
@@ -488,7 +518,7 @@ public class MybatisXmlConfigBuilder extends BaseBuilder {
     }
 
     private DataSourceFactory dataSourceElement (XNode context) throws Exception {
-        logger.info("im.lincq.mybatisplus.taste.MybatisXmlConfigBuilder#dataSourceElement");
+        logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         if (context != null) {
             String type = context.getStringAttribute("type");
             Properties properties = context.getChildrenAsProperties();

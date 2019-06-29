@@ -23,7 +23,7 @@ import java.util.Properties;
 /**
  * 分页拦截器
  */
-@Intercepts({@Signature(type = StatementHandler.class, method="prepare", args = Connection.class)})
+@Intercepts({@Signature(type = StatementHandler.class, method="prepare", args = {Connection.class, Integer.class })})
 public class PaginationInterceptor implements Interceptor {
 
     /** 方言类型 */

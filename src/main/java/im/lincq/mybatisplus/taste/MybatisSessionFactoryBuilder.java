@@ -22,7 +22,7 @@ public class MybatisSessionFactoryBuilder extends SqlSessionFactoryBuilder {
         logger.info("exec: im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder.build(java.io.Reader, java.lang.String, java.util.Properties)");
 
         try {
-            MybatisXmlConfigBuilder parser = new MybatisXmlConfigBuilder(reader, environment, properties);
+            MybatisXMLConfigBuilder parser = new MybatisXMLConfigBuilder(reader, environment, properties);
             return build(parser.parse());
         } catch (Exception e) {
             throw ExceptionFactory.wrapException("Error building SqlSession.", e);
@@ -41,7 +41,7 @@ public class MybatisSessionFactoryBuilder extends SqlSessionFactoryBuilder {
         logger.info("exec im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder.build(java.io.InputStream, java.lang.String, java.util.Properties)");
 
         try  {
-            MybatisXmlConfigBuilder  parser = new MybatisXmlConfigBuilder(inputStream, environment, properties);
+            MybatisXMLConfigBuilder  parser = new MybatisXMLConfigBuilder(inputStream, environment, properties);
             // configuration 的引用实例是MybatisConfiguration，这是mybatis-plus的扩展configuration.
             // configuration配置了
             Configuration configuration = parser.parse();
