@@ -48,10 +48,13 @@ public class UserMapperTest {
         System.err.println(" debug run 查询执行 user 表数据变化！ ");
         //session.delete("deleteAll");
 
+        int rlt = userMapper.insertInjector(new User(1L, "1", 1, 1));
+        System.err.println("-----------------insertInjector------------------------" + rlt);
+
         /* 插入*/
         System.out.println("\n------------------insert----------------- age=18");
         Long id = IdWorker.getId();
-        int rlt = userMapper.insert(new User(id, "lincq",18, 12));
+        rlt = userMapper.insert(new User(id, "lincq",18, 12));
         sleep();
 
         rlt = userMapper.insertSelective(new User("abc", 18));

@@ -2,6 +2,7 @@ package im.lincq.mybatisplus.taste.test.mapper;
 
 import im.lincq.mybatisplus.taste.mapper.AutoMapper;
 import im.lincq.mybatisplus.taste.test.mysql.entity.User;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
@@ -18,5 +19,11 @@ public interface UserMapper extends AutoMapper<User> {
      * @return 查询结果集
      */
     List<User> selectListRow (RowBounds pagination);
+
+    /**
+     * 注解插入【测试】
+     */
+    @Insert("insert into user (test_id, name, age) values (#{id}, #{name}, #{age})")
+    int insertInjector(User user);
 
 }
