@@ -574,7 +574,7 @@ public class AutoSqlInjector {
         ParameterizedType target = null;
         for (Type type : types) {
             // 1. 有泛型参数 && 类型为AutoMapper.class
-            if (type instanceof ParameterizedType && ((ParameterizedType)type).getRawType().equals(AutoMapper.class) ) {
+            if (type instanceof ParameterizedType && BaseMapper.class.isAssignableFrom(mapperClass) ) {
                 target = (ParameterizedType)type;
                 break;
             }

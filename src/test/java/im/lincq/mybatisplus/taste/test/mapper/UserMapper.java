@@ -1,7 +1,7 @@
 package im.lincq.mybatisplus.taste.test.mapper;
 
 import im.lincq.mybatisplus.taste.mapper.AutoMapper;
-import im.lincq.mybatisplus.taste.test.entity.User;
+import im.lincq.mybatisplus.taste.test.mysql.entity.User;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;

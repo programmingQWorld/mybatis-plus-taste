@@ -3,11 +3,9 @@ package im.lincq.mybatisplus.taste.test;
 import im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder;
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import im.lincq.mybatisplus.taste.plugins.Page;
-import im.lincq.mybatisplus.taste.plugins.pagination.Pagination;
-import im.lincq.mybatisplus.taste.test.entity.User;
+import im.lincq.mybatisplus.taste.test.mysql.entity.User;
 import im.lincq.mybatisplus.taste.test.mapper.UserMapper;
 import im.lincq.mybatisplus.taste.toolkit.IdWorker;
-import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.BasicConfigurator;
@@ -43,7 +41,7 @@ public class UserMapperTest {
         InputStream in = UserMapperTest.class.getClassLoader().getResourceAsStream(RESOUCE);
 
         // SqlSession session = new SqlSessionFactoryBuilder().build(in).openSession();
-        // 此处使用MybatisSessionFactoryBuilder构建SqlSessionFactory,目的是为了引入AutoMapper
+        // 此处使用MybatisSessionFactoryBuilder构建SqlSessionFactory,目的是为了引入AutoMapper（BaseMapper）
         SqlSessionFactory sessionFactory = new MybatisSessionFactoryBuilder().build(in);
         SqlSession session = sessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);

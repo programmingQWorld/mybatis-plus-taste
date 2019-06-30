@@ -100,16 +100,12 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
 
     private ObjectWrapperFactory objectWrapperFactory;
 
-    /**
-     * 数据库类型（默认 MySql）
-     */
-    public static DBType DB_TYPE = DBType.MYSQL;
 
-    /*
+    /**
 	 * 注入数据库类型
 	 */
     public void setDbType(String dbType) {
-        DB_TYPE = DBType.getDBType(dbType);
+        MybatisConfiguration.DB_TYPE = DBType.getDBType(dbType);
     }
 
     /**

@@ -6,7 +6,7 @@
 
     <groupId>im.lincq</groupId>
     <artifactId>mybatis-plus-taste</artifactId>
-    <version>1.2.14</version>
+    <version>1.2.15</version>
     <build>
         <plugins>
             <plugin>
@@ -67,6 +67,7 @@
         <mysql-connector-java.version>5.1.38</mysql-connector-java.version>
         <slf4j.version>1.7.16</slf4j.version>
         <spring.version>4.2.3.RELEASE</spring.version>
+        <ojdbc14.version>10.2.0.5.0</ojdbc14.version>
     </properties>
 
     <dependencies>

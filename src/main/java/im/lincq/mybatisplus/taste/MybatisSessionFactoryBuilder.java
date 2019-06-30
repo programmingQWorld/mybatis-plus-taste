@@ -1,5 +1,6 @@
 package im.lincq.mybatisplus.taste;
 
+import im.lincq.mybatisplus.taste.mapper.DBType;
 import org.apache.ibatis.exceptions.ExceptionFactory;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.Configuration;
@@ -56,5 +57,10 @@ public class MybatisSessionFactoryBuilder extends SqlSessionFactoryBuilder {
                 // Intentionally ignore. Prefer previous error.
             }
         }
+    }
+
+    //TODO 注入数据库类型
+    public void setDbType( String dbType ) {
+        MybatisConfiguration.DB_TYPE = DBType.getDBType(dbType);
     }
 }

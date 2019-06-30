@@ -1,9 +1,5 @@
 package im.lincq.mybatisplus.taste.test;
 
-import im.lincq.mybatisplus.taste.test.entity.User;
-import im.lincq.mybatisplus.taste.toolkit.TableInfo;
-import im.lincq.mybatisplus.taste.toolkit.TableInfoHelper;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

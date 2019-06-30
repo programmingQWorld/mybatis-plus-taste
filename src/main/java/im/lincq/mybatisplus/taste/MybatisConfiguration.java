@@ -2,6 +2,8 @@ package im.lincq.mybatisplus.taste;
 
 import im.lincq.mybatisplus.taste.mapper.AutoMapper;
 import im.lincq.mybatisplus.taste.mapper.AutoSqlInjector;
+import im.lincq.mybatisplus.taste.mapper.BaseMapper;
+import im.lincq.mybatisplus.taste.mapper.DBType;
 import im.lincq.mybatisplus.taste.spring.MybatisSqlSessionFactoryBean;
 import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -19,6 +21,11 @@ public class MybatisConfiguration extends Configuration {
 
     protected Logger logger = Logger.getLogger("MybatisConfiguration");
 
+
+    /**
+     * 数据库类型（默认 MySql）
+     */
+    public static DBType DB_TYPE = DBType.MYSQL;
 
     /**
      * 初始化调用
@@ -75,11 +82,11 @@ public class MybatisConfiguration extends Configuration {
     @Override
     public <T> void addMapper(Class<T> type) {
         super.addMapper(type);
-        if (!AutoMapper.class.isAssignableFrom(type)) {
+        if (!BaseMapper.class.isAssignableFrom(type)) {
             return;
         }
         /* 自动注入SQL */
-        new AutoSqlInjector(this, MybatisSqlSessionFactoryBean.DB_TYPE).inject(type);
+        new AutoSqlInjector(this, DB_TYPE).inject(type);
     }
 
     @Override

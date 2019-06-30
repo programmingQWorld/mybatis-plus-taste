@@ -115,8 +115,8 @@ public class PaginationInterceptor implements Interceptor {
             sqlUse = sql.substring(0, order_by);
         }*/
         // sql: 获取总记录数量
-        StringBuffer countSql = new StringBuffer("SELECT COUNT(1) FROM (");
-        countSql.append(sqlUse).append(") AS TOTAL");
+        StringBuffer countSql = new StringBuffer("SELECT COUNT(1) AS TOTAL FROM (");
+        countSql.append(sqlUse).append(") A");
 
         PreparedStatement pstmt = null;
         ResultSet rs = null;
