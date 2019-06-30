@@ -1,6 +1,5 @@
 package im.lincq.mybatisplus.taste.mapper;
 
-import com.sun.org.apache.bcel.internal.generic.TABLESWITCH;
 import im.lincq.mybatisplus.taste.annotations.IdType;
 import im.lincq.mybatisplus.taste.toolkit.TableFieldInfo;
 import im.lincq.mybatisplus.taste.toolkit.TableInfo;
@@ -30,7 +29,7 @@ public class AutoSqlInjector {
 
     /** mybatis配置类对象， 还有一个小助理*/
     private Configuration configuration;
-    private MapperBuilderAssistant assistant;
+    private MapperBuilderAssistant builderAssistant;
 
     private DBType dbType = DBType.MYSQL;
 
@@ -45,10 +44,9 @@ public class AutoSqlInjector {
      * 注入单点SQL
      * @param mapperClass
      */
-    public void inject(Class<?> mapperClass) {
+    public void inject(MapperBuilderAssistant builderAssistant, Class<?> mapperClass) {
         System.out.println("执行sql语句注入方法");
-        assistant = new MapperBuilderAssistant(configuration, mapperClass.getName().replaceAll("\\.", "/"));
-        assistant.setCurrentNamespace(mapperClass.getName());
+        this.builderAssistant = builderAssistant;
 
         Class<?> modelClass  = extractModelClass(mapperClass);
         TableInfo table = TableInfoHelper.getTableInfo(modelClass);
@@ -481,8 +479,13 @@ public class AutoSqlInjector {
             System.err.println(statementName + ", Has been loaded by XML or SqlProvider, ignoring the injection of the SQL.");
             return null;
         }
-        return assistant.addMappedStatement(id, sqlSource, StatementType.PREPARED, sqlCommandType, null, null, null,
-                parameterClass, null, resultType, null, false, true, false, keyGenerator, keyProperty, keyColumn,
+        /* 缓存逻辑处理 */
+        boolean isSelect = false;
+        if (sqlCommandType == SqlCommandType.SELECT) {
+            isSelect = true;
+        }
+        return builderAssistant.addMappedStatement(id, sqlSource, StatementType.PREPARED, sqlCommandType, null, null, null,
+                parameterClass, null, resultType, null, !isSelect, isSelect, false, keyGenerator, keyProperty, keyColumn,
                 configuration.getDatabaseId(), new XMLLanguageDriver(), null);
     }
 
@@ -509,7 +512,7 @@ public class AutoSqlInjector {
             return;
         }
 
-        assistant.addMappedStatement(
+        builderAssistant.addMappedStatement(
                 id, source, StatementType.PREPARED, sqlCommandType,
                 null, null, null, parameterClass, null,
                 resultType, null, false, true, false,

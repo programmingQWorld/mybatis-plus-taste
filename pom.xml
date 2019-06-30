@@ -69,6 +69,7 @@
         <spring.version>4.2.3.RELEASE</spring.version>
         <ojdbc14.version>10.2.0.5.0</ojdbc14.version>
         <logback-classic.version>1.1.7</logback-classic.version>
+        <mybatis-ehcache.version>1.0.3</mybatis-ehcache.version>
     </properties>
 
     <dependencies>
@@ -84,7 +85,15 @@
             <scope>provided</scope>
         </dependency>
 
+
         <!-- test begin -->
+        <!-- 话说是引入了 caches , 但假设没有引入，程序也将照样能够使用缓存 -->
+        <dependency>
+            <groupId>org.mybatis.caches</groupId>
+            <artifactId>mybatis-ehcache</artifactId>
+            <version>${mybatis-ehcache.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>

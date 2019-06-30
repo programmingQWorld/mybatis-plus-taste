@@ -1,17 +1,10 @@
 package im.lincq.mybatisplus.taste;
 
-import im.lincq.mybatisplus.taste.mapper.AutoMapper;
-import im.lincq.mybatisplus.taste.mapper.AutoSqlInjector;
-import im.lincq.mybatisplus.taste.mapper.BaseMapper;
 import im.lincq.mybatisplus.taste.mapper.DBType;
-import im.lincq.mybatisplus.taste.spring.MybatisSqlSessionFactoryBean;
-import org.apache.ibatis.io.ResolverUtil;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.SqlSession;
 
-import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -45,7 +38,7 @@ public class MybatisConfiguration extends Configuration {
      */
     @Override
     public void addMappedStatement(MappedStatement ms) {
-
+        logger.fine("addMappedStatement: " );
         if (this.mappedStatements.containsKey(ms.getId())) {
             // 说明已经加载了xml中的节点,忽略mapper中的SqlProvider数据.
             logger.severe("mapper["+ ms.getId() +"] is ignored, because it's exists, maybe from xml file");
@@ -68,41 +61,5 @@ public class MybatisConfiguration extends Configuration {
         /* 设置自定义 driver */
         return languageRegistry.getDriver(MybatisXmlLanguageDriver.class);
     }
-
-    @Override
-    public <T> T getMapper(Class<T > type, SqlSession sqlSession) {
-        return super.getMapper(type, sqlSession);
-    }
-
-    /**
-     * 重写 addMapper 方法
-     * @param type      Mapper类型
-     * @param <T>      泛型声明.
-     */
-    @Override
-    public <T> void addMapper(Class<T> type) {
-        super.addMapper(type);
-        if (!BaseMapper.class.isAssignableFrom(type)) {
-            return;
-        }
-        /* 自动注入SQL */
-        new AutoSqlInjector(this, DB_TYPE).inject(type);
-    }
-
-    @Override
-    public void addMappers(String packageName) {
-        this.addMappers(packageName, Object.class);
-    }
-
-    @Override
-    public void addMappers(String packageName, Class<?> superType) {
-        ResolverUtil<Class<?>> resolverUtil = new ResolverUtil<Class<?>>();
-        resolverUtil.find(new ResolverUtil.IsA(superType), packageName);
-        Set<Class<? extends Class<?>>> mapperSet = resolverUtil.getClasses();
-        for (Class<?> mapperClass: mapperSet) {
-            this.addMapper(mapperClass);
-        }
-    }
-
 
 }

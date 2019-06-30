@@ -14,8 +14,8 @@ import javax.sql.DataSource;
 
 import im.lincq.mybatisplus.taste.MybatisConfiguration;
 import im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder;
+import im.lincq.mybatisplus.taste.MybatisXMLMapperBuilder;
 import im.lincq.mybatisplus.taste.mapper.DBType;
-import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.io.VFS;
@@ -526,7 +526,7 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
                 }
 
                 try {
-                    XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(mapperLocation.getInputStream(),
+                    MybatisXMLMapperBuilder xmlMapperBuilder = new MybatisXMLMapperBuilder(mapperLocation.getInputStream(),
                             configuration, mapperLocation.toString(), configuration.getSqlFragments());
                     xmlMapperBuilder.parse();
                 } catch ( Exception e ) {

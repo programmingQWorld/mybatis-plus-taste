@@ -2,7 +2,6 @@ package im.lincq.mybatisplus.taste;
 
 import org.apache.ibatis.builder.BaseBuilder;
 import org.apache.ibatis.builder.BuilderException;
-import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
 import org.apache.ibatis.datasource.DataSourceFactory;
 import org.apache.ibatis.executor.ErrorContext;
@@ -18,10 +17,7 @@ import org.apache.ibatis.reflection.MetaClass;
 import org.apache.ibatis.reflection.ReflectorFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
-import org.apache.ibatis.session.AutoMappingBehavior;
-import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.ExecutorType;
-import org.apache.ibatis.session.LocalCacheScope;
+import org.apache.ibatis.session.*;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.slf4j.Logger;
@@ -476,12 +472,12 @@ public class MybatisXMLConfigBuilder extends BaseBuilder {
                     if (resource != null && url == null && mapperClass == null) {
                         ErrorContext.instance().resource(resource);
                         InputStream inputStream = Resources.getResourceAsStream(resource);
-                        XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
+                        MybatisXMLMapperBuilder mapperParser = new MybatisXMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
                         mapperParser.parse();
                     } else if (resource == null && url != null && mapperClass == null) {
                         ErrorContext.instance().resource(url);
                         InputStream inputStream = Resources.getUrlAsStream(url);
-                        XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
+                        MybatisXMLMapperBuilder mapperParser = new MybatisXMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
                         mapperParser.parse();
                     } else if (resource == null && url == null && mapperClass != null) {
                         Class<?> mapperInterface = Resources.classForName(mapperClass);

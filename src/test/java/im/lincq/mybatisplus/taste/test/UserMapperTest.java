@@ -48,8 +48,23 @@ public class UserMapperTest {
         System.err.println(" debug run 查询执行 user 表数据变化！ ");
         //session.delete("deleteAll");
 
+        userMapper.deleteSelective(new User());
+        System.err.println("deleteAll --data-- ");
+
         int rlt = userMapper.insertInjector(new User(1L, "1", 1, 1));
         System.err.println("-----------------insertInjector------------------------" + rlt);
+
+        /**
+         * ehcache 缓存测试
+         */
+        User cacheUserQuery = new User();
+        cacheUserQuery.setAge(1);
+        cacheUserQuery.setId(1L);
+        User cacheUser = userMapper.selectOne(cacheUserQuery);
+        print(cacheUser);
+        System.out.println("在这里检查查询前后sql执行情况");
+        cacheUser = userMapper.selectOne(cacheUserQuery);
+        print(cacheUser);
 
         /* 插入*/
         System.out.println("\n------------------insert----------------- age=18");
