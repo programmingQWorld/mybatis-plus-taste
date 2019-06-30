@@ -16,7 +16,7 @@ import java.util.List;
 public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T, I> {
 
     @Autowired
-    protected M autoMapper;
+    protected M baseMapper;
 
     public boolean retBool (int result) {
         return result >= 1;
@@ -24,102 +24,102 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
 
     @Override
     public boolean insert(T entity) {
-        return retBool(autoMapper.insert(entity));
+        return retBool(baseMapper.insert(entity));
     }
 
     @Override
     public boolean insertBatch (List<T> entityList) {
-        return retBool(autoMapper.insertBatch(entityList));
+        return retBool(baseMapper.insertBatch(entityList));
     }
 
     @Override
     public boolean insertSelective(T entity) {
-        return retBool(autoMapper.insertSelective(entity));
+        return retBool(baseMapper.insertSelective(entity));
     }
 
     @Override
     public boolean deleteById(I id) {
-        return retBool(autoMapper.deleteById(id));
+        return retBool(baseMapper.deleteById(id));
     }
 
     @Override
     public boolean deleteSelective(T entity) {
-        return retBool(autoMapper.deleteSelective(entity));
+        return retBool(baseMapper.deleteSelective(entity));
     }
 
     @Override
     public boolean deleteBatchIds(List<I> idList) {
-        return retBool(autoMapper.deleteBatchIds(idList));
+        return retBool(baseMapper.deleteBatchIds(idList));
     }
 
     @Override
     public boolean updateById (T entity) {
-        return retBool(autoMapper.updateById(entity));
+        return retBool(baseMapper.updateById(entity));
     }
 
     @Override
     public boolean updateSelectiveById(T entity) {
-        return retBool(autoMapper.updateSelectiveById(entity));
+        return retBool(baseMapper.updateSelectiveById(entity));
     }
 
     @Override
     public boolean update(T entity, T whereEntity) {
-        return retBool(autoMapper.update(entity, whereEntity));
+        return retBool(baseMapper.update(entity, whereEntity));
     }
 
     @Override
     public boolean updateSelective(T entity, T whereEntity) {
-        return retBool(autoMapper.updateSelective(entity, whereEntity));
+        return retBool(baseMapper.updateSelective(entity, whereEntity));
     }
 
     @Override
     public boolean updateBatchById(List<T> entityList) {
-        return retBool(autoMapper.updateBatchById(entityList));
+        return retBool(baseMapper.updateBatchById(entityList));
     }
 
     @Override
     public T selectById(I id) {
-        return autoMapper.selectById(id);
+        return baseMapper.selectById(id);
     }
 
     @Override
     public List<T> selectBatchIds(List<I> idList) {
-        return autoMapper.selectBatchIds(idList);
+        return baseMapper.selectBatchIds(idList);
     }
 
     @Override
     public T selectOne(T entity) {
-        return autoMapper.selectOne(entity);
+        return baseMapper.selectOne(entity);
     }
 
     @Override
     public int selectCount(T entity) {
-        return autoMapper.selectCount(entity);
+        return baseMapper.selectCount(entity);
     }
 
     // # 下面2组方法，是orderByField的区别
 
     @Override
     public List<T> selectList (T entity, String orderByField) {
-        return autoMapper.selectList(new EntityWrapper<T>(entity, orderByField));
+        return baseMapper.selectList(new EntityWrapper<T>(entity, orderByField));
     }
 
     @Override
     public List<T> selectList(T entity) {
-        return autoMapper.selectList(new EntityWrapper<T>(entity, null));
+        return baseMapper.selectList(new EntityWrapper<T>(entity, null));
     }
 
     // # 下面2组方法，是 orderByField 的区别
 
     @Override
     public Page<T > selectPage (Page<T> page, T entity, String orderByField) {
-        page.setRecords(autoMapper.selectPage(page, new EntityWrapper<T>(entity, orderByField)));
+        page.setRecords(baseMapper.selectPage(page, new EntityWrapper<T>(entity, orderByField)));
         return page;
     }
 
     @Override
     public Page<T> selectPage (Page<T> page, T entity) {
-        page.setRecords(autoMapper.selectPage(page, new EntityWrapper<T>(entity, null)));
+        page.setRecords(baseMapper.selectPage(page, new EntityWrapper<T>(entity, null)));
         return page;
     }
 

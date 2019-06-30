@@ -35,6 +35,8 @@ Maven 坐标
 3、Spring 根据不同环境加载不同配置支持。
 
 
+![项目结构说明](http://git.oschina.net/uploads/images/2016/0427/104817_6ebcc3eb_12260.png "项目结构说明")
+
 Usage
 ===========
 1、代码自动生成，查看类
