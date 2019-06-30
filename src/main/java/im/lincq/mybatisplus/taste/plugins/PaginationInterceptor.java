@@ -26,6 +26,8 @@ import java.util.Properties;
 @Intercepts({@Signature(type = StatementHandler.class, method="prepare", args = {Connection.class, Integer.class })})
 public class PaginationInterceptor implements Interceptor {
 
+    private static final long serialVersionUID = 1L;
+
     /** 方言类型 */
     private String dialectType;
     /** 方言实现类 */

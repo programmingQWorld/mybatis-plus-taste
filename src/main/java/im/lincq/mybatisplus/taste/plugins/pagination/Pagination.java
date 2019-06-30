@@ -1,14 +1,18 @@
 package im.lincq.mybatisplus.taste.plugins.pagination;
 
-import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import org.apache.ibatis.session.RowBounds;
+
+import java.io.Serializable;
 
 /**
  * 简单分页模型
  * 用户可以通过继承org.apache.ibatis.session.RowBounds实现自己的分页模型
  * 注意，插件仅支持RowBounds及其子类作为分页参数
  */
-public class Pagination extends RowBounds {
+public class Pagination extends RowBounds implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     /** 总记录条数 */
     private int total;
     /** 每页数量 */
