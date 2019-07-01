@@ -15,7 +15,9 @@ import javax.sql.DataSource;
 import im.lincq.mybatisplus.taste.MybatisConfiguration;
 import im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder;
 import im.lincq.mybatisplus.taste.MybatisXMLMapperBuilder;
+import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import im.lincq.mybatisplus.taste.mapper.DBType;
+import im.lincq.mybatisplus.taste.toolkit.PackageHelper;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.io.VFS;
@@ -430,8 +432,16 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
         }
 
         if ( hasLength(this.typeAliasesPackage) ) {
-            String[] typeAliasPackageArray = tokenizeToStringArray(this.typeAliasesPackage,
-                    ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
+            String[] typeAliasPackageArray = null;
+            if (typeAliasesPackage.contains("*")) {
+                typeAliasPackageArray = PackageHelper.convertTypeAliasesPackage(this.typeAliasesPackage);
+            } else {
+                typeAliasPackageArray = tokenizeToStringArray(this.typeAliasesPackage,
+                        ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
+            }
+            if (typeAliasPackageArray == null) {
+                throw new MybatisPlusException("not find typeAliasesPackage: " + this.typeAliasesPackage);
+            }
             for ( String packageToScan : typeAliasPackageArray ) {
                 configuration.getTypeAliasRegistry().registerAliases(packageToScan,
                         typeAliasesSuperType == null ? Object.class : typeAliasesSuperType);
