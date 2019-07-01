@@ -21,6 +21,8 @@ public class Pagination extends RowBounds implements Serializable {
     private int pages;
     /** 当前页 */
     private int current = 1;
+    /* 查询总记录数（默认true）(lincq:决定执行count查询) */
+    private boolean searchCount  = true;
 
     public Pagination () {
         super();
@@ -33,13 +35,16 @@ public class Pagination extends RowBounds implements Serializable {
      * @param size         每页显示条数
      */
     public Pagination(int current, int size) {
-        super(offsetCurrent(current ,size), size);
+        this(current, size, true);
+    }
 
+    public Pagination (int current, int size, boolean searchCount) {
+        super(offsetCurrent(current ,size), size);
         if (current > 1) {
             this.current = current;
         }
         this.size = size;
-
+        this.searchCount = searchCount;
     }
 
     public int getOffsetCurrent() {
@@ -86,6 +91,13 @@ public class Pagination extends RowBounds implements Serializable {
         return current;
     }
 
+    public boolean isSearchCount() {
+        return searchCount;
+    }
+
+    public void setSearchCount(boolean searchCount) {
+        this.searchCount = searchCount;
+    }
 
     @Override
     public String toString() {

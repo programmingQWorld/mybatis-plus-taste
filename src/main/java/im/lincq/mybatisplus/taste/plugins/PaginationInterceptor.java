@@ -89,7 +89,10 @@ public class PaginationInterceptor implements Interceptor {
                 // # 定义分页查询（Pagination→count()）
                 MappedStatement mappedStatement = (MappedStatement)metaStatementHandler.getValue("delegate.mappedStatement");
                 Connection connection = (Connection)invocation.getArgs()[0];
-                Pagination page = this.count(originalSql, connection, mappedStatement, boundSql, (Pagination)rowBounds);
+                Pagination page = (Pagination)rowBounds;
+                if (page.isSearchCount()) {
+                    this.count(originalSql, connection, mappedStatement, boundSql, page);
+                }
                 originalSql = dialect.buildPaginationSql(originalSql, page.getOffsetCurrent(), page.getSize());
             }
             /* 将组装分页后的sql写回对应的statementhandler */
