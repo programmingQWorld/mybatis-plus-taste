@@ -133,6 +133,16 @@ public interface IService<T, I> {
      */
     int selectCount( @Param("ew" ) T entity);
 
+
+    /**
+     * <p>查询列表</p>
+     *
+     * @param entity 实体对象
+     * @param sqlSegment SQL 片段
+     * @param orderByFIeld 对应EntityWrapper类中orderByField字段{@link EntityWrapper}
+     * @return
+     */
+    List<T> selectList(T entity, String sqlSegment, String orderByFIeld);
     /**
      * <p>查询列表</p>
      *
@@ -143,6 +153,17 @@ public interface IService<T, I> {
     List<T> selectList(T entity, String orderByField);
 
     List<T> selectList(T entity);
+
+    /**
+     * <p>翻页查询</p>
+     *
+     * @param page            翻页对象
+     * @param entity          实体对象
+     * @param sqlSegment SQL 片段
+     * @param orderByField  对应 EntityWrapper 类中 orderByField 字段
+     * @return              数据结果集
+     */
+    Page<T> selectPage(Page<T>page, T entity, String sqlSegment, String orderByField);
 
     /**
      * <p>翻页查询</p>

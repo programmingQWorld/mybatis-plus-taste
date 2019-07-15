@@ -97,6 +97,11 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
         return baseMapper.selectCount(entity);
     }
 
+    @Override
+    public List<T> selectList(T entity, String sqlSegment, String orderByFIeld) {
+        return baseMapper.selectList(new EntityWrapper<>(entity, sqlSegment, orderByFIeld));
+    }
+
     // # 下面2组方法，是orderByField的区别
 
     @Override
@@ -107,6 +112,12 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
     @Override
     public List<T> selectList(T entity) {
         return baseMapper.selectList(new EntityWrapper<T>(entity, null));
+    }
+
+    @Override
+    public Page<T> selectPage(Page<T> page, T entity, String sqlSegment, String orderByField) {
+        page.setRecords(baseMapper.selectPage(page, new EntityWrapper<>(entity, sqlSegment, orderByField)));
+        return page;
     }
 
     // # 下面2组方法，是 orderByField 的区别
