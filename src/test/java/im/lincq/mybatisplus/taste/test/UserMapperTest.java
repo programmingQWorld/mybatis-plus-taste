@@ -86,10 +86,10 @@ public class UserMapperTest {
 
 
         List<User> ul = new ArrayList<User>();
-        ul.add(new User("insert-batch-1", 12, 0));
-        ul.add(new User( "insert-batch-2", 13, 9));
-        ul.add(new User( "insert-batch-3", 14, 9));
-        ul.add(new User( "delname", 14, 6));
+        ul.add(new User("insert-batch-1", 12, 1));
+        ul.add(new User( "insert-batch-2", 13, 1));
+        ul.add(new User( "insert-batch-3", 14, 1));
+        ul.add(new User( "delname", 14, 1));
         rlt = userMapper.insertBatch(ul);
 
         System.err.println("\n------------------insertBatch----------------------\n \n\n\n" + rlt);
@@ -140,8 +140,8 @@ public class UserMapperTest {
 
         List<User> userList = new ArrayList<User>();
         userList.add(new User(11L, "updateBatchById-1", 1, 1));
-        userList.add(new User(12L, "updateBatchById-2", 2, 2));
-        userList.add(new User(13L, "updateBatchById-3", 3, 3));
+        userList.add(new User(12L, "updateBatchById-2", 2, 1));
+        userList.add(new User(13L, "updateBatchById-3", 3, 1));
         rlt = userMapper.updateBatchById(userList);
         System.err.println("------------------updateBatchById---------------------- result=" + rlt + "\n\n");
         sleep();
@@ -159,6 +159,8 @@ public class UserMapperTest {
 
         System.err.println("\n------------------selectList--------(id DESC)--------------");
         EntityWrapper<User> ew = new EntityWrapper<>(new User("insert-batch-2"), "id desc");
+        /** 查询条件，支持 sql 片段 */
+        ew.setSqlSegment(" AND name like %dateBatch% ");
         List<User> ewUserList = userMapper.selectList(ew);
         ewUserList.forEach(UserMapperTest::print);
 

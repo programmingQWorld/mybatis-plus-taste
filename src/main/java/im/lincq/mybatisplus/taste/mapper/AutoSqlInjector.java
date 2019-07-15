@@ -165,8 +165,9 @@ public class AutoSqlInjector {
 
         where.append("\n\t\t").append("</where>");
 
-        // # order by  拼接
-        where.append("\n\t\t<if test = \"ew.orderByField != null\"> ORDER BY #{ew.orderByField}</if>");
+        // # 拼接额外的 sql 片段 . 作用（条件过滤），同时也包含了 order by 的拼接
+        where.append("\n<if test=\"ew.sqlSegment!=null\">\n${ew.sqlSegment}\n</if>");
+
         where.append("\n\t</if>");
         where .append("\n</if>");
         String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table), table.getTableName(), where.toString());
