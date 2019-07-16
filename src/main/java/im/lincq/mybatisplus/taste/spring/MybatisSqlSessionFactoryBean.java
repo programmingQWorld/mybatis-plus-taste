@@ -111,6 +111,13 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
     }
 
     /**
+     * 注入表字段使用下划线命名
+     */
+    public void setDbColumnUnderline(boolean dbColumnUnderline) {
+        MybatisConfiguration.DB_COLUMN_UNDERLINE = dbColumnUnderline;
+    }
+
+    /**
      * Sets the ObjectFactory.
      *
      * @since 1.1.2

@@ -28,8 +28,14 @@
 		    </bean>
         </array>
     </property>
-    <!-- oracle 添加 -->
-    <!--<property name="dbType" value="oracle" />-->
+   
+    <!--
+    oracle 添加 
+    <property name="dbType" value="oracle" />
+    全局表为下划线命名设置 true
+    <property name="dbColumnUnderline" value="true" />
+    -->
+    
 </bean>
 
 <!-- 加载 mapper.xml 接口 配置文件 -->

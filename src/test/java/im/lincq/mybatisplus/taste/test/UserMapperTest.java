@@ -45,6 +45,17 @@ public class UserMapperTest {
         // SqlSession session = new SqlSessionFactoryBuilder().build(in).openSession();
         // 此处使用MybatisSessionFactoryBuilder构建SqlSessionFactory,目的是为了引入AutoMapper（BaseMapper）
         SqlSessionFactory sessionFactory = new MybatisSessionFactoryBuilder().build(in);
+
+        /**
+         * 1、数据库字段驼峰命名不需要任何设置
+         * 2、当前演示时驼峰下划线混合命名
+         * 3、如下开启，标识数据库字段使用下划线命名，该设置是全局的。
+         * 开启该设置实体可无 @TableId(value="id") 或者 @TableField(value = "field_1")等字段映射
+         * 开启方式为 调用 sqlSessionFactory 实例的 setDbColumnUnderline 方法, 传 true， 如：
+         * mf.setDbColumnUnderline(true);
+         *
+         */
+
         SqlSession session = sessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
         System.err.println(" debug run 查询执行 user 表数据变化！ ");

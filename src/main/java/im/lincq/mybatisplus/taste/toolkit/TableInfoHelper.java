@@ -1,5 +1,6 @@
 package im.lincq.mybatisplus.taste.toolkit;
 
+import im.lincq.mybatisplus.taste.MybatisConfiguration;
 import im.lincq.mybatisplus.taste.annotations.TableField;
 import im.lincq.mybatisplus.taste.annotations.TableId;
 import im.lincq.mybatisplus.taste.annotations.TableName;
@@ -57,6 +58,9 @@ public class TableInfoHelper {
                         /*主键字段名称可能会和当前属性名称不一样，plus遵循当前的注解value配置主键字段名称*/
                         tableInfo.setKeyColumn(tableId.value());
                         tableInfo.setKeyRelated(true);
+                    } else if (MybatisConfiguration.DB_COLUMN_UNDERLINE)  {
+                        /* 开启字段下划线声明 */
+                        tableInfo.setKeyColumn(camelToUnderline(field.getName()));
                     } else {
                         tableInfo.setKeyColumn(field.getName());
                     }
@@ -82,14 +86,19 @@ public class TableInfoHelper {
                 continue;
             }
 
-            /* 不需要自定义映射表字段 */
-            fieldList.add(new TableFieldInfo( field.getName() ));
+            if (MybatisConfiguration.DB_COLUMN_UNDERLINE) {
+                fieldList.add(new TableFieldInfo(true, camelToUnderline(field.getName()), field.getName()));
+            } else {
+                /* 不需要自定义映射表字段  会影响到是否追加 as 部分*/
+                fieldList.add(new TableFieldInfo( field.getName() ));
+            }
+
         }
 
         /* 字段列表 */
         tableInfo.setFieldList(fieldList);
 
-        /* we未发现主键注解，抛出异常 */
+        /* 未发现主键注解，抛出异常 */
         if (tableInfo.getKeyColumn() == null) {
             throw new MybatisPlusException("Not found @TableId annotation in " + clazz);
         }
@@ -98,6 +107,9 @@ public class TableInfoHelper {
         return tableInfo;
     }
 
+    /**
+     * 驼峰转下划线
+     */
     private static String camelToUnderline(String param) {
         if (param == null || "".equals(param)) {
             return "";
@@ -109,7 +121,7 @@ public class TableInfoHelper {
             if (Character.isUpperCase(c) && i > 0) {
                 sb.append("_");
             }
-            sb.append(Character.toUpperCase(c));
+            sb.append(Character.toLowerCase(c));
         }
         return sb.toString();
     }
