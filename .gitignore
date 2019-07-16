@@ -2,4 +2,7 @@
 /.idea/
 /out/
 /target/
+/.settings/
+/.project
+/.classpath
 
