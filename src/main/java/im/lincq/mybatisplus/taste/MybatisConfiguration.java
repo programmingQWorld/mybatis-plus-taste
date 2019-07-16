@@ -1,6 +1,8 @@
 package im.lincq.mybatisplus.taste;
 
+import im.lincq.mybatisplus.taste.mapper.AutoSqlInjector;
 import im.lincq.mybatisplus.taste.mapper.DBType;
+import im.lincq.mybatisplus.taste.mapper.ISqlInjector;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
@@ -24,6 +26,11 @@ public class MybatisConfiguration extends Configuration {
      * 数据库字段使用下划线命名（默认 false）
      */
     public static boolean DB_COLUMN_UNDERLINE = false;
+
+    /*
+     * SQL 注入器，实现 ISqlInjector 或继承 AutoSqlInjector 自定义方法
+     */
+    public static ISqlInjector SQL_INJECTOR  = new AutoSqlInjector();;
 
     /**
      * 初始化调用

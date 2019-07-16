@@ -372,9 +372,9 @@ public class MybatisXMLMapperBuilder extends BaseBuilder {
                     configuration.addLoadedResource("namespace:" + namespace);
                     configuration.addMapper(boundType);
                 }
-                // TODO 注入 CURD 动态 SQL
+                // TODO 注入 CURD 动态 SQL {  inject 方法内会注入各种增删改查的 SQL 语句 }
                 if (BaseMapper.class.isAssignableFrom(boundType)) {
-                    new AutoSqlInjector(configuration, MybatisConfiguration.DB_TYPE).inject(builderAssistant, boundType);
+                    MybatisConfiguration.SQL_INJECTOR.inject(configuration, builderAssistant, boundType);
                 }
             }
         }

@@ -17,6 +17,7 @@ import im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder;
 import im.lincq.mybatisplus.taste.MybatisXMLMapperBuilder;
 import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import im.lincq.mybatisplus.taste.mapper.DBType;
+import im.lincq.mybatisplus.taste.mapper.ISqlInjector;
 import im.lincq.mybatisplus.taste.toolkit.PackageHelper;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.executor.ErrorContext;
@@ -115,6 +116,11 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
      */
     public void setDbColumnUnderline(boolean dbColumnUnderline) {
         MybatisConfiguration.DB_COLUMN_UNDERLINE = dbColumnUnderline;
+    }
+
+    //TODO 注入 SQL注入器
+    public void setSqlInjector(ISqlInjector sqlInjector) {
+        MybatisConfiguration.SQL_INJECTOR = sqlInjector;
     }
 
     /**

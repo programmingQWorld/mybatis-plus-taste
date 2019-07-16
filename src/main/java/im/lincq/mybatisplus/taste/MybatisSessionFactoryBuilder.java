@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste;
 
 import im.lincq.mybatisplus.taste.mapper.DBType;
+import im.lincq.mybatisplus.taste.mapper.ISqlInjector;
 import org.apache.ibatis.exceptions.ExceptionFactory;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.Configuration;
@@ -67,5 +68,10 @@ public class MybatisSessionFactoryBuilder extends SqlSessionFactoryBuilder {
     // TODO 注入表字段使用下划线命名
     public void  setDbColumnUnderline(boolean dbColumnUnderline) {
         MybatisConfiguration.DB_COLUMN_UNDERLINE = dbColumnUnderline;
+    }
+
+    //TODO 注入 SQL注入器
+    public void setSqlInjector(ISqlInjector sqlInjector) {
+        MybatisConfiguration.SQL_INJECTOR = sqlInjector;
     }
 }

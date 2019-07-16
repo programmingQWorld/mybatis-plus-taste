@@ -5,6 +5,7 @@ import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import im.lincq.mybatisplus.taste.plugins.Page;
 import im.lincq.mybatisplus.taste.plugins.PaginationInterceptor;
 import im.lincq.mybatisplus.taste.plugins.pagination.Pagination;
+import im.lincq.mybatisplus.taste.test.mysql.MySqlInjector;
 import im.lincq.mybatisplus.taste.test.mysql.entity.User;
 import im.lincq.mybatisplus.taste.test.mapper.UserMapper;
 import im.lincq.mybatisplus.taste.toolkit.IdWorker;
@@ -44,7 +45,8 @@ public class UserMapperTest {
 
         // SqlSession session = new SqlSessionFactoryBuilder().build(in).openSession();
         // 此处使用MybatisSessionFactoryBuilder构建SqlSessionFactory,目的是为了引入AutoMapper（BaseMapper）
-        SqlSessionFactory sessionFactory = new MybatisSessionFactoryBuilder().build(in);
+        MybatisSessionFactoryBuilder mf = new MybatisSessionFactoryBuilder();
+        SqlSessionFactory sessionFactory = mf.build(in);
 
         /**
          * 1、数据库字段驼峰命名不需要任何设置
@@ -55,6 +57,11 @@ public class UserMapperTest {
          * mf.setDbColumnUnderline(true);
          *
          */
+
+        /**
+         * 设置，自定义 SQL 注入器
+         */
+        mf.setSqlInjector(new MySqlInjector());
 
         SqlSession session = sessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
@@ -185,8 +192,8 @@ public class UserMapperTest {
         //List<User> rowList = userMapper.selectListRow(new RowBounds(0, 2));
         //rowList.forEach(UserMapperTest::print);
 
-        /* 删除测试数据 */
-        //rlt = session.delete("deleteAll");
+        /* 自定义方法，删除测试数据 */
+        rlt = userMapper.deleteAll();
         System.err.println("清空测试数据！ rlt=" + rlt);
 
         System.err.println("\n------------------insertBatch----------------------\n \n\n\n" + userMapper.insertBatch(ul));
