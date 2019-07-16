@@ -1,6 +1,5 @@
 package im.lincq.mybatisplus.taste.plugins;
 
-
 import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
@@ -14,7 +13,6 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -29,8 +27,6 @@ import java.util.Properties;
                 RowBounds.class, ResultHandler.class}),
         @Signature(type = Executor.class, method = "update", args = { MappedStatement.class, Object.class})})
 public class PerformanceInterceptor implements Interceptor {
-
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     /**
      * SQL 执行最大时长，超过自动停止运行，有助于发现问题。
@@ -121,8 +117,8 @@ public class PerformanceInterceptor implements Interceptor {
         return sql.replaceFirst("\\?", result);
     }
 
-    public static synchronized String dateToString (Object obj) {
-        return DATE_FORMAT.format(obj);
+    private static synchronized String dateToString (Object obj) {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(obj);
     }
 
     public long getMaxTime() {
