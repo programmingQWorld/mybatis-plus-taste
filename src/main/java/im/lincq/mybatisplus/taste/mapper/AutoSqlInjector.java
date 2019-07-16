@@ -18,6 +18,7 @@ import org.apache.ibatis.session.Configuration;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -62,6 +63,7 @@ public class AutoSqlInjector {
 
             /* 删除 */
             this.injectDeleteSelectiveSql(mapperClass, modelClass, table);
+            this.injectDeleteByMapSql(mapperClass, table);
             this.injectDeleteSql(false, mapperClass, modelClass, table);
             this.injectDeleteSql(true, mapperClass, modelClass, table);
             System.out.println("The modelClass is  (User ???)" + modelClass);
@@ -77,6 +79,7 @@ public class AutoSqlInjector {
             /* 查询 */
             this.injectSelectSql(false, mapperClass, modelClass, table);
             this.injectSelectSql(true, mapperClass, modelClass, table);
+            this.injectSelectByMapSql(mapperClass, modelClass, table);
             this.injectSelectOneSql(mapperClass, modelClass, table);
             this.injectSelectCountSql(mapperClass, modelClass, table);
             this.injectSelectListSql(SqlMethod.SELECT_LIST, mapperClass, modelClass, table);
@@ -114,6 +117,16 @@ public class AutoSqlInjector {
             sqlSource = new RawSqlSource(configuration, sql, mapperClass);
         }
         System.out.println("inject select(batch) sql: " + sql);
+        this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.SELECT, modelClass);
+    }
+
+    /**
+     * <p>注入 map 查询 SQL 语句</p>
+     */
+    private void injectSelectByMapSql(Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
+        SqlMethod sqlMethod = SqlMethod.SELECT_BY_MAP;
+        String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhereByMap());
+        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, Map.class);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.SELECT, modelClass);
     }
 
@@ -342,12 +355,25 @@ public class AutoSqlInjector {
         this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
     }
 
+    /**
+     * 注入 entity 条件删除 SQL 语句
+     * @param mapperClass
+     * @param modelClass
+     * @param table
+     */
     private void injectDeleteSelectiveSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
         SqlMethod sqlMethod = SqlMethod.DELETE_SELECTIVE;
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhere(table, false));
         System.out.println("inject delete selective sql : " + sql);
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.DELETE, null);
+    }
+
+    private void injectDeleteByMapSql(Class<?> mapperClass, TableInfo table) {
+        SqlMethod sqlMethod = SqlMethod.DELETE_BY_MAP;
+        String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhereByMap());
+        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, Map.class);
+        this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.DELETE, Integer.class);
     }
 
     /**
@@ -541,6 +567,15 @@ public class AutoSqlInjector {
             }
         }
         return columns.toString();
+    }
+
+    private String sqlWhereByMap () {
+        // # cm 是Map对象，keys代表 Map对象的键集合，foreach标签遍历到每个键，键名称代表 表字段名称
+        StringBuilder where = new StringBuilder();
+        where.append("\n<foreach collection=\"cm.keys\" item=\"k\" separator=\"AND\"> ");
+        where.append("\n<if test=\"cm[k]!=null\">").append("${k}=#{cm[${k}]}").append("</if>");
+        where.append("\n</foreach>");
+        return where.toString();
     }
 
     /**

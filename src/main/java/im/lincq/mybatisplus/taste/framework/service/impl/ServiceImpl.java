@@ -8,6 +8,7 @@ import im.lincq.mybatisplus.taste.plugins.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lincq
@@ -40,6 +41,11 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
     @Override
     public boolean deleteById(I id) {
         return retBool(baseMapper.deleteById(id));
+    }
+
+    @Override
+    public boolean deleteByMap(Map<String, Object> columnMap) {
+        return retBool(baseMapper.deleteByMap(columnMap));
     }
 
     @Override
@@ -85,6 +91,11 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
     @Override
     public List<T> selectBatchIds(List<I> idList) {
         return baseMapper.selectBatchIds(idList);
+    }
+
+    @Override
+    public List<T> selectByMap(Map<String, Object> columnMap) {
+        return baseMapper.selectByMap(columnMap);
     }
 
     @Override

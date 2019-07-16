@@ -5,6 +5,7 @@ import im.lincq.mybatisplus.taste.plugins.Page;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author lincq
@@ -43,6 +44,14 @@ public interface IService<T, I> {
      * @return boolean
      */
     boolean deleteById( I id );
+
+    /**
+     *<p>根据 columnMap 条件，删除记录</p>
+     *
+     * @param columnMap 表字段 map 对象
+     * @return boolean
+     */
+    boolean deleteByMap(Map<String, Object> columnMap);
 
     /**
      * 根据 entity 条件删除，删除记录
@@ -119,6 +128,14 @@ public interface IService<T, I> {
     List<T> selectBatchIds( List<I> idList );
 
     /**
+     * <p>查询（根据 columnMap 条件）</p>
+     *
+     * @param columnMap 表字段 map 对象
+     * @return List<T>
+     */
+    List<T> selectByMap (Map<String, Object> columnMap);
+
+    /**
      * 根据entity条件，查询一条记录
      *
      * @param entity 数据实体
@@ -131,7 +148,7 @@ public interface IService<T, I> {
      * @param entity 实体对象
      * @return int
      */
-    int selectCount( @Param("ew" ) T entity);
+    int selectCount(T entity);
 
 
     /**

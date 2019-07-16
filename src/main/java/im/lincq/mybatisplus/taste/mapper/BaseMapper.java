@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -47,6 +48,14 @@ public interface BaseMapper<T, I> {
      * @return       int
      * */
     int deleteById(I id);
+
+    /**
+     *<p>据 columnMap 条件，删除记录</p>
+     *
+     * @param columnMap 表字段 map 对象
+     * @return int
+     */
+    int deleteByMap(@Param("cm") Map<String, Object> columnMap);
 
     /**
      * <p>
@@ -122,6 +131,15 @@ public interface BaseMapper<T, I> {
      * @return List<T>
      */
     List<T> selectBatchIds(List<I> idList);
+
+    /**
+     * <p>
+     *     查询（根据 columnMap 条件）
+     * </p>
+     * @param columnMap  表字段 map 对象
+     * @return List<T>
+     */
+    List<T> selectByMap(@Param("cm")Map<String, Object> columnMap);
 
     /**
      * <p>
