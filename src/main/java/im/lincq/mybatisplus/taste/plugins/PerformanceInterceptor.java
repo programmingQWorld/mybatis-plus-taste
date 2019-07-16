@@ -24,8 +24,10 @@ import java.util.Properties;
 /**
  * <p>性能分析拦截器，用于输出每条 SQL 语句及其执行时间</p>
  */
-@Intercepts({@Signature(type = Executor.class, method = "query", args = { MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
-    @Signature(type = Executor.class, method = "update", args = { MappedStatement.class, Object.class})})
+@Intercepts({
+        @Signature(type = Executor.class, method = "query",   args = { MappedStatement.class, Object.class,
+                RowBounds.class, ResultHandler.class}),
+        @Signature(type = Executor.class, method = "update", args = { MappedStatement.class, Object.class})})
 public class PerformanceInterceptor implements Interceptor {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -109,7 +111,7 @@ public class PerformanceInterceptor implements Interceptor {
             if (propertyValue instanceof String) {
                 result = "'" + propertyValue + "'";
             } else if (propertyValue instanceof Date) {
-                result = "'" + DATE_FORMAT.format(propertyValue) + "'";
+                result = "'" + dateToString(propertyValue) + "'";
             } else {
                 result = propertyValue.toString();
             }
@@ -117,6 +119,10 @@ public class PerformanceInterceptor implements Interceptor {
             result = "null";
         }
         return sql.replaceFirst("\\?", result);
+    }
+
+    public static synchronized String dateToString (Object obj) {
+        return DATE_FORMAT.format(obj);
     }
 
     public long getMaxTime() {
