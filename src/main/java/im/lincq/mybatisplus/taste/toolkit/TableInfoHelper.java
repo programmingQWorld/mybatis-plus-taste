@@ -3,6 +3,7 @@ package im.lincq.mybatisplus.taste.toolkit;
 import im.lincq.mybatisplus.taste.annotations.TableField;
 import im.lincq.mybatisplus.taste.annotations.TableId;
 import im.lincq.mybatisplus.taste.annotations.TableName;
+import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -80,7 +81,13 @@ public class TableInfoHelper {
 
         /* 字段列表 */
         tableInfo.setFieldList(fieldList);
-        tableInfoCache.put(clazz.getName(), tableInfo);
+
+        /* we未发现主键注解，抛出异常 */
+        if (tableInfo.getKeyColumn() == null) {
+            throw new MybatisPlusException("Not found @TableId annotation in " + clazz);
+        }
+
+      tableInfoCache.put(clazz.getName(), tableInfo);
         return tableInfo;
     }
 

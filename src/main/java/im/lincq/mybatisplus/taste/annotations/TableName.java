@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface TableName {
-    /**表名**/
-    String value() default "";
+    /**表名，必填 **/
+    String value();
 }
