@@ -83,6 +83,10 @@
         <plugin interceptor="im.lincq.mybatisplus.taste.plugins.PaginationInterceptor">
             <property name="dialectType" value="mysql" />
         </plugin>
+        <!-- SQL 执行性能分析，开发环境使用，线上不推荐 -->
+        <plugin interceptor="im.lincq.mybatisplus.taste.plugins.PerformanceInterceptor">
+            <property name="maxTime" value="100" />
+        </plugin>
     </plugins>
 
     <!-- 多环境配置，通过default属性指定运行时环境 -->
