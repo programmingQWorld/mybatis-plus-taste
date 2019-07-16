@@ -56,10 +56,4 @@ public class MybatisConfiguration extends Configuration {
         super.setDefaultScriptingLanguage(driver);
     }
 
-    @Override
-    public LanguageDriver getDefaultScriptingLanuageInstance() {
-        /* 设置自定义 driver */
-        return languageRegistry.getDriver(MybatisXmlLanguageDriver.class);
-    }
-
 }
