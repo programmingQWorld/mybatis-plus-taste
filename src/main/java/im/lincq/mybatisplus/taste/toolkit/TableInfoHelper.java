@@ -51,15 +51,22 @@ public class TableInfoHelper {
             /* 主键ID */
             TableId tableId = field.getAnnotation(TableId.class);
             if (tableId != null) {
-                if (!"".equals(tableId.value())) {
-                    /*主键字段名称可能会和当前属性名称不一样，plus遵循当前的注解value配置主键字段名称*/
-                    tableInfo.setKeyColumn(tableId.value());
-                    tableInfo.setKeyRelated(true);
+                if (tableInfo.getKeyColumn() == null) {
+
+                    if (!"".equals(tableId.value())) {
+                        /*主键字段名称可能会和当前属性名称不一样，plus遵循当前的注解value配置主键字段名称*/
+                        tableInfo.setKeyColumn(tableId.value());
+                        tableInfo.setKeyRelated(true);
+                    } else {
+                        tableInfo.setKeyColumn(field.getName());
+                    }
+                    tableInfo.setKeyProperty(field.getName());
+                    continue;
+
                 } else {
-                    tableInfo.setKeyColumn(field.getName());
+                    /* 发现设置多个主键主键，抛出异常 */
+                    throw new MybatisPlusException("There must be only one, Discover multiple @TableId annotation in " + clazz);
                 }
-                tableInfo.setKeyProperty(field.getName());
-                continue;
             }
             /* 字段 也支持通过注解自定义映射表字段 */
             TableField tableField = field.getAnnotation(TableField.class);
