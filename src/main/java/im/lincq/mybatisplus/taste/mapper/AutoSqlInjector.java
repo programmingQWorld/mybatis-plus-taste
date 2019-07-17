@@ -138,7 +138,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
      */
     protected void injectSelectByMapSql(Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
         SqlMethod sqlMethod = SqlMethod.SELECT_BY_MAP;
-        String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhereByMap());
+        String sql = String.format(sqlMethod.getSql(),  sqlSelectColumns(table), table.getTableName(), sqlWhereByMap());
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, Map.class);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.SELECT, modelClass);
     }

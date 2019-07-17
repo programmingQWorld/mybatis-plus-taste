@@ -61,7 +61,7 @@ public class UserMapperTest {
         /**
          * 设置，自定义 SQL 注入器
          */
-        mf.setSqlInjector(new MySqlInjector());
+        //mf.setSqlInjector(new MySqlInjector());
 
         SqlSession session = sessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
@@ -135,6 +135,8 @@ public class UserMapperTest {
 
         User user = new User();
         user.setId(1);
+        user.setAge(21);
+        user.setTestType(1);
         user.setName("lin-cq :: MybatisPlus_" + System.currentTimeMillis());
         rlt = userMapper.updateById(user);
         System.err.println("\n------------------updateById----------------------\n result=" + rlt);
@@ -173,7 +175,7 @@ public class UserMapperTest {
         System.err.println("\n------------------selectList--------(id DESC)--------------");
         EntityWrapper<User> ew = new EntityWrapper<>(new User("insert-batch-2"), "id desc");
         /** 查询条件，支持 sql 片段 */
-        ew.setSqlSegment(" AND name like %dateBatch% ");
+        ew.setSqlSegment(" AND name like '%dateBatch%' ");
         List<User> ewUserList = userMapper.selectList(ew);
         ewUserList.forEach(UserMapperTest::print);
 
@@ -193,7 +195,7 @@ public class UserMapperTest {
         //rowList.forEach(UserMapperTest::print);
 
         /* 自定义方法，删除测试数据 */
-        rlt = userMapper.deleteAll();
+       //rlt = userMapper.deleteAll();
         System.err.println("清空测试数据！ rlt=" + rlt);
 
         System.err.println("\n------------------insertBatch----------------------\n \n\n\n" + userMapper.insertBatch(ul));

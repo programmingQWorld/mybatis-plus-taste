@@ -91,7 +91,11 @@ public class PaginationInterceptor implements Interceptor {
                 Connection connection = (Connection)invocation.getArgs()[0];
                 Pagination page = (Pagination)rowBounds;
                 if (page.isSearchCount()) {
-                    this.count(originalSql, connection, mappedStatement, boundSql, page);
+                    page = this.count(originalSql, connection, mappedStatement, boundSql, page);
+                    /** 总数 0 跳出执行 */
+                    if (page.getTotal() <= 0) {
+                        return invocation.proceed();
+                    }
                 }
                 originalSql = dialect.buildPaginationSql(originalSql, page.getOffsetCurrent(), page.getSize());
             }
@@ -154,7 +158,7 @@ public class PaginationInterceptor implements Interceptor {
                  rs.close();
                  pstmt.close();
              } catch (SQLException e) {
-                 e.printStackTrace();;
+                 e.printStackTrace();
              }
         }
         return page;
