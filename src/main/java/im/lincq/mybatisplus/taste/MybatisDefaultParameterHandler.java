@@ -38,18 +38,31 @@ public class MybatisDefaultParameterHandler extends DefaultParameterHandler {
      * @return
      */
     protected static Object processBatch (MappedStatement ms, Object parameterObject) {
-        Collection<Object> parameters = getParameters(parameterObject);
-        // 是集合，遍历集合，为对象填充主键ID.
-        if (parameters != null) {
-            List<Object> objectList = new ArrayList<>();
-            for (Object param : parameters) {
-                objectList.add(populateKeys(ms, parameterObject));
+
+        if (ms.getSqlCommandType() == SqlCommandType.INSERT) {
+            /*
+            * 只处理插入操作
+            * */
+            Collection<Object> parameters = getParameters(parameterObject);
+            // 是集合，遍历集合，为对象填充主键ID.
+            if (parameters != null) {
+                List<Object> objectList = new ArrayList<>();
+                for (Object param : parameters) {
+                    if (param instanceof Map) {
+                        /* map 插入不处理 */
+                        objectList.add(param);
+                    } else {
+                        objectList.add(populateKeys(ms, parameterObject));
+                    }
+                }
+                return objectList;
+            } else {
+                // 不是集合，直接为其填充主键ID
+                return populateKeys(ms, parameterObject);
             }
-            return objectList;
-        } else {
-            // 不是集合，直接为其填充主键ID
-            return populateKeys(ms, parameterObject);
         }
+        return parameterObject;
+
     }
 
     protected static Collection<Object> getParameters(Object parameter) {
