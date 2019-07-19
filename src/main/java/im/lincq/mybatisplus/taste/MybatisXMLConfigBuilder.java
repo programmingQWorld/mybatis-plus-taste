@@ -7,6 +7,8 @@ import org.apache.ibatis.datasource.DataSourceFactory;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.executor.loader.ProxyFactory;
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.io.VFS;
+import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.parsing.XNode;
@@ -74,7 +76,7 @@ public class MybatisXMLConfigBuilder extends BaseBuilder {
     }
 
 
-    // 这是在转换什么呢？
+    // 这是在转换什么呢？将mybatis配置文件信息转为Configuration对象
     // 具体转换逻辑在本类parseConfiguration方法中，
     // 该方法对本类configuration对象的属性数据初始化.
     public Configuration parse () {
@@ -98,7 +100,7 @@ public class MybatisXMLConfigBuilder extends BaseBuilder {
             pluginElement(root.evalNode("plugins"));
             objectFactoryElement(root.evalNode("objectFactory"));
             objectWrapperFactoryElement(root.evalNode("objectWrapperFactory"));
-            reflectionFactoryElement(root.evalNode("reflectionFactory"));
+            reflectorFactoryElement(root.evalNode("reflectorFactory"));
             settingsElement(settings);
             //settingsElement(root.evalNode("settings"));
             // read it after objectFactory and objectWrapperFactory issue #631
@@ -134,7 +136,9 @@ public class MybatisXMLConfigBuilder extends BaseBuilder {
             String[] clazzes = value.split(",");
             for (String clazz : clazzes) {
                 if (!clazz.isEmpty()) {
-                    configuration.setVfsImpl(Resources.classForName(clazz));
+                    @SuppressWarnings("unchecked")
+                    Class<? extends VFS> vfsImpl = (Class<? extends VFS>)Resources.classForName(clazz);
+                    configuration.setVfsImpl(vfsImpl);
                 }
             }
         }
@@ -277,7 +281,7 @@ public class MybatisXMLConfigBuilder extends BaseBuilder {
      * dtd 文件中好像没有这个标签定义reflectionFactory
      * @param context reflectionFactory
      */
-    private void reflectionFactoryElement (XNode context) throws IllegalAccessException, InstantiationException {
+    private void reflectorFactoryElement (XNode context) throws IllegalAccessException, InstantiationException {
         logger.info("im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder#dataSourceElement");
         if (context != null) {
             String type = context.getStringAttribute("type");
@@ -330,8 +334,11 @@ public class MybatisXMLConfigBuilder extends BaseBuilder {
         configuration.setSafeResultHandlerEnabled(booleanValueOf(props.getProperty("safeResultHandlerEnabled"), true));
         configuration.setDefaultScriptingLanguage(resolveClass(props.getProperty("defaultScriptingLanguage")));
         configuration.setCallSettersOnNulls(booleanValueOf(props.getProperty("callSettersOnNulls"), false));
+        configuration.setUseActualParamName(booleanValueOf(props.getProperty("useActualParamName"), false));
         configuration.setLogPrefix(props.getProperty("logPrefix"));
-        configuration.setLogImpl(resolveClass(props.getProperty("logImpl")));
+        @SuppressWarnings("unchecked")
+        Class<? extends Log> logImpl = (Class<? extends Log>) resolveClass(props.getProperty("logImpl"));
+        configuration.setLogImpl(logImpl);
         configuration.setConfigurationFactory(resolveClass(props.getProperty("configurationFactory")));
     }
 
