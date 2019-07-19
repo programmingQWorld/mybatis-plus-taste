@@ -52,8 +52,7 @@ public class SystemClock {
             public void run () {
                 now.set(System.currentTimeMillis());
             }
-        }, period, period, TimeUnit.MICROSECONDS);
-
+        }, period, period, TimeUnit.MILLISECONDS);
     }
 
     private long currentTimeMillis () {
