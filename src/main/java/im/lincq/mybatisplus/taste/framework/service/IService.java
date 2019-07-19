@@ -154,52 +154,29 @@ public interface IService<T, I> {
     /**
      * <p>查询列表</p>
      *
-     * @param entity 实体对象
-     * @param sqlSegment SQL 片段
-     * @param orderByFIeld 对应EntityWrapper类中orderByField字段{@link EntityWrapper}
+
      * @return
      */
-    List<T> selectList(T entity, String sqlSegment, String orderByFIeld);
+
     /**
      * <p>查询列表</p>
-     *
-     * @param entity          实体对象
-     * @param orderByField    对应 EntityWrapper 类中 orderByField 字段 {@link EntityWrapper }
-     * @return                数据结果集
+     * @param entity                实体对象
+     * @param sqlSelect         SQL 查询字段内容，例如 id,name,age
+     * @param sqlSegment    SQL 片段
+     * @param orderByField  对应EntityWrapper类中orderByField字段{@link EntityWrapper}
+     * @return                          数据结果集
      */
-    List<T> selectList(T entity, String orderByField);
-
-    List<T> selectList(T entity);
-
-    List<T> selectListSqlSegment(String sqlSegment);
-
-    List<T> selectListSqlSegment(String sqlSegment, String orderByField);
+    List<T> selectList(T entity, String sqlSelect, String sqlSegment, String orderByField);
 
     /**
      * <p>翻页查询</p>
      *
-     * @param page            翻页对象
-     * @param entity          实体对象
-     * @param sqlSegment SQL 片段
-     * @param orderByField  对应 EntityWrapper 类中 orderByField 字段
-     * @return              数据结果集
+     * @param page                  翻页对象
+     * @param sqlSelect          SQL 查询字段内容，例如 id,name,age
+     * @param entity                实体对象
+     * @param sqlSegment    对应 EntityWrapper 类中 orderByField 字段
+     * @return                           数据结果集
      */
-    Page<T> selectPage(Page<T>page, T entity, String sqlSegment, String orderByField);
-
-    /**
-     * <p>翻页查询</p>
-     *
-     * @param page          翻页对象
-     * @param entity        实体对象
-     * @param orderByField  对应 EntityWrapper 类中 orderByField 字段
-     * @return              数据结果集
-     */
-    Page<T> selectPage(Page<T>page, T entity, String orderByField);
-
-    Page<T> selectPage(Page<T> page, T entity);
-
-    Page<T> selectPageSqlSegment(Page<T> page, String sqlSegment);
-
-    Page<T> selectPageSqlSegment(Page<T> page, String sqlSegment, String orderByField);
+    Page<T> selectPage(Page<T>page, String sqlSelect, T entity, String sqlSegment);
 
 }

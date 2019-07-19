@@ -187,7 +187,21 @@ public class UserMapperTest {
         ul1.forEach(UserMapperTest::print);
 
         System.err.println("\n------------------分页pagination查询 --- 查询页中 testType = 1 的所有数据----------------------");
-        List<User> paginList = userMapper.selectPage(new Pagination(1, 2, false), ew);
+        Page<User> page = new Page<>(1, 2);
+        /**
+         * 排序 test_id desc
+         */
+        page.setOrderByField("test_id");
+        page.setAsc(false);
+        ew = new EntityWrapper<User>(new User(1));
+
+        ew.setSqlSegment("age,name");
+
+        /**
+         * 查询条件，SQL片段（注意！程序会自动在 sqlSegment内容前面添加where或者and）
+         */
+        ew.setSqlSegment("name like '%dateBatch%'");
+        List<User> paginList = userMapper.selectPage(page, ew);
         paginList.forEach(UserMapperTest::print);
 
         System.err.println("\n---------------xml---selectListRow 分页查询，不查询总数（此时可自定义 count 查询）----无查询条件--------------");

@@ -122,10 +122,10 @@ public class AutoSqlInjector  implements  ISqlInjector {
             sqlMethod = SqlMethod.SELECT_BATCH;
             StringBuilder ids = new StringBuilder();
             ids.append("\n<foreach collection=\"list\" item=\"item\" index=\"index\" separator=\",\">\n\t#{item}\n</foreach>");
-            sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table), table.getTableName(), table.getKeyColumn(), ids.toString());
+            sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table, false), table.getTableName(), table.getKeyColumn(), ids.toString());
             sqlSource = languageDriver.createSqlSource(configuration, sql, mapperClass);
         } else {
-            sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table), table.getTableName(), table.getKeyColumn(), table.getKeyProperty());
+            sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table, false), table.getTableName(), table.getKeyColumn(), table.getKeyProperty());
             sqlSource = new RawSqlSource(configuration, sql, mapperClass);
         }
         System.out.println("inject select(batch) sql: " + sql);
@@ -137,7 +137,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
      */
     protected void injectSelectByMapSql(Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
         SqlMethod sqlMethod = SqlMethod.SELECT_BY_MAP;
-        String sql = String.format(sqlMethod.getSql(),  sqlSelectColumns(table), table.getTableName(), sqlWhereByMap());
+        String sql = String.format(sqlMethod.getSql(),  sqlSelectColumns(table, false), table.getTableName(), sqlWhereByMap());
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, Map.class);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.SELECT, modelClass);
     }
@@ -147,7 +147,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
      */
     protected void injectSelectOneSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
         SqlMethod sqlMethod = SqlMethod.SELECT_ONE;
-        String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table), table.getTableName(), sqlWhere(table, false));
+        String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table, false), table.getTableName(), sqlWhere(table, false));
         System.out.println("inject select (one) sql("+ sqlMethod.getMethod() +")：" + sql);
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource,SqlCommandType.SELECT, modelClass);
@@ -195,7 +195,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
 
         where.append("\n\t</if>");
         where .append("\n</if>");
-        String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table), table.getTableName(), where.toString());
+        String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table, true), table.getTableName(), where.toString());
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         System.out.println("inject select (list by ew) : " + sql);
         this.addMappedStatement(mapperClass, sqlMethod, sqlSource, SqlCommandType.SELECT, modelClass);
@@ -559,12 +559,19 @@ public class AutoSqlInjector  implements  ISqlInjector {
     }
 
     /**
-     * SQL 查询所有表字段
+     * SQL 查询所有表字段，若为包装类型查询则允许查询部分字段
+     * @param table   表名称
+     * @param entityWrapper 是否为包装类型查询
      */
-    protected String sqlSelectColumns (TableInfo table) {
+    protected String sqlSelectColumns (TableInfo table, boolean entityWrapper) {
 
         // 获取主键,属性
         StringBuilder columns = new StringBuilder();
+
+        if (entityWrapper) {
+            columns.append("<choose><when test=\"ew.sqlSelect != null\">${ew.sqlSelect}</when><otherwise>");
+        }
+
         if (table.isKeyRelated()) {
             columns.append(table.getKeyColumn()).append(" AS ").append(table.getKeyProperty());
         } else {
@@ -577,6 +584,10 @@ public class AutoSqlInjector  implements  ISqlInjector {
             if (fieldInfo.isRelated()) {
                 columns.append(" AS ").append(fieldInfo.getProperty());
             }
+        }
+
+        if (entityWrapper) {
+            columns.append("</otherwise></choose>");
         }
         return columns.toString();
     }

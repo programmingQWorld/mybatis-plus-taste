@@ -109,62 +109,36 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
     }
 
     @Override
-    public List<T> selectList(T entity, String sqlSegment, String orderByFIeld) {
-        return baseMapper.selectList(new EntityWrapper<>(entity, sqlSegment, orderByFIeld));
+    public List<T> selectList(T entity, String sqlSelect, String sqlSegment, String orderByField) {
+        StringBuffer segment = new StringBuffer();
+        if (null != sqlSegment) {
+            segment.append(sqlSegment);
+        }
+        if (null != orderByField) {
+            segment.append(" ORDER BY ").append(orderByField);
+        }
+        return baseMapper.selectList(new EntityWrapper<T>(entity, sqlSelect, segment.toString()));
     }
 
-    // # 下面2组方法，是orderByField的区别
-
+    // 把 order by field 变量给搞到了分页page里面去了，怪不得看不到这个变量了
     @Override
-    public List<T> selectList (T entity, String orderByField) {
-        return baseMapper.selectList(new EntityWrapper<T>(entity, orderByField));
+    public Page<T> selectPage(Page<T> page, String sqlSelect, T entity, String sqlSegment) {
+        page.setRecords(baseMapper.selectPage(page, new EntityWrapper<T>(entity, sqlSelect, this.convertSqlSegment(page, sqlSegment))));
+        return null;
     }
 
-    @Override
-    public List<T> selectList(T entity) {
-        return baseMapper.selectList(new EntityWrapper<T>(entity, null));
-    }
-
-    @Override
-    public List<T> selectListSqlSegment(String sqlSegment) {
-        return baseMapper.selectList(new EntityWrapper<>(null, sqlSegment, null));
-    }
-
-    @Override
-    public List<T> selectListSqlSegment(String sqlSegment, String orderByField) {
-        return baseMapper.selectList(new EntityWrapper<>(null, sqlSegment, orderByField));
-    }
-
-    @Override
-    public Page<T> selectPage(Page<T> page, T entity, String sqlSegment, String orderByField) {
-        page.setRecords(baseMapper.selectPage(page, new EntityWrapper<>(entity, sqlSegment, orderByField)));
-        return page;
-    }
-
-    // # 下面2组方法，是 orderByField 的区别
-
-    @Override
-    public Page<T > selectPage (Page<T> page, T entity, String orderByField) {
-        page.setRecords(baseMapper.selectPage(page, new EntityWrapper<T>(entity, orderByField)));
-        return page;
-    }
-
-    @Override
-    public Page<T> selectPage (Page<T> page, T entity) {
-        page.setRecords(baseMapper.selectPage(page, new EntityWrapper<T>(entity, null)));
-        return page;
-    }
-
-    @Override
-    public Page<T> selectPageSqlSegment(Page<T> page, String sqlSegment) {
-        page.setRecords(baseMapper.selectPage(page, new EntityWrapper<T>(null, sqlSegment, null)));
-        return page;
-    }
-
-    @Override
-    public Page<T> selectPageSqlSegment(Page<T> page, String sqlSegment, String orderByField) {
-        page.setRecords(baseMapper.selectPage(page, new EntityWrapper<T>(null, sqlSegment, orderByField)));
-        return page;
+    protected String convertSqlSegment(Page<T> page, String sqlSegment) {
+        StringBuffer segment = new StringBuffer();
+        if (null != sqlSegment) {
+            segment.append(sqlSegment);
+        }
+        if (null != page.getOrderByField()) {
+            segment.append(" ORDER BY  ").append(page.getOrderByField());
+            if (!page.isAsc()) {
+                segment.append(" DESC ");
+            }
+        }
+        return segment.toString();
     }
 
 }
