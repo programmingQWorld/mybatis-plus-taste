@@ -1,7 +1,6 @@
 package im.lincq.mybatisplus.taste.mapper;
 
 import im.lincq.mybatisplus.taste.MybatisConfiguration;
-import im.lincq.mybatisplus.taste.MybatisXmlLanguageDriver;
 import im.lincq.mybatisplus.taste.annotations.IdType;
 import im.lincq.mybatisplus.taste.toolkit.TableFieldInfo;
 import im.lincq.mybatisplus.taste.toolkit.TableInfo;
@@ -14,6 +13,7 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.mapping.StatementType;
+import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.scripting.defaults.RawSqlSource;
 import org.apache.ibatis.scripting.xmltags.XMLLanguageDriver;
 import org.apache.ibatis.session.Configuration;
@@ -29,12 +29,10 @@ import java.util.Map;
  */
 public class AutoSqlInjector  implements  ISqlInjector {
 
-    protected static final MybatisXmlLanguageDriver languageDriver = new MybatisXmlLanguageDriver();
-
     /** mybatis配置类对象， 还有一个小助理*/
     protected Configuration configuration;
     protected MapperBuilderAssistant builderAssistant;
-
+    protected LanguageDriver languageDriver;
     protected DBType dbType = DBType.MYSQL;
 
     public AutoSqlInjector () {}
@@ -50,6 +48,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
     public void inject(Configuration configuration,  MapperBuilderAssistant builderAssistant, Class<?> mapperClass) {
         System.out.println("执行sql语句注入方法");
         this.configuration = configuration;
+        this.languageDriver = configuration.getDefaultScriptingLanuageInstance();
         this.builderAssistant = builderAssistant;
         this.dbType = MybatisConfiguration.DB_TYPE;
 
@@ -526,7 +525,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         }
         return builderAssistant.addMappedStatement(id, sqlSource, StatementType.PREPARED, sqlCommandType, null, null, null,
                 parameterClass, null, resultType, null, !isSelect, isSelect, false, keyGenerator, keyProperty, keyColumn,
-                configuration.getDatabaseId(), new XMLLanguageDriver(), null);
+                configuration.getDatabaseId(), languageDriver, null);
     }
 
     protected void addInsertMappedStatement(Class<?> mapperClass, Class<?> modelClass, String id, SqlSource source, KeyGenerator keyGenerator, String keyProperty, String keyColumn) {
