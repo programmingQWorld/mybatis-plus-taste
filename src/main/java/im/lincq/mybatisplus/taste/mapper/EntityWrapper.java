@@ -16,9 +16,29 @@ public class EntityWrapper<T> {
     private T entity = null;
 
     /**
+     * SQL 查询字段内容，例如：id,name,age
+     */
+    private String sqlSelect = null;
+
+    /**
      *  SQL 片段
      */
     private String sqlSegment = null;
+
+    public String getSqlSelect() {
+        if (sqlSelect == null || "".equals(sqlSelect)) {
+            return sqlSelect;
+        }
+        return stripSqlInjection(sqlSegment);
+    }
+
+    public void setSqlSelect(String sqlSelect) {
+        this.sqlSelect = sqlSelect;
+    }
+
+    public void setOrderByField(String orderByField) {
+        this.orderByField = orderByField;
+    }
 
     /**
      * <p>SQL 排序 ORDER BY字段, 例如 id DESC（根据id降序查询）</p>
@@ -54,17 +74,17 @@ public class EntityWrapper<T> {
 
 
     public String getSqlSegment () {
-        if ( sqlSegment == null && orderByField == null) {
+        if (sqlSegment == null || "".equals(sqlSegment)) {
             return null;
         }
-        StringBuffer andOrSql  = new StringBuffer();
-        if ( sqlSegment != null ) {
-            andOrSql.append(sqlSegment);
+        StringBuffer andOr = new StringBuffer();
+        if (null == entity) {
+            andOr.append("WHERE ");
+        } else {
+            andOr.append("AND ");
         }
-        if ( orderByField != null ) {
-            andOrSql.append(" ORDER BY  ").append(orderByField);
-        }
-        return stripSqlInjection(andOrSql.toString());
+        andOr.append(sqlSegment);
+        return stripSqlInjection(sqlSegment);
     }
 
     public void setSqlSegment( String sqlSegment ) {

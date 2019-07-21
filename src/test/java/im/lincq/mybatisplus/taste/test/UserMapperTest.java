@@ -200,11 +200,15 @@ public class UserMapperTest {
         /**
          * 查询条件，SQL片段（注意！程序会自动在 sqlSegment内容前面添加where或者and）
          */
-        ew.setSqlSegment("name like '%dateBatch%'");
+        ew.setSqlSegment(" and name like '%dateBatch%'");
         List<User> paginList = userMapper.selectPage(page, ew);
         paginList.forEach(UserMapperTest::print);
 
         System.err.println("\n---------------xml---selectListRow 分页查询，不查询总数（此时可自定义 count 查询）----无查询条件--------------");
+
+        paginList = userMapper.selectList(new EntityWrapper<>(null , null, null));
+        paginList.forEach(UserMapperTest::print);
+        System.err.println("\n----------用户列表-------------");
         //List<User> rowList = userMapper.selectListRow(new RowBounds(0, 2));
         //rowList.forEach(UserMapperTest::print);
 

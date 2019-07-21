@@ -184,7 +184,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         List<TableFieldInfo> fieldList = table.getFieldList();
         for (TableFieldInfo fieldInfo : fieldList) {
             where.append("\n\t\t\t").append("<if test = \"ew.entity.").append(fieldInfo.getProperty()).append("!= null\">");
-            where.append("\t\t\t").append(fieldInfo.getColumn()).append("=#{ew.entity.").append(fieldInfo.getProperty()).append("}");
+            where.append("\t\t\t").append("  AND ").append(fieldInfo.getColumn()).append("=#{ew.entity.").append(fieldInfo.getProperty()).append("}");
             where.append("\t\t").append("</if>");
         }
 
@@ -192,8 +192,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
 
         // # 拼接额外的 sql 片段 . 作用（条件过滤），同时也包含了 order by 的拼接
         where.append("\n<if test=\"ew.sqlSegment!=null\">\n${ew.sqlSegment}\n</if>");
-
-        where.append("\n\t</if>");
+        where .append("\n\t</if>");
         where .append("\n</if>");
         String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table, true), table.getTableName(), where.toString());
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);

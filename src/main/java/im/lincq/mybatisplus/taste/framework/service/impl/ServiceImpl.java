@@ -110,31 +110,25 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
 
     @Override
     public List<T> selectList(T entity, String sqlSelect, String sqlSegment, String orderByField) {
-        StringBuffer segment = new StringBuffer();
-        if (null != sqlSegment) {
-            segment.append(sqlSegment);
-        }
-        if (null != orderByField) {
-            segment.append(" ORDER BY ").append(orderByField);
-        }
-        return baseMapper.selectList(new EntityWrapper<T>(entity, sqlSelect, segment.toString()));
+        return baseMapper.selectList(new EntityWrapper<T>(entity, sqlSelect, this.convertSqlSegment(sqlSegment, orderByField, true)));
     }
 
     // 把 order by field 变量给搞到了分页page里面去了，怪不得看不到这个变量了
     @Override
     public Page<T> selectPage(Page<T> page, String sqlSelect, T entity, String sqlSegment) {
-        page.setRecords(baseMapper.selectPage(page, new EntityWrapper<T>(entity, sqlSelect, this.convertSqlSegment(page, sqlSegment))));
-        return null;
+        EntityWrapper<T> ew = new EntityWrapper<T>(entity, sqlSelect, this.convertSqlSegment(page.getOrderByField(), sqlSegment, page.isAsc()));
+        page.setRecords(baseMapper.selectPage(page, ew));
+        return page;
     }
 
-    protected String convertSqlSegment(Page<T> page, String sqlSegment) {
+    protected String convertSqlSegment(String sqlSegment, String orderByField, boolean isAsc) {
         StringBuffer segment = new StringBuffer();
         if (null != sqlSegment) {
             segment.append(sqlSegment);
         }
-        if (null != page.getOrderByField()) {
-            segment.append(" ORDER BY  ").append(page.getOrderByField());
-            if (!page.isAsc()) {
+        if (null != orderByField) {
+            segment.append(" ORDER BY  ").append(orderByField);
+            if (!isAsc) {
                 segment.append(" DESC ");
             }
         }
