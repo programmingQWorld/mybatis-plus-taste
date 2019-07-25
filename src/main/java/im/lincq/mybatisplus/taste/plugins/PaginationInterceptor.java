@@ -4,6 +4,7 @@ import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import im.lincq.mybatisplus.taste.plugins.pagination.DialectFactory;
 import im.lincq.mybatisplus.taste.plugins.pagination.IDialect;
 import im.lincq.mybatisplus.taste.plugins.pagination.Pagination;
+import im.lincq.mybatisplus.taste.toolkit.StringUtils;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -50,14 +51,14 @@ public class PaginationInterceptor implements Interceptor {
 
             /* 定义数据库方言 */
             IDialect dialect = null;
-            if (dialectType != null && !"".equals(dialectType)) {
+            if (StringUtils.isNotEmpty(dialectType)) {
                 dialect = DialectFactory.getDialectByDbtype(dialectType);
             } else {
                 /*
                  * 从这里可以看出，字符串类型dialectClazz配置了分页方言类，
                  * 配置方式可以是配置文件中指定
                  * dialectClazz: "im.lincq.mybatisplus.taste.plugins.pagination.dialects.MySqlDialect"*/
-                if (dialectClazz != null && !"".equals(dialectClazz)) {
+                if (StringUtils.isNotEmpty(dialectClazz)) {
                     try {
                         Class<?> clazz = Class.forName(dialectClazz);
                         if (IDialect.class.isAssignableFrom(clazz)) {
@@ -183,10 +184,10 @@ public class PaginationInterceptor implements Interceptor {
         String dialectType = prop.getProperty("dialectType");
         String dialectClazz = prop.getProperty("dialectClazz");
 
-        if (dialectType != null && !"".equals(dialectType)) {
+        if ( StringUtils.isNotEmpty(dialectType) ) {
             this.dialectType = dialectType;
         }
-        if (dialectClazz != null && !"".equals(dialectClazz)) {
+        if ( StringUtils.isNotEmpty(dialectClazz) ) {
             this.dialectClazz = dialectClazz;
         }
     }

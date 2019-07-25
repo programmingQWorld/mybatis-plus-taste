@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste.mapper;
 
 import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
+import im.lincq.mybatisplus.taste.toolkit.StringUtils;
 
 /**
  * <p>Entity封装操作类</p>
@@ -26,14 +27,16 @@ public class EntityWrapper<T> {
     private String sqlSegment = null;
 
     public String getSqlSelect() {
-        if (sqlSelect == null || "".equals(sqlSelect)) {
+        if (StringUtils.isNotEmpty(sqlSelect)) {
             return sqlSelect;
         }
         return stripSqlInjection(sqlSegment);
     }
 
     public void setSqlSelect(String sqlSelect) {
-        this.sqlSelect = sqlSelect;
+        if (StringUtils.isNotEmpty(sqlSelect)) {
+            this.sqlSelect = sqlSelect;
+        }
     }
 
     public void setOrderByField(String orderByField) {
@@ -74,7 +77,7 @@ public class EntityWrapper<T> {
 
 
     public String getSqlSegment () {
-        if (sqlSegment == null || "".equals(sqlSegment)) {
+        if (StringUtils.isEmpty(sqlSegment)) {
             return null;
         }
         StringBuffer andOr = new StringBuffer();
@@ -88,7 +91,7 @@ public class EntityWrapper<T> {
     }
 
     public void setSqlSegment( String sqlSegment ) {
-        if ( sqlSegment != null && !"".equals(sqlSegment) ) {
+        if ( StringUtils.isNotEmpty(sqlSegment) ) {
             this.sqlSegment = sqlSegment;
         }
     }

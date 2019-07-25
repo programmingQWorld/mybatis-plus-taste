@@ -54,7 +54,7 @@ public class TableInfoHelper {
             if (tableId != null) {
                 if (tableInfo.getKeyColumn() == null) {
 
-                    if (!"".equals(tableId.value())) {
+                    if (StringUtils.isNotEmpty(tableId.value())) {
                         /*主键字段名称可能会和当前属性名称不一样，plus遵循当前的注解value配置主键字段名称*/
                         tableInfo.setKeyColumn(tableId.value());
                         tableInfo.setKeyRelated(true);
@@ -75,7 +75,7 @@ public class TableInfoHelper {
             /* 字段 也支持通过注解自定义映射表字段 */
             TableField tableField = field.getAnnotation(TableField.class);
 
-            if (tableField != null && tableField.value() != null && !"".equals(tableField.value())) {
+            if (tableField != null && StringUtils.isNotEmpty(tableField.value())) {
                 /* TableFieldInfo 第二个参数,
                    前面一直认为这里需要对column字段进行驼峰转下划线格式才行,
                    现在想来是不用的,在注解上完成正确的字段名称填写即可.
@@ -111,7 +111,7 @@ public class TableInfoHelper {
      * 驼峰转下划线
      */
     private static String camelToUnderline(String param) {
-        if (param == null || "".equals(param)) {
+        if (StringUtils.isEmpty(param)) {
             return "";
         }
         int len = param.length();
@@ -156,7 +156,4 @@ public class TableInfoHelper {
         return result;
     }
 
-    public static void main(String[] args) {
-        System.out.println(camelToUnderline("HelloWorld"));
-    }
 }

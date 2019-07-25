@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste.plugins;
 
 import im.lincq.mybatisplus.taste.plugins.pagination.Pagination;
+import im.lincq.mybatisplus.taste.toolkit.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -56,7 +57,7 @@ public class Page<T> extends Pagination {
     }
 
     public void setOrderByField(String orderByField) {
-        if (!"".equals(orderByField)) {
+        if (StringUtils.isNotEmpty(orderByField)) {
             this.orderByField = orderByField;
         }
     }
