@@ -5,6 +5,7 @@ import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.util.logging.Logger;
 
 /**
  * <p>
@@ -13,6 +14,8 @@ import java.net.NetworkInterface;
  * </p>
  */
 public class Sequence {
+
+    protected final static Logger logger = Logger.getLogger("Sequence");
 
     /* 时间起始标记点，作为基准，一般取系统的最近时间（一旦确定不能变动）*/
     private final long twepoch = 1288834974657L;
@@ -37,10 +40,8 @@ public class Sequence {
     public Sequence() {
 
         /* 数据标识id部分 */
-        this.datacenterId = getDatacenterId();
-        /* MAC + PID 的 hashcode 获取16个低位 */
-        long macPidHashCode = (datacenterId + "" + getJvmPid()).hashCode() & 0xffff;
-        this.workerId = macPidHashCode % (maxWorkerId + 1);
+        this.datacenterId = getDatacenterId(maxDatacenterId);
+        this.workerId = getMaxWorkerId(datacenterId, maxWorkerId);
     }
 
     /**
@@ -70,7 +71,7 @@ public class Sequence {
     public synchronized long nextId() {
         long timestamp = timeGen();
         if (timestamp < lastTimestamp) {
-            throw new RuntimeException(String.format(
+            throw new MybatisPlusException(String.format(
                     "Clock moved backwards. Refusing to generate id for %d milliseconds", lastTimestamp - timestamp));
         }
         if (lastTimestamp == timestamp) {
@@ -102,16 +103,20 @@ public class Sequence {
 
     /**
      * <p>
-     * 获取 PID
+     * 获取 maxWorkerId
      * </p>
      */
-    private static String getJvmPid() {
+    private static long getMaxWorkerId (long datacenterId, long maxWorkerId) {
+        StringBuffer mpid = new StringBuffer();
+        mpid.append(datacenterId);
+
         String name = ManagementFactory.getRuntimeMXBean().getName();
-        // get pid
-        if (name != null) {
-            return name.split("@")[0];
+        if (StringUtils.isNotEmpty(name)) {
+            // get jvmPid
+            mpid.append(name.split("@")[0]);
         }
-        return null;
+        /* MAC + PID 的hashcode获取16个地位 */
+        return (mpid.toString().hashCode() & 0xfff % (maxWorkerId + 1));
     }
 
     /**
@@ -119,21 +124,23 @@ public class Sequence {
      * 数据标识id部分
      * </p>
      */
-    protected static long getDatacenterId() {
+    protected static long getDatacenterId(long maxDatacenterId) {
+        long id = 1L;
         try {
             InetAddress ip = InetAddress.getLocalHost();
             NetworkInterface network = NetworkInterface.getByInetAddress(ip);
-            long id;
             if (network == null) {
                 id = 1;
             } else {
                 byte[] mac = network.getHardwareAddress();
                 id = ((0x000000FF & (long) mac[mac.length - 1])
                         | (0x0000FF00 & (((long) mac[mac.length - 2]) << 8))) >> 6;
+                id = id % (maxDatacenterId + 1);
             }
             return id;
         } catch (Exception e) {
-            throw new MybatisPlusException(e);
+            logger.fine("getDatacenterId: " + e.getMessage());
         }
+        return id;
     }
 }
