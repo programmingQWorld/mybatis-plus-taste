@@ -70,6 +70,8 @@
         <ojdbc14.version>10.2.0.5.0</ojdbc14.version>
         <logback-classic.version>1.1.7</logback-classic.version>
         <mybatis-ehcache.version>1.0.3</mybatis-ehcache.version>
+        <junit.version>4.12</junit.version>
+        <contiperf.version>2.3.4</contiperf.version>
     </properties>
 
     <dependencies>
@@ -112,6 +114,17 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback-classic.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <!--<scope>test</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>org.databene</groupId>
+            <artifactId>contiperf</artifactId>
+            <version>${contiperf.version}</version>
         </dependency>
         <!--  test end  -->
 
