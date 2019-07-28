@@ -36,6 +36,7 @@ public class Sequence {
 
     public Sequence() {
 
+        /* 数据标识id部分 */
         this.datacenterId = getDatacenterId();
         /* MAC + PID 的 hashcode 获取16个低位 */
         long macPidHashCode = (datacenterId + "" + getJvmPid()).hashCode() & 0xffff;
@@ -50,11 +51,11 @@ public class Sequence {
      */
     public Sequence(long workerId, long datacenterId) {
         if (workerId > maxWorkerId || workerId < 0) {
-            throw new IllegalArgumentException(
+            throw new MybatisPlusException (
                     String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
         }
         if (datacenterId > maxDatacenterId || datacenterId < 0) {
-            throw new IllegalArgumentException(
+            throw new MybatisPlusException (
                     String.format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId));
         }
         this.workerId = workerId;
