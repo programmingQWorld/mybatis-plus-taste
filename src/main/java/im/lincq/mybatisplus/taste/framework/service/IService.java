@@ -1,6 +1,5 @@
 package im.lincq.mybatisplus.taste.framework.service;
 
-import im.lincq.mybatisplus.taste.mapper.Condition;
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import im.lincq.mybatisplus.taste.plugins.Page;
 import org.apache.ibatis.annotations.Param;
@@ -161,18 +160,18 @@ public interface IService<T, I> {
 
     /**
      * <p>查询列表</p>
-     * @param condition         查询条件，详见Condition类{@link Condition}
+     * @param entityWrapper 实体包装类，详见EntityWrapper类{@link EntityWrapper}
      * @return                          数据结果集
      */
-    List<T> selectList(Condition<T> condition);
+    List<T> selectList(EntityWrapper<T> entityWrapper);
 
     /**
      * <p>翻页查询</p>
      *
      * @param page                  翻页对象
-     * @param condition          SQL 查询条件，详见Condition类{@link Condition}
+     * @param entityWrapper 实体包装类，详见EntityWrapper类{@link EntityWrapper}
      * @return                           数据结果集
      */
-    Page<T> selectPage(Page<T>page, Condition<T> condition);
+    Page<T> selectPage(Page<T>page, EntityWrapper<T> entityWrapper);
 
 }

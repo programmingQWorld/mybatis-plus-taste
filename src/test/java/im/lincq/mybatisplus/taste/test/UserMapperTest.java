@@ -206,7 +206,7 @@ public class UserMapperTest {
 
         System.err.println("\n---------------xml---selectListRow 分页查询，不查询总数（此时可自定义 count 查询）----无查询条件--------------");
 
-        paginList = userMapper.selectList(new EntityWrapper<>(null , null, null));
+        paginList = userMapper.selectList(new EntityWrapper<User>(new User(1), "id, age"));
         paginList.forEach(UserMapperTest::print);
         System.err.println("\n----------用户列表-------------");
         //List<User> rowList = userMapper.selectListRow(new RowBounds(0, 2));

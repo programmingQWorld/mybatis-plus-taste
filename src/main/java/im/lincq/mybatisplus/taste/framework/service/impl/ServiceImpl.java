@@ -109,15 +109,17 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
     }
 
     @Override
-    public List<T> selectList(T entity, String sqlSelect, String sqlSegment, String orderByField) {
-        return baseMapper.selectList(new EntityWrapper<T>(entity, sqlSelect, this.convertSqlSegment(sqlSegment, orderByField, true)));
+    public List<T> selectList(EntityWrapper<T> entityWrapper) {
+        return baseMapper.selectList(entityWrapper);
     }
 
     // 把 order by field 变量给搞到了分页page里面去了，怪不得看不到这个变量了
     @Override
-    public Page<T> selectPage(Page<T> page, String sqlSelect, T entity, String sqlSegment) {
-        EntityWrapper<T> ew = new EntityWrapper<T>(entity, sqlSelect, this.convertSqlSegment(page.getOrderByField(), sqlSegment, page.isAsc()));
-        page.setRecords(baseMapper.selectPage(page, ew));
+    public Page<T> selectPage(Page<T> page, EntityWrapper<T> entityWrapper) {
+        if (null != entityWrapper) {
+            entityWrapper.addFilter(" ORDER BY {0} {1}", page.getOrderByField(), page.isAsc() ? "" : "DESC");
+        }
+        page.setRecords(baseMapper.selectPage(page, entityWrapper));
         return page;
     }
 

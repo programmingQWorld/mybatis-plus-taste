@@ -44,7 +44,7 @@ public class TableInfoHelper {
         if (table != null && table.value().trim().length() > 0) {
             tableInfo.setTableName(table.value());
         } else {
-            tableInfo.setTableName(camelToUnderline(clazz.getSimpleName()));
+            tableInfo.setTableName(StringUtils.camelToUnderline(clazz.getSimpleName()));
         }
 
         List<TableFieldInfo> fieldList = new ArrayList<TableFieldInfo>();
@@ -60,7 +60,7 @@ public class TableInfoHelper {
                         tableInfo.setKeyRelated(true);
                     } else if (MybatisConfiguration.DB_COLUMN_UNDERLINE)  {
                         /* 开启字段下划线声明 */
-                        tableInfo.setKeyColumn(camelToUnderline(field.getName()));
+                        tableInfo.setKeyColumn(StringUtils.camelToUnderline(field.getName()));
                     } else {
                         tableInfo.setKeyColumn(field.getName());
                     }
@@ -87,7 +87,7 @@ public class TableInfoHelper {
             }
 
             if (MybatisConfiguration.DB_COLUMN_UNDERLINE) {
-                fieldList.add(new TableFieldInfo(true, camelToUnderline(field.getName()), field.getName()));
+                fieldList.add(new TableFieldInfo(true, StringUtils.camelToUnderline(field.getName()), field.getName()));
             } else {
                 /* 不需要自定义映射表字段  会影响到是否追加 as 部分*/
                 fieldList.add(new TableFieldInfo( field.getName() ));
@@ -105,25 +105,6 @@ public class TableInfoHelper {
 
       tableInfoCache.put(clazz.getName(), tableInfo);
         return tableInfo;
-    }
-
-    /**
-     * 驼峰转下划线
-     */
-    private static String camelToUnderline(String param) {
-        if (StringUtils.isEmpty(param)) {
-            return "";
-        }
-        int len = param.length();
-        StringBuilder sb = new StringBuilder(len);
-        for (int i=0; i<len; i++) {
-            char c = param.charAt(i);
-            if (Character.isUpperCase(c) && i > 0) {
-                sb.append("_");
-            }
-            sb.append(Character.toLowerCase(c));
-        }
-        return sb.toString();
     }
 
     /**

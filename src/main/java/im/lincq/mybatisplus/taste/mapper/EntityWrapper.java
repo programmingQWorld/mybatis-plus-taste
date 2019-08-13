@@ -3,6 +3,8 @@ package im.lincq.mybatisplus.taste.mapper;
 import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import im.lincq.mybatisplus.taste.toolkit.StringUtils;
 
+import java.text.MessageFormat;
+
 /**
  * <p>Entity封装操作类</p>
  *
@@ -49,22 +51,23 @@ public class EntityWrapper<T> {
      */
     private String orderByField = null;
 
-    /**  基本保护EntityWrapper对象. */
-    protected EntityWrapper () {}
+    /**
+     * 查询条件
+     */
+    protected StringBuffer queryFilter = new StringBuffer();
+
+    public EntityWrapper () {
+        // to do nothing
+    }
 
     public EntityWrapper (T entity) {
         this.entity = entity;
     }
 
-    public EntityWrapper (T entity, String orderByField) {
-        this.entity = entity;
-        this.orderByField = orderByField;
-    }
 
-    public EntityWrapper (T entity, String sqlSegment, String orderByField) {
+    public EntityWrapper (T entity, String sqlSelect) {
         this.entity = entity;
-        this.sqlSegment = sqlSegment;
-        this.orderByField = orderByField;
+        this.sqlSelect = sqlSelect;
     }
 
     public T getEntity() {
@@ -76,18 +79,31 @@ public class EntityWrapper<T> {
     }
 
 
+    /**
+     * SQL片段 ( where 后面t条件sql部分 )
+     */
     public String getSqlSegment () {
-        if (StringUtils.isEmpty(sqlSegment)) {
+        /* ===无条件SQL片段, 在这里忽略了queryFilter的前后空格 === */
+        String tempQuery = queryFilter.toString().trim();
+        if (StringUtils.isEmpty(tempQuery)) {
             return null;
         }
-        StringBuffer andOr = new StringBuffer();
-        if (null == entity) {
-            andOr.append("WHERE ");
-        } else {
-            andOr.append("AND ");
+
+        /* ===只排序 、直接返回=== */
+        if (tempQuery.toUpperCase().indexOf("ORDER BY") == 0) {
+            return stripSqlInjection(tempQuery.toString());
         }
-        andOr.append(sqlSegment);
-        return stripSqlInjection(sqlSegment);
+
+        /* 条件部分不为空，对条件SQL做拼接 */
+        StringBuffer sqlSegment = new StringBuffer();
+        if (null == this.getEntity()) {
+            sqlSegment.append(" WHERE ");
+        } else {
+            sqlSegment.append(" AND ");
+        }
+
+        sqlSegment.append(queryFilter);
+        return stripSqlInjection(sqlSegment.toString());
     }
 
     public void setSqlSegment( String sqlSegment ) {
@@ -105,6 +121,42 @@ public class EntityWrapper<T> {
             this.orderByField = orderByField;
         }
     }
+
+    /**
+     * <p> 添加查询条件 </p>
+     * <p>
+     *     例如： ew.addFilter("name = {0}", "'123'")<br>
+     *     输出：name = '123'<br>
+         * </p>
+     * @param filter       sql片段内容，如例子中的 "name={0}"
+     * @param params  格式参数，组装sql的参数
+     */
+    public EntityWrapper<T> addFilter (String filter, Object ... params) {
+        if (StringUtils.isEmpty(filter)) {
+            return this;
+        }
+        queryFilter.append(MessageFormat.format(filter, params));
+        return this;
+    }
+
+    /**
+     * <p>添加查询条件</p>
+     * <p>
+     *     例如：ew.addFilter("name = {0}", "'123'").addFilterIfNeed(false, " ORDER BY id") <br>
+     *     输出:  name = '123'
+     * </p>
+     * @param willAppend 判断条件 true 输出 SQL 片段，false 不输出
+     * @param filter            SQL 片段
+     * @param params       格式参数
+     * @return EntityWrapper
+     */
+    public EntityWrapper<T> addFilterIfNeed (boolean willAppend, String filter, Object ... params) {
+        if (willAppend) {
+            addFilter(filter, params);
+        }
+        return this;
+    }
+
 
     /**
      * SQL注入内容剥离
