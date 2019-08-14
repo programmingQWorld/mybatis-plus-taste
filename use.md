@@ -97,4 +97,5 @@
 
 > 	列表||翻页，模糊，排序等查询
 
-参考：mybatis-plus/src/test/java/com/baomidou/mybatisplus/test/mysql/UserMapperTest.java
+参考：mybatis-plus/src/test/java/com/baomidou/mybatisplus/test/mysql
+/UserMapperTest.java

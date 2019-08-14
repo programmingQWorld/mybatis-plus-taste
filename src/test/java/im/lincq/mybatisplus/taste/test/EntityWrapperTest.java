@@ -73,4 +73,39 @@ public class EntityWrapperTest {
         Assert.assertEquals("Order By id DESC", sqlSegment);
     }
 
+    @Test
+    public void testBlend() {
+		/*
+		 * 实体查询，混合 SQL 原样输出
+		 */
+        ew.setEntity(new User(1));
+        ew.addFilter(null, "name={0}", "'123'").orderBy("id", false);
+        String sqlSegment = ew.getSqlSegment();
+        System.err.println("testBlend = " + sqlSegment);
+        Assert.assertEquals(" AND name='123' ORDER BY id DESC ", sqlSegment);
+    }
+
+    @Test
+    public void testNoTSQL() {
+		/*
+		 * 非 T-SQL 实体查询
+		 */
+        ew.setEntity(new User(1));
+        ew.addFilter(null, "name={0}", "'123'").addFilterIfNeed(true, " order by id");
+        String sqlSegment = ew.getSqlSegment();
+        System.err.println("testNoTSQL = " + sqlSegment);
+        Assert.assertEquals(" AND name='123' order by id", sqlSegment);
+    }
+
+    @Test
+    public void testNoTSQL1() {
+		/*
+		 * 非 T-SQL 无实体查询
+		 */
+        ew.addFilter(null, "name={0}", "'123'").addFilterIfNeed(false, " order by id");
+        String sqlSegment = ew.getSqlSegment();
+        System.err.println("testNoTSQL1 = " + sqlSegment);
+        Assert.assertEquals(" WHERE name='123'", sqlSegment);
+    }
+
 }

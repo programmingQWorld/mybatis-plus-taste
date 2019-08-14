@@ -116,6 +116,9 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
     // 把 order by field 变量给搞到了分页page里面去了，怪不得看不到这个变量了
     @Override
     public Page<T> selectPage(Page<T> page, EntityWrapper<T> entityWrapper) {
+        if (entityWrapper != null) {
+            entityWrapper.orderBy(page.getOrderByField(), page.isAsc());
+        }
         page.setRecords(baseMapper.selectPage(page, entityWrapper));
         return page;
     }

@@ -3,50 +3,53 @@ package im.lincq.mybatisplus.taste.mapper;
 import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import im.lincq.mybatisplus.taste.toolkit.StringUtils;
 
-import javax.swing.text.html.parser.Entity;
 import java.text.MessageFormat;
 
 /**
- * <p>Entity封装操作类</p>
+ * <p>Entity封装操作类，定义T-SQL语法</p>
  *
- * @author lincq
+ * @author hubin, yanghu, DYang
  * @date 2019/6/16 14:19
  */
 public class EntityWrapper<T> {
 
     /**
-    * 定义T-SQL SELECT中的WHERE关键字
+    * WHERE关键字
     */
-    private final String WHERE_WORD = " WHERE ";
+    private final String WHERE = " WHERE ";
     /**
-     * 定义T-SQL SELECT中的AND关键字
+     * AND关键字
      */
-    private final String AND_WORD = " AND ";
+    private final String AND = " AND ";
     /**
-     * 定义T-SQL SELECT中的OR关键字
+     * OR关键字
      */
-    private final String OR_WORD = " OR ";
+    private final String OR = " OR ";
     /**
-     * 定义T-SQL SELECT中的GROUP BY关键字
+     * GROUP BY关键字
      */
-    private final String GROUPBY_WORD = " GROUP BY ";
+    private final String GROUPBY = " GROUP BY ";
     /**
-     * 定义T-SQL SELECT中的HAVING关键字
+     * HAVING关键字
      */
-    private final String HAVING_WORD = " HAVING ";
+    private final String HAVING = " HAVING ";
     /**
-     * 定义T-SQL SELECT中的ORDER BY关键字
+     * ORDER BY关键字
      */
-    private final String ORDERBY_WORD = " ORDER BY ";
+    private final String ORDERBY = " ORDER BY ";
     /**
-     * 定义T-SQL SELECT中的DESC_WORD关键字
+     * DESC关键字
      */
-    private final String DESC_WORD = " DESC ";
+    private final String DESC = " DESC ";
     /**
-     * 定义T-SQL SELECT中的ASC关键字
+     * ASC关键字
      */
-    private final String ASC_WORD = " ASC ";
+    private final String ASC = " ASC ";
 
+    /**
+     * 是否使用了T-SQL语法
+     */
+    protected boolean tsql = false;
 
     /**
      * 数据库表映射实体类
@@ -107,6 +110,17 @@ public class EntityWrapper<T> {
         if (StringUtils.isEmpty(tempQuery)) {
             return null;
         }
+        /** SQL片段，兼容非T-SQL语法*/
+        if (!tsql) {
+            StringBuffer sqlSegment = new StringBuffer();
+            if (null == this.getEntity()) {
+                sqlSegment.append(WHERE);
+            } else {
+                sqlSegment.append(AND);
+            }
+            sqlSegment.append(queryFilter.toString());
+            return stripSqlInjection(sqlSegment.toString());
+        }
         // 使用防SQL注入处理后返回
         return stripSqlInjection(queryFilter.toString());
     }
@@ -119,7 +133,16 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> where (String sqlWhere, Object ... params) {
-        addFilter(WHERE_WORD, sqlWhere, params);
+        if (tsql) {
+            throw new MybatisPlusException("SQL already contains the String where.");
+        }
+        /** 使用T-SQL语法 */
+        tsql = true;
+        if (null == this.getEntity()) {
+            addFilter(WHERE, sqlWhere, params);
+        } else {
+            addFilter(AND, sqlWhere, params);
+        }
         return this;
     }
 
@@ -131,7 +154,7 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> and (String sqlAnd, Object ... params) {
-        addFilter(AND_WORD, sqlAnd, params);
+        addFilter(AND, sqlAnd, params);
         return this;
     }
 
@@ -143,7 +166,7 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> andIfNeed(boolean need, String sqlAnd, Object ... params) {
-        addFilterIfNeed(need, AND_WORD, sqlAnd, params);
+        addFilterIfNeed(need, AND, sqlAnd, params);
         return this;
     }
 
@@ -154,7 +177,7 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> or (String sqlOr, Object ... params) {
-        addFilter(OR_WORD, sqlOr, params);
+        addFilter(OR, sqlOr, params);
         return this;
     }
 
@@ -166,7 +189,7 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> orIfNeed(boolean need, String sqlOr, Object ... params) {
-        addFilterIfNeed(need, OR_WORD, sqlOr, params);
+        addFilterIfNeed(need, OR, sqlOr, params);
         return this;
     }
 
@@ -177,7 +200,7 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> groupBy (String sqlGroupBy) {
-        addFilter(GROUPBY_WORD, sqlGroupBy);
+        addFilter(GROUPBY, sqlGroupBy);
         return this;
     }
 
@@ -189,7 +212,7 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> having(String sqlHaving, Object ... params) {
-        addFilter(HAVING_WORD, sqlHaving, params);
+        addFilter(HAVING, sqlHaving, params);
         return this;
     }
 
@@ -202,16 +225,16 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> orderBy(String sqlOrderBy) {
-        addFilter(ORDERBY_WORD, sqlOrderBy);
+        addFilter(ORDERBY, sqlOrderBy);
         return this;
     }
 
     public EntityWrapper<T> orderBy(String sqlOrderBy, boolean isAsc) {
-        addFilter(ORDERBY_WORD, sqlOrderBy);
+        addFilter(ORDERBY, sqlOrderBy);
         if (isAsc) {
-            queryFilter.append(ASC_WORD);
+            queryFilter.append(ASC);
         } else {
-            queryFilter.append(DESC_WORD);
+            queryFilter.append(DESC);
         }
         return this;
     }
@@ -224,7 +247,6 @@ public class EntityWrapper<T> {
     protected String stripSqlInjection(String value) {
         return value.replaceAll("('.+--)|(--)|(\\|)|(%7C)", "");
     }
-
 
     /**
      * <p> 添加查询条件 </p>
@@ -239,16 +261,20 @@ public class EntityWrapper<T> {
         if (StringUtils.isEmpty(filter)) {
             return this;
         }
-        queryFilter.append(keyWord);
+        if (StringUtils.isNotEmpty(keyWord)) {
+            queryFilter.append(keyWord);
+        }
         if (null != params && params.length >= 1) {
             queryFilter.append(MessageFormat.format(filter, params));
         } else {
                 queryFilter.append(filter);
         }
-
         return this;
     }
 
+    public EntityWrapper<T> addFilter (String filter, Object... params) {
+        return addFilter(null, filter, params);
+    }
     /**
      * <p>添加查询条件</p>
      * <p>
@@ -265,6 +291,21 @@ public class EntityWrapper<T> {
             addFilter(keyWord, filter, params);
         }
         return this;
+    }
+
+    /**
+     * <p>添加查询条件</p>
+     * <p>
+     *     例如：ew.addFilter("name={0}", "'123'").addFilterIfNeed(false," ORDER BY id") <br>
+     *     输出：name='123'
+     * </p>
+     * @param willAppend  判断条件 true 输出 SQL 片段，false 不输出
+     * @param filter            SQL 片段
+     * @param params        格式参数
+     * @return this
+     */
+    public EntityWrapper<T> addFilterIfNeed (boolean willAppend, String filter, Object ... params) {
+        return addFilterIfNeed(willAppend, null, filter, params);
     }
 
 }
