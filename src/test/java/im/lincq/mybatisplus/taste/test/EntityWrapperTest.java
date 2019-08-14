@@ -25,7 +25,8 @@ public class EntityWrapperTest {
     @Test
     public void test1 () {
         ew.setEntity(new User(1));
-        ew.addFilter("name={0}", "'123'").orderBy("id", true);
+        ew.addFilter("name={0}", "'123'");
+        ew.orderBy("id", true);
         String sqlSegment = ew.getSqlSegment();
         System.out.println(sqlSegment);
         Assert.assertEquals(" AND name='123'", sqlSegment);
@@ -51,7 +52,8 @@ public class EntityWrapperTest {
 
     @Test
     public void test21 () {
-        ew.addFilter("name={0}", "'123'").orderBy("id", true);
+        ew.addFilter("name={0}", "'123'");
+        ew.orderBy("id", true);
         String sqlSegment = ew.getSqlSegment();
         System.out.println(sqlSegment);
         Assert.assertEquals(" WHERE name='123'", sqlSegment);
@@ -74,24 +76,12 @@ public class EntityWrapperTest {
     }
 
     @Test
-    public void testBlend() {
-		/*
-		 * 实体查询，混合 SQL 原样输出
-		 */
-        ew.setEntity(new User(1));
-        ew.addFilter(null, "name={0}", "'123'").orderBy("id", false);
-        String sqlSegment = ew.getSqlSegment();
-        System.err.println("testBlend = " + sqlSegment);
-        Assert.assertEquals(" AND name='123' ORDER BY id DESC ", sqlSegment);
-    }
-
-    @Test
     public void testNoTSQL() {
 		/*
 		 * 非 T-SQL 实体查询
 		 */
         ew.setEntity(new User(1));
-        ew.addFilter(null, "name={0}", "'123'").addFilterIfNeed(true, " order by id");
+        ew.addFilter("name={0}", "'123'").addFilterIfNeed(true, " order by id");
         String sqlSegment = ew.getSqlSegment();
         System.err.println("testNoTSQL = " + sqlSegment);
         Assert.assertEquals(" AND name='123' order by id", sqlSegment);
@@ -102,7 +92,7 @@ public class EntityWrapperTest {
 		/*
 		 * 非 T-SQL 无实体查询
 		 */
-        ew.addFilter(null, "name={0}", "'123'").addFilterIfNeed(false, " order by id");
+        ew.addFilter("name={0}", "'123'").addFilterIfNeed(false, " order by id");
         String sqlSegment = ew.getSqlSegment();
         System.err.println("testNoTSQL1 = " + sqlSegment);
         Assert.assertEquals(" WHERE name='123'", sqlSegment);

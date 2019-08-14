@@ -11,7 +11,7 @@ import java.text.MessageFormat;
  * @author hubin, yanghu, DYang
  * @date 2019/6/16 14:19
  */
-public class EntityWrapper<T> {
+public class EntityWrapper<T> extends QueryFilter {
 
     /**
     * WHERE关键字
@@ -246,66 +246,6 @@ public class EntityWrapper<T> {
      */
     protected String stripSqlInjection(String value) {
         return value.replaceAll("('.+--)|(--)|(\\|)|(%7C)", "");
-    }
-
-    /**
-     * <p> 添加查询条件 </p>
-     * <p>
-     *     例如： ew.addFilter("name = {0}", "'123'")<br>
-     *     输出：name = '123'<br>
-         * </p>
-     * @param filter       sql片段内容，如例子中的 "name={0}"
-     * @param params  格式参数，组装sql的参数
-     */
-    public EntityWrapper<T> addFilter (String keyWord, String filter, Object ... params) {
-        if (StringUtils.isEmpty(filter)) {
-            return this;
-        }
-        if (StringUtils.isNotEmpty(keyWord)) {
-            queryFilter.append(keyWord);
-        }
-        if (null != params && params.length >= 1) {
-            queryFilter.append(MessageFormat.format(filter, params));
-        } else {
-                queryFilter.append(filter);
-        }
-        return this;
-    }
-
-    public EntityWrapper<T> addFilter (String filter, Object... params) {
-        return addFilter(null, filter, params);
-    }
-    /**
-     * <p>添加查询条件</p>
-     * <p>
-     *     例如：ew.addFilter("name = {0}", "'123'").addFilterIfNeed(false, " ORDER BY id") <br>
-     *     输出:  name = '123'
-     * </p>
-     * @param willAppend 判断条件 true 输出 SQL 片段，false 不输出
-     * @param filter            SQL 片段
-     * @param params       格式参数
-     * @return EntityWrapper
-     */
-    public EntityWrapper<T> addFilterIfNeed (boolean willAppend, String keyWord, String filter, Object ... params) {
-        if (willAppend) {
-            addFilter(keyWord, filter, params);
-        }
-        return this;
-    }
-
-    /**
-     * <p>添加查询条件</p>
-     * <p>
-     *     例如：ew.addFilter("name={0}", "'123'").addFilterIfNeed(false," ORDER BY id") <br>
-     *     输出：name='123'
-     * </p>
-     * @param willAppend  判断条件 true 输出 SQL 片段，false 不输出
-     * @param filter            SQL 片段
-     * @param params        格式参数
-     * @return this
-     */
-    public EntityWrapper<T> addFilterIfNeed (boolean willAppend, String filter, Object ... params) {
-        return addFilterIfNeed(willAppend, null, filter, params);
     }
 
 }
