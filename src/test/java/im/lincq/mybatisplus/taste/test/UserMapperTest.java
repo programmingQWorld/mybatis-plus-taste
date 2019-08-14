@@ -175,7 +175,7 @@ public class UserMapperTest {
         System.err.println("\n------------------selectList--------(id DESC)--------------");
         EntityWrapper<User> ew = new EntityWrapper<>(new User("insert-batch-2"), "id desc");
         /** 查询条件，支持 sql 片段 */
-        ew.setSqlSegment(" AND name like '%dateBatch%' ");
+        ew.and(" name like '%dateBatch%' ");
         List<User> ewUserList = userMapper.selectList(ew);
         ewUserList.forEach(UserMapperTest::print);
 
@@ -191,16 +191,14 @@ public class UserMapperTest {
         /**
          * 排序 test_id desc
          */
-        page.setOrderByField("test_id");
-        page.setAsc(false);
         ew = new EntityWrapper<User>(new User(1));
-
-        ew.setSqlSegment("age,name");
+        ew.orderBy("id", true);
+        ew.setSqlSelect("age,name");
 
         /**
          * 查询条件，SQL片段（注意！程序会自动在 sqlSegment内容前面添加where或者and）
          */
-        ew.setSqlSegment(" and name like '%dateBatch%'");
+        ew.and(" name like '%dateBatch%'");
         List<User> paginList = userMapper.selectPage(page, ew);
         paginList.forEach(UserMapperTest::print);
 

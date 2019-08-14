@@ -25,7 +25,7 @@ public class EntityWrapperTest {
     @Test
     public void test1 () {
         ew.setEntity(new User(1));
-        ew.addFilter("name={0}", "'123'").addFilterIfNeed(false, " ORDER BY id");
+        ew.addFilter("name={0}", "'123'").orderBy("id", true);
         String sqlSegment = ew.getSqlSegment();
         System.out.println(sqlSegment);
         Assert.assertEquals(" AND name='123'", sqlSegment);
@@ -43,7 +43,7 @@ public class EntityWrapperTest {
     @Test
     public void test3() {
         ew.setEntity(new User(1));
-        ew.addFilter(" Order By id desc");
+        ew.orderBy("id", true);
         String sqlSegment = ew.getSqlSegment();
         System.out.println(sqlSegment);
         Assert.assertEquals("Order By id desc", sqlSegment);
@@ -51,7 +51,7 @@ public class EntityWrapperTest {
 
     @Test
     public void test21 () {
-        ew.addFilter("name={0}", "'123'").addFilterIfNeed(false, " ORDER BY id");
+        ew.addFilter("name={0}", "'123'").orderBy("id", true);
         String sqlSegment = ew.getSqlSegment();
         System.out.println(sqlSegment);
         Assert.assertEquals(" WHERE name='123'", sqlSegment);
@@ -59,18 +59,18 @@ public class EntityWrapperTest {
 
     @Test
     public void test22 () {
-        ew.addFilter("name={0} order by id desc", "'123'");
+        ew.where("name={0}", "'123'").andIfNeed(false, "id=1").orderBy("id");
         String sqlSegment = ew.getSqlSegment();
         System.out.println(sqlSegment);
-        Assert.assertEquals(" WHERE name='123' order by id desc", sqlSegment);
+        Assert.assertEquals(" WHERE name='123' ORDER by id DESC", sqlSegment);
     }
 
     @Test
     public void test23 () {
-        ew.addFilter(" Order By id desc");
+        ew.orderBy(" id",false);
         String sqlSegment = ew.getSqlSegment();
         System.out.println(sqlSegment);
-        Assert.assertEquals("Order By id desc", sqlSegment);
+        Assert.assertEquals("Order By id DESC", sqlSegment);
     }
 
 }
