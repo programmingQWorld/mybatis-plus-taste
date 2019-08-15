@@ -61,7 +61,7 @@ public class EntityWrapperTest {
 
     @Test
     public void test22 () {
-        ew.where("name={0}", "'123'").andIf(false, "id=1").orderBy("id");
+        ew.where("name={0}", "'123'").filterIf(false, "id=1").orderBy("id");
         String sqlSegment = ew.getSqlSegment();
         System.out.println(sqlSegment);
         Assert.assertEquals(" WHERE name='123' ORDER by id DESC", sqlSegment);
