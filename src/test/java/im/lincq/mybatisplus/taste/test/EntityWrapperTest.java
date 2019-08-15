@@ -61,7 +61,7 @@ public class EntityWrapperTest {
 
     @Test
     public void test22 () {
-        ew.where("name={0}", "'123'").andIfNeed(false, "id=1").orderBy("id");
+        ew.where("name={0}", "'123'").andIf(false, "id=1").orderBy("id");
         String sqlSegment = ew.getSqlSegment();
         System.out.println(sqlSegment);
         Assert.assertEquals(" WHERE name='123' ORDER by id DESC", sqlSegment);
@@ -96,6 +96,25 @@ public class EntityWrapperTest {
         String sqlSegment = ew.getSqlSegment();
         System.err.println("testNoTSQL1 = " + sqlSegment);
         Assert.assertEquals(" WHERE name='123'", sqlSegment);
+    }
+
+    @Test
+    public void testSQL11 () {
+        /*
+        * 实体待查询使用方法 输出看结果
+        * */
+        ew.setEntity(new User(1));
+        ew.where("name={0}", "zhangsan").and("id=1")
+                .orNew("status={0}", "0").or("status=1")
+                .notLike("nlike", "notvalue")
+                .andNew("new=xx").like("hhh", "ddd")
+                .andNew("pwd=11").isNotNull("n1,n2").isNull("n3")
+                .groupBy("x1").groupBy("x2,x3")
+                .having("x1=11").having("x3=433")
+                .orderBy("dd").orderBy("d1,w2")
+        ;
+
+        System.out.println(ew.getSqlSegment());
     }
 
 }

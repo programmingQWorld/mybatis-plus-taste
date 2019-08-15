@@ -93,4 +93,8 @@ public class StringUtils {
         Matcher matcher = pattern.matcher(str);
         return matcher.matches();
     }
+
+    public static String quotaMark(String srcStr) {
+        return isEmpty(srcStr) ? "" : "\'" + srcStr + "\'";
+    }
 }
