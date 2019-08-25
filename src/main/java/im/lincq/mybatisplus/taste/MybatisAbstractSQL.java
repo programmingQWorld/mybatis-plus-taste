@@ -3,6 +3,7 @@ package im.lincq.mybatisplus.taste;
 import im.lincq.mybatisplus.taste.toolkit.StringUtils;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,8 @@ import java.util.List;
  * @author lincq
  * @date 2019/8/15 13:03
  */
-public abstract class MybatisAbstractSQL<T> {
+@SuppressWarnings("serial")
+public abstract class MybatisAbstractSQL<T>  implements Serializable {
 
     private static final String AND = " AND ";
     private static final String OR = " OR ";
@@ -82,7 +84,7 @@ public abstract class MybatisAbstractSQL<T> {
     /**
      * SQL连接器
      */
-    private static class SafeAppendable {
+    private static class SafeAppendable implements Serializable {
         private final Appendable a;
         private boolean empty = true;
 
@@ -111,7 +113,7 @@ public abstract class MybatisAbstractSQL<T> {
     /**
      * SQL条件类
      * */
-    private static class SQLCondition {
+    private static class SQLCondition implements Serializable {
         List<String> where = new ArrayList<String>();
         List<String> having = new ArrayList<String>();
         List<String> groupBy = new ArrayList<String>();
