@@ -9,13 +9,13 @@ import java.text.MessageFormat;
  * @author lincq
  * @date 2019/8/15 14:27
  */
-public class TSQLPlus extends MybatisAbstractSQL<TSQLPlus> {
+public class TSqlPlus extends MybatisAbstractSQL<TSqlPlus> {
 
     private final String IS_NOT_NULL = " IS NOT NULL";
     private final String IS_NULL = " IS NULL";
 
     @Override
-    public TSQLPlus getSelf () {
+    public TSqlPlus getSelf () {
         return this;
     }
 
@@ -25,7 +25,7 @@ public class TSQLPlus extends MybatisAbstractSQL<TSQLPlus> {
      * @param value      like值，无需前后%及ORACLE通用
      * @return this
      */
-    public TSQLPlus LIKE (String column, String value) {
+    public TSqlPlus LIKE (String column, String value) {
         handlerLike(column, value, false) ;
         return this;
     }
@@ -36,7 +36,7 @@ public class TSQLPlus extends MybatisAbstractSQL<TSQLPlus> {
      * @param value      like值，无需前后%及ORACLE通用
      * @return this
      */
-    public TSQLPlus NOT_LIKE (String column, String value) {
+    public TSqlPlus NOT_LIKE (String column, String value) {
         handlerLike(column, value, true) ;
         return this;
     }
@@ -46,7 +46,7 @@ public class TSQLPlus extends MybatisAbstractSQL<TSQLPlus> {
      * @param columns  以逗号分隔的字段名称
      * @return
      */
-    public TSQLPlus IS_NOT_NULL (String columns) {
+    public TSqlPlus IS_NOT_NULL (String columns) {
         handlerNull(columns, IS_NOT_NULL);
         return this;
     }
@@ -56,7 +56,7 @@ public class TSQLPlus extends MybatisAbstractSQL<TSQLPlus> {
      * @param columns 以逗号分隔的字段名称
      * @return this
      */
-    public TSQLPlus IS_NULL (String columns) {
+    public TSqlPlus IS_NULL (String columns) {
         handlerNull(columns, IS_NULL);
         return this;
     }

@@ -117,4 +117,19 @@ public class EntityWrapperTest {
         System.out.println(ew.getSqlSegment());
     }
 
+    @Test
+    public void testNull () {
+        ew.orderBy(null);
+        String part = ew.getSqlSegment();
+        Assert.assertNull(part);
+    }
+
+    @Test
+    public void testNull2() {
+        ew.like(null, null).where("aa={0}", "'bb'").orderBy(null);
+        String sqlPart = ew.getSqlSegment();
+        System.out.println(sqlPart);
+        Assert.assertEquals("WHERE (aa='bb')", sqlPart);
+    }
+
 }

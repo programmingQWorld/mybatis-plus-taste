@@ -25,7 +25,7 @@ public class EntityWrapper<T> {
     /**
      * 实现了TSQL语法的SQL实体
      */
-    protected TSQLPlus sql = new TSQLPlus();
+    protected TSqlPlus sql = new TSqlPlus();
 
     /**
      * 查询条件
@@ -80,10 +80,7 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> where (String sqlWhere, Object ... params) {
-        String sqlPart = formatSql(sqlWhere, params);
-        if (retNeed(sqlPart)) {
-            sql.WHERE(sqlPart);
-        }
+        sql.WHERE(formatSql(sqlWhere, params));
         return this;
     }
 
@@ -94,7 +91,8 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> and (String sqlAnd, Object ... params) {
-        return where(sqlAnd, params);
+        sql.AND().WHERE(formatSql(sqlAnd, params));
+        return this;
     }
 
 
@@ -111,10 +109,7 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> andNew(String sqlAnd, Object ... params) {
-        String sqlPart = formatSql (sqlAnd, params);
-        if (retNeed(sqlPart)) {
-            sql.AND_NEW().WHERE(sqlPart);
-        }
+        sql.AND_NEW().WHERE(formatSql (sqlAnd, params));
         return this;
     }
 
@@ -125,10 +120,7 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> or (String sqlOr, Object ... params) {
-        String sqlPart  = formatSql(sqlOr, params);
-        if (retNeed(sqlPart)) {
-            sql.OR().WHERE(sqlPart);
-        }
+        sql.OR().WHERE(formatSql(sqlOr, params));
         return this;
     }
 
@@ -139,10 +131,7 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> orNew(String sqlOr, Object ... params) {
-        String sqlPart = formatSql (sqlOr, params);
-        if (retNeed(sqlPart)) {
-            sql.OR_NEW().WHERE(sqlPart);
-        }
+        sql.OR_NEW().WHERE(formatSql (sqlOr, params));
         return this;
     }
 
@@ -169,10 +158,7 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> having(String sqlHaving, Object ... params) {
-        String sqlPart = formatSql(sqlHaving, params);
-        if (retNeed(sqlPart)) {
-            sql.HAVING(sqlPart);
-        }
+        sql.HAVING(formatSql(sqlHaving, params));
         return this;
     }
 
@@ -202,7 +188,9 @@ public class EntityWrapper<T> {
      * @return this
      */
     public EntityWrapper<T> orderBy(String columns, boolean isAsc) {
-        sql.ORDER_BY(columns + (isAsc ? " ASC" : " DESC"));
+        if (StringUtils.isNotEmpty(columns)) {
+            sql.ORDER_BY(columns + (isAsc ? " ASC" : " DESC"));
+        }
         return this;
     }
 

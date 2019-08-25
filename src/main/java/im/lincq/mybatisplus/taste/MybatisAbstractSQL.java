@@ -1,5 +1,7 @@
 package im.lincq.mybatisplus.taste;
 
+import im.lincq.mybatisplus.taste.toolkit.StringUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -136,6 +138,8 @@ public abstract class MybatisAbstractSQL<T> {
          */
         // 通过or(New) and(New)方法添加的sql_condition存放在where集合中，实现为 step1: append语义关键词， step2: append sql_part
         private void sqlCause (SafeAppendable builder, String keyWord, List<String> parts, String open, String close, String conjunction) {
+
+            parts = clearNull(parts);
             // parts集合不为空的情况下
             if (!parts.isEmpty()) {
                 // 如果builder 不为空，则准备换行
@@ -165,6 +169,22 @@ public abstract class MybatisAbstractSQL<T> {
                 }
                 builder.append(close);
             }
+        }
+
+        /**
+         * 清除LIST中的NULL和空字符串
+         * @param parts 原LIST列表
+         * @return List
+         */
+        private List<String> clearNull(List<String> parts) {
+            List<String> temps = new ArrayList<String>();
+            for (String part : parts) {
+                if (StringUtils.isEmpty(part)) {
+                    continue;
+                }
+                temps.add(part);
+            }
+            return temps;
         }
 
         /**
