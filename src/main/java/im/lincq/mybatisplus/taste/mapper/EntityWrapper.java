@@ -1,6 +1,5 @@
 package im.lincq.mybatisplus.taste.mapper;
 
-import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import im.lincq.mybatisplus.taste.toolkit.StringUtils;
 
 import java.text.MessageFormat;
@@ -11,7 +10,7 @@ import java.text.MessageFormat;
  * @author hubin, yanghu, DYang
  * @date 2019/6/16 14:19
  */
-public class EntityWrapper<T> extends QueryFilter {
+public class EntityWrapper<T> {
 
     /**
      * 数据库表映射实体类
@@ -34,6 +33,7 @@ public class EntityWrapper<T> extends QueryFilter {
     protected StringBuffer queryFilter = new StringBuffer();
 
     public EntityWrapper () {
+        /* 注意，传入查询参数 */
     }
 
     public EntityWrapper (T entity) {
@@ -263,23 +263,11 @@ public class EntityWrapper<T> extends QueryFilter {
     }
 
     /**
-     * <p>动态判断是否需要添加条件语句</p>
-     * @param need          bool
-     * @param sqlAnd       and 条件语句
-     * @param params     参数集
-     * @return this
-     */
-    public EntityWrapper<T> filterIf (boolean need, String sqlAnd, Object ... params) {
-        return need ? where(sqlAnd, params) : this;
-    }
-
-    /**
      * 为了兼容之前的版本，可使用where()或and()替代
      * @param sqlWhere  where sql 部分
      * @param params     参数集
      * @return this
      */
-    @Override
     public EntityWrapper<T> addFilter(String sqlWhere, Object ... params) {
         return and(sqlWhere, params);
     }
@@ -300,9 +288,8 @@ public class EntityWrapper<T> extends QueryFilter {
      * @param params   参数集
      * @return this
      */
-    @Override
     public EntityWrapper<T> addFilterIfNeed(boolean need, String sqlWhere, Object... params) {
-        return filterIf(need, sqlWhere, params);
+        return need ? where(sqlWhere, params) : this;
     }
 
         /**
@@ -332,11 +319,11 @@ public class EntityWrapper<T> extends QueryFilter {
      * @param params 参数集
      * @return
      */
-    private String formatSql (String sqlStr, Object ... params) {
+    protected String formatSql (String sqlStr, Object ... params) {
         return formatSqlIfNeed(true, sqlStr, params);
     }
 
-    private String formatSqlIfNeed(boolean need, String sqlStr, Object ... params) {
+    protected String formatSqlIfNeed(boolean need, String sqlStr, Object ... params) {
         if (!need || StringUtils.isEmpty(sqlStr)) {
             return null;
         }
