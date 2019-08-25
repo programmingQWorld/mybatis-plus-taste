@@ -29,6 +29,9 @@ public class PaginationInterceptor implements Interceptor {
 
     private static final long serialVersionUID = 1L;
 
+    /* 溢出总页数，设置第一页 */
+    private boolean overflowCurrent = false;
+
     /** 方言类型 */
     private String dialectType;
     /** 方言实现类 */
@@ -150,6 +153,11 @@ public class PaginationInterceptor implements Interceptor {
                 total = rs.getInt(1);
             }
             page.setTotal(total);
+
+            if (overflowCurrent && (page.getCurrent() > page.getPages())) {
+                page = new Pagination(1, page.getSize());
+                page.setTotal(total);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
