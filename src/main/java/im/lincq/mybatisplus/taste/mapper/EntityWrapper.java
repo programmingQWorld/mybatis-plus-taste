@@ -2,6 +2,7 @@ package im.lincq.mybatisplus.taste.mapper;
 
 import im.lincq.mybatisplus.taste.toolkit.StringUtils;
 
+import java.io.Serializable;
 import java.text.MessageFormat;
 
 /**
@@ -10,7 +11,8 @@ import java.text.MessageFormat;
  * @author hubin, yanghu, DYang
  * @date 2019/6/16 14:19
  */
-public class EntityWrapper<T> {
+@SuppressWarnings("serial")
+public class EntityWrapper<T> implements Serializable {
 
     /**
      * 数据库表映射实体类
