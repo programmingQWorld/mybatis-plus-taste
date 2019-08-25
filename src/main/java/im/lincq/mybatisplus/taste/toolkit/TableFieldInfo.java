@@ -21,13 +21,13 @@ public class TableFieldInfo {
 
     public TableFieldInfo(boolean related, String column, String property) {
         this.related = related;
-        this.column = column;
+        this.column = DBKeywordsProcessor.convert(column);
         this.property = property;
     }
     public TableFieldInfo(String column) {
         this.related = false;
         this.property = column;
-        this.column = column;
+        this.column = DBKeywordsProcessor.convert(column);
     }
 
     public boolean isRelated() {
