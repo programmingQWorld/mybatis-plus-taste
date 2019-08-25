@@ -35,7 +35,7 @@ public class StringUtils {
      * @return  转换好的字符串
      */
     public static String camelToUnderline (String param) {
-        if (StringUtils.isEmpty(param)) {
+        if (isEmpty(param)) {
             return "";
         }
         int len = param.length();
