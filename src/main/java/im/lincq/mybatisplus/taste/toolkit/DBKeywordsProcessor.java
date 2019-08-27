@@ -6,13 +6,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * @author lincq
  * @date 2019/8/26 01:11
  */
 public class DBKeywordsProcessor {
-
+    protected static final Logger logger = Logger.getLogger("DBKeywordsProcessor");
     private static final String ESCAPE_CHARACTER = "`";
     private static final Set<String> KEYWORDS = new HashSet<String>();
 
@@ -26,7 +27,8 @@ public class DBKeywordsProcessor {
                 KEYWORDS.add(keyword);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warning("If you want to support the keyword query, must have database_keywords.dic \n"
+                    + e.getMessage());
         } finally {
             if (br != null) {
                 try {

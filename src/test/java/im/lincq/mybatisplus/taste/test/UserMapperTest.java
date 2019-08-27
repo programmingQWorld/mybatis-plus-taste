@@ -3,9 +3,6 @@ package im.lincq.mybatisplus.taste.test;
 import im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder;
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import im.lincq.mybatisplus.taste.plugins.Page;
-import im.lincq.mybatisplus.taste.plugins.PaginationInterceptor;
-import im.lincq.mybatisplus.taste.plugins.pagination.Pagination;
-import im.lincq.mybatisplus.taste.test.mysql.MySqlInjector;
 import im.lincq.mybatisplus.taste.test.mysql.entity.User;
 import im.lincq.mybatisplus.taste.test.mapper.UserMapper;
 import im.lincq.mybatisplus.taste.toolkit.IdWorker;
@@ -173,9 +170,9 @@ public class UserMapperTest {
         print(one);
 
         System.err.println("\n------------------selectList--------(id DESC)--------------");
-        EntityWrapper<User> ew = new EntityWrapper<>(new User("insert-batch-2"), "id desc");
+        EntityWrapper<User> ew = new EntityWrapper<>(new User(1), "test_id");
         /** 查询条件，支持 sql 片段 */
-        ew.and(" name like '%dateBatch%' ");
+        ew.and(" name like '%lincq%' ");
         List<User> ewUserList = userMapper.selectList(ew);
         ewUserList.forEach(UserMapperTest::print);
 

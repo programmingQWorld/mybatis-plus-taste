@@ -84,9 +84,9 @@
             <property name="dialectType" value="mysql" />
         </plugin>
         <!-- SQL 执行性能分析，开发环境使用，线上不推荐 -->
-        <plugin interceptor="im.lincq.mybatisplus.taste.plugins.PerformanceInterceptor">
+        <!--<plugin interceptor="im.lincq.mybatisplus.taste.plugins.PerformanceInterceptor">
             <property name="maxTime" value="100" />
-        </plugin>
+        </plugin>-->
     </plugins>
 
     <!-- 多环境配置，通过default属性指定运行时环境 -->
@@ -96,9 +96,10 @@
             <!-- 配置数据库连接信息 -->
             <dataSource type="UNPOOLED">
                 <property name="driver" value="com.mysql.jdbc.Driver" />
-                <property name="url" value="jdbc:mysql://192.168.111.130:3306/mplus" />
+                <property name="driver" value="com.mysql.jdbc.Driver" />
+                <property name="url" value="jdbc:mysql://localhost:3306/mplus" />
                 <property name="username" value="root" />
-                <property name="password" value="123456" />
+                <property name="password" value="" />
             </dataSource>
         </environment>
     </environments>
