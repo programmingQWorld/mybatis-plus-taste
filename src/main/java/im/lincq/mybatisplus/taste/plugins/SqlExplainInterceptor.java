@@ -17,6 +17,10 @@ import java.sql.ResultSet;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+
+/**
+ * SQL执行分析拦截器【目前只支持 MYSQL-5.6.3 以上版本 】
+ */
 @Intercepts({
         @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class })
 })

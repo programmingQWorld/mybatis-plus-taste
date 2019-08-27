@@ -134,7 +134,7 @@ public abstract class MybatisAbstractSQL<T>  implements Serializable {
          * @param builder            连接器
          * @param keyWord        TSQL中的关键字
          * @param parts               SQL条件语句集合
-         * @param open               其实符号
+         * @param open               起始符号
          * @param close               结束符号
          * @param conjunction   链接条件
          */
