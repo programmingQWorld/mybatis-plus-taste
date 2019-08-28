@@ -57,6 +57,9 @@ public class MybatisConfiguration extends Configuration {
     public void addMappedStatement(MappedStatement ms) {
         logger.fine("addMappedStatement: " );
         if (IS_REFRESH) {
+            /*
+			 * 支持是否自动刷新 XML 变更内容，开发环境使用【 注：生产环境勿用！】
+			 */
             this.mappedStatements.remove(ms.getId());
         } else {
             if (this.mappedStatements.containsKey(ms.getId())) {

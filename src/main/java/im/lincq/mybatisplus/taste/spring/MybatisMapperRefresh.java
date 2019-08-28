@@ -1,7 +1,6 @@
-package im.lincq.mybatisplus.taste.refresh;
+package im.lincq.mybatisplus.taste.spring;
 
 import im.lincq.mybatisplus.taste.MybatisConfiguration;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.binding.MapperRegistry;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperEntityResolver;
@@ -13,11 +12,9 @@ import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.core.NestedIOException;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
@@ -30,8 +27,8 @@ import java.util.logging.Logger;
  * @author lincq
  * @date 2019/8/28 09:39
  */
-public class MapperRefresh implements Runnable {
-    protected final Logger logger = Logger.getLogger(MapperRefresh.class.getName());
+public class MybatisMapperRefresh implements Runnable {
+    protected final Logger logger = Logger.getLogger(MybatisMapperRefresh.class.getName());
     private SqlSessionFactory sqlSessionFactory;
     private Resource[] mapperLocations;
     private Long beforeTime = 0L;
@@ -61,7 +58,7 @@ public class MapperRefresh implements Runnable {
      */
     private static Map<String, List<Resource>> jarMapper = new HashMap<>();
 
-    public MapperRefresh(Resource[] mapperLocations, SqlSessionFactory sqlSessionFactory, int delaySeconds, int sleepSeconds, boolean enabled) {
+    public MybatisMapperRefresh(Resource[] mapperLocations, SqlSessionFactory sqlSessionFactory, int delaySeconds, int sleepSeconds, boolean enabled) {
         this.mapperLocations = mapperLocations;
         this.sqlSessionFactory = sqlSessionFactory;
         this.delaySeconds = delaySeconds;
@@ -70,7 +67,7 @@ public class MapperRefresh implements Runnable {
         this.run();  // 并没有使用新的线程
     }
 
-    public MapperRefresh(Resource[] mapperLocations, SqlSessionFactory sqlSessionFactory, boolean enabled) {
+    public MybatisMapperRefresh(Resource[] mapperLocations, SqlSessionFactory sqlSessionFactory, boolean enabled) {
         this.mapperLocations = mapperLocations;
         this.sqlSessionFactory = sqlSessionFactory;
         this.enabled = enabled;
@@ -78,14 +75,14 @@ public class MapperRefresh implements Runnable {
     }
 
     /**
-     * 在里面创建了线程 "mybatis-plus MapperRefresh"
+     * 在里面创建了线程 "mybatis-plus MybatisMapperRefresh"
      * 先延迟，然后在循环中，通过休眠达成每5s后执行下一次循环。
      */
     @Override
     public void run() {
         beforeTime = System.currentTimeMillis();
         if (enabled) {
-            final MapperRefresh runnable = this;
+            final MybatisMapperRefresh runnable = this;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -158,7 +155,7 @@ public class MapperRefresh implements Runnable {
                         }
                     }
                 }
-            }, "mybatis-plus MapperRefresh").start();
+            }, "mybatis-plus MybatisMapperRefresh").start();
         }
     }
 

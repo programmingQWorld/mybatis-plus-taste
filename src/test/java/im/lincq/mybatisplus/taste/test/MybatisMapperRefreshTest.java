@@ -1,11 +1,10 @@
-package im.lincq.mybatisplus.taste.test.refresh;
+package im.lincq.mybatisplus.taste.test;
 
 import im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder;
 import im.lincq.mybatisplus.taste.plugins.pagination.Pagination;
-import im.lincq.mybatisplus.taste.refresh.MapperRefresh;
+import im.lincq.mybatisplus.taste.spring.MybatisMapperRefresh;
 import im.lincq.mybatisplus.taste.test.mapper.UserMapper;
 import im.lincq.mybatisplus.taste.test.mysql.MySqlInjector;
-import im.lincq.mybatisplus.taste.test.mysql.entity.User;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.BasicConfigurator;
@@ -14,13 +13,12 @@ import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.SecureClassLoader;
 
 /**
  * @author lincq
  * @date 2019/8/28 09:08
  */
-public class MapperRefreshTest {
+public class MybatisMapperRefreshTest {
     public static void main(String[] args) throws InterruptedException {
 
         BasicConfigurator.configure();
@@ -32,7 +30,7 @@ public class MapperRefreshTest {
         Resource[] resource = new ClassPathResource[]{new ClassPathResource("mysql/UserMapper.xml")};
         SqlSessionFactory sessionFactory = mf.build(in);
 
-        new MapperRefresh(resource,sessionFactory,0,5, true);
+        new MybatisMapperRefresh(resource,sessionFactory,0,5, true);
         boolean isReturn = false;
         SqlSession session=null;
         int i = 0;
