@@ -303,23 +303,54 @@ public class EntityWrapper<T> implements Serializable {
     }
 
     /**
-     * 格式化SQL
+     * <p>
+     *     格式化SQL
+     * </p>
      *
      * @param sqlStr SQL语句部分
      * @param params 参数集
-     * @return
+     * @return return
      */
     protected String formatSql (String sqlStr, Object ... params) {
         return formatSqlIfNeed(true, sqlStr, params);
     }
 
+    /**
+     * <p>
+     * 根据需要格式化SQL
+     * </p>
+     *
+     * @param need   是否需要格式化
+     * @param sqlStr SQL语句部分
+     * @param params 参数集
+     * @return this
+     */
     protected String formatSqlIfNeed(boolean need, String sqlStr, Object ... params) {
         if (!need || StringUtils.isEmpty(sqlStr)) {
             return null;
         }
         if (null != params && params.length > 0) {
+            dealParams(params);
             sqlStr = MessageFormat.format(sqlStr, params);
         }
         return sqlStr;
+    }
+
+
+    /**
+     * <p>
+     *     处理String类型的参数，自动添加单引号，如：'value'<br />
+     *     如果当前字符串已经包含引号，则不做修改
+     * </p>
+     *
+     * @param params 参数集
+     */
+    protected void dealParams (Object[] params) {
+        for (int i = 0; i < params.length; i++) {
+            Object tempVal = params[i];
+            if (tempVal instanceof String && !String.valueOf(tempVal).matches("\'(.+)\'")) {
+                params[i] = StringUtils.quotaMark(String.valueOf(tempVal));
+            }
+        }
     }
 }

@@ -32,7 +32,7 @@ public class MapperRefreshTest {
         Resource[] resource = new ClassPathResource[]{new ClassPathResource("mysql/UserMapper.xml")};
         SqlSessionFactory sessionFactory = mf.build(in);
 
-        new MapperRefresh(resource,sessionFactory,0,5);
+        new MapperRefresh(resource,sessionFactory,0,5, true);
         boolean isReturn = false;
         SqlSession session=null;
         int i = 0;
