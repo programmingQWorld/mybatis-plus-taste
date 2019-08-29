@@ -1,13 +1,13 @@
 package im.lincq.mybatisplus.taste.test.mysql;
 
-import im.lincq.mybatisplus.taste.MybatisMetaObjectHandler;
+import im.lincq.mybatisplus.taste.mapper.IMetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
 
 /**
  * @author lincq
  * @date 2019/8/29 15:11
  */
-public class MyMetaObjectHandler implements MybatisMetaObjectHandler {
+public class MyMetaObjectHandler implements IMetaObjectHandler {
 
     /**
      * 测试user表name字段为空自动填充

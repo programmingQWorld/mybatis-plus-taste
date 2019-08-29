@@ -2,9 +2,9 @@ package im.lincq.mybatisplus.taste;
 
 import im.lincq.mybatisplus.taste.mapper.AutoSqlInjector;
 import im.lincq.mybatisplus.taste.mapper.DBType;
+import im.lincq.mybatisplus.taste.mapper.IMetaObjectHandler;
 import im.lincq.mybatisplus.taste.mapper.ISqlInjector;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 
 import java.util.logging.Logger;
@@ -36,7 +36,7 @@ public class MybatisConfiguration extends Configuration {
     /**
      * 元对象字段填充控制器
      */
-    public static MybatisMetaObjectHandler META_OBJECT_HANDLER = null;
+    public static IMetaObjectHandler META_OBJECT_HANDLER = null;
 
     /*
 	 * 是否刷新mapper

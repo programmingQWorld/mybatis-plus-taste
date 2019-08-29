@@ -1,4 +1,4 @@
-package im.lincq.mybatisplus.taste;
+package im.lincq.mybatisplus.taste.mapper;
 
 import org.apache.ibatis.reflection.MetaObject;
 
@@ -7,7 +7,7 @@ import org.apache.ibatis.reflection.MetaObject;
  * @author lincq
  * @date 2019/8/29 15:32
  */
-public interface MybatisMetaObjectHandler {
+public interface IMetaObjectHandler {
 
     /**
      * <p>

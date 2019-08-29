@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste;
 
 import im.lincq.mybatisplus.taste.annotations.IdType;
+import im.lincq.mybatisplus.taste.mapper.IMetaObjectHandler;
 import im.lincq.mybatisplus.taste.toolkit.IdWorker;
 import im.lincq.mybatisplus.taste.toolkit.TableInfo;
 import im.lincq.mybatisplus.taste.toolkit.TableInfoHelper;
@@ -106,7 +107,7 @@ public class MybatisDefaultParameterHandler extends DefaultParameterHandler {
                     }
                 }
                 /* 自定义元对象填充控制器 */
-                MybatisMetaObjectHandler metaObjectHandler =  MybatisConfiguration.META_OBJECT_HANDLER;
+                IMetaObjectHandler metaObjectHandler =  MybatisConfiguration.META_OBJECT_HANDLER;
                 if (null != metaObjectHandler) {
                     metaObjectHandler.insertFill(metaObject);
                 }
