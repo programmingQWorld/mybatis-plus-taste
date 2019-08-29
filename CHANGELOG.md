@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [v1.4.5] 2016.08.28
+- 新增 XML 修改自动热加载功能
+- 添加自动处理EntityWrapper方法中的MessageFormat Params类型为字符串的参数
+- 新增表公共字段自动填充功能
 
 ## [v1.4.4](http://www.oschina.net/news/76419/mybatis-plus-1-4-3) 2016.08.25
 - entitywrapper所有条件类方法支持传入null参数，该条件不会附件到SQL语句中

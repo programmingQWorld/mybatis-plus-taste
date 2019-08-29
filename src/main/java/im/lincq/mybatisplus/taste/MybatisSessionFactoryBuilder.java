@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste;
 
 import im.lincq.mybatisplus.taste.mapper.DBType;
+import im.lincq.mybatisplus.taste.mapper.IMetaObjectHandler;
 import im.lincq.mybatisplus.taste.mapper.ISqlInjector;
 import org.apache.ibatis.exceptions.ExceptionFactory;
 import org.apache.ibatis.executor.ErrorContext;
@@ -76,7 +77,7 @@ public class MybatisSessionFactoryBuilder extends SqlSessionFactoryBuilder {
     }
 
     // TODO 注入 元对象字段填充控制器
-    public void setMetaObjectHandler(MybatisMetaObjectHandler metaObjectHandler) {
+    public void setMetaObjectHandler(IMetaObjectHandler metaObjectHandler) {
         MybatisConfiguration.META_OBJECT_HANDLER = metaObjectHandler;
     }
 }
