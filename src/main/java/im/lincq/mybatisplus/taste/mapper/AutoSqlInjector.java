@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste.mapper;
 
 import im.lincq.mybatisplus.taste.MybatisConfiguration;
+import im.lincq.mybatisplus.taste.MybatisXmlLanguageDriver;
 import im.lincq.mybatisplus.taste.annotations.IdType;
 import im.lincq.mybatisplus.taste.toolkit.TableFieldInfo;
 import im.lincq.mybatisplus.taste.toolkit.TableInfo;
@@ -554,7 +555,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
                 id, source, StatementType.PREPARED, sqlCommandType,
                 null, null, null, parameterClass, null,
                 resultType, null, false, true, false,
-                keyGenerator, keyProperty, keyColumn, configuration.getDatabaseId(), new XMLLanguageDriver(), null);
+                keyGenerator, keyProperty, keyColumn, configuration.getDatabaseId(), languageDriver, null);
     }
 
     /**

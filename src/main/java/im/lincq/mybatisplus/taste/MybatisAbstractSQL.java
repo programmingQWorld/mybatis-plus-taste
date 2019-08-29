@@ -139,7 +139,7 @@ public abstract class MybatisAbstractSQL<T>  implements Serializable {
          * @param conjunction   链接条件
          */
         // 通过or(New) and(New)方法添加的sql_condition存放在where集合中，实现为 step1: append语义关键词， step2: append sql_part
-        private void sqlCause (SafeAppendable builder, String keyWord, List<String> parts, String open, String close, String conjunction) {
+        private void sqlClause (SafeAppendable builder, String keyWord, List<String> parts, String open, String close, String conjunction) {
 
             parts = clearNull(parts);
             // parts集合不为空的情况下
@@ -196,10 +196,10 @@ public abstract class MybatisAbstractSQL<T>  implements Serializable {
          * @return
          */
         private String buildSQL (SafeAppendable builder) {
-            sqlCause(builder, "WHERE", where, "(", ")", AND);
-            sqlCause(builder, "GROUP BY", groupBy, "(", ")", ",");
-            sqlCause(builder, "HAVING", having, "(", ")", OR);
-            sqlCause(builder, "ORDER BY", orderBy, "(", ")", ",");
+            sqlClause(builder, "WHERE", where, "(", ")", AND);
+            sqlClause(builder, "GROUP BY", groupBy, "", "", ",");
+            sqlClause(builder, "HAVING", having, "(", ")", OR);
+            sqlClause(builder, "ORDER BY", orderBy, "", "", ",");
             return builder.toString();
         }
 

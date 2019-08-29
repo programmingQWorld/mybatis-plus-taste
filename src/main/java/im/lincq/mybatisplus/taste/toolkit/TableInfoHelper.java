@@ -53,7 +53,7 @@ public class TableInfoHelper {
             TableId tableId = field.getAnnotation(TableId.class);
             if (tableId != null) {
                 if (tableInfo.getKeyColumn() == null) {
-
+                    tableInfo.setIdType(tableId.type());
                     if (StringUtils.isNotEmpty(tableId.value())) {
                         /*主键字段名称可能会和当前属性名称不一样，plus遵循当前的注解value配置主键字段名称*/
                         tableInfo.setKeyColumn(tableId.value());

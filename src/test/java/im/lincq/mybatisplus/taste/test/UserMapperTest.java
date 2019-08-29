@@ -3,6 +3,7 @@ package im.lincq.mybatisplus.taste.test;
 import im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder;
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import im.lincq.mybatisplus.taste.plugins.Page;
+import im.lincq.mybatisplus.taste.test.mysql.MyMetaObjectHandler;
 import im.lincq.mybatisplus.taste.test.mysql.entity.User;
 import im.lincq.mybatisplus.taste.test.mapper.UserMapper;
 import im.lincq.mybatisplus.taste.toolkit.IdWorker;
@@ -43,6 +44,7 @@ public class UserMapperTest {
         // SqlSession session = new SqlSessionFactoryBuilder().build(in).openSession();
         // 此处使用MybatisSessionFactoryBuilder构建SqlSessionFactory,目的是为了引入AutoMapper（BaseMapper）
         MybatisSessionFactoryBuilder mf = new MybatisSessionFactoryBuilder();
+        mf.setMetaObjectHandler(new MyMetaObjectHandler());
         SqlSessionFactory sessionFactory = mf.build(in);
 
         /**
@@ -100,6 +102,9 @@ public class UserMapperTest {
         ul.add(new User( "insert-batch-2", 13, 1));
         ul.add(new User( "insert-batch-3", 14, 1));
         ul.add(new User( "delname", 14, 1));
+        /* 测试 name 填充 */
+        ul.add(new User(117L, 7));
+        ul.add(new User(7));
         rlt = userMapper.insertBatch(ul);
 
         System.err.println("\n------------------insertBatch----------------------\n \n\n\n" + rlt);
@@ -189,7 +194,7 @@ public class UserMapperTest {
          * 排序 test_id desc
          */
         ew = new EntityWrapper<User>(new User(1));
-        ew.orderBy("id", true);
+        ew.orderBy("test_id", true);
         ew.setSqlSelect("age,name");
 
         /**
@@ -201,7 +206,7 @@ public class UserMapperTest {
 
         System.err.println("\n---------------xml---selectListRow 分页查询，不查询总数（此时可自定义 count 查询）----无查询条件--------------");
 
-        paginList = userMapper.selectList(new EntityWrapper<User>(new User(1), "id, age"));
+        paginList = userMapper.selectList(new EntityWrapper<User>(new User(1), "test_id, age"));
         paginList.forEach(UserMapperTest::print);
         System.err.println("\n----------用户列表-------------");
         //List<User> rowList = userMapper.selectListRow(new RowBounds(0, 2));

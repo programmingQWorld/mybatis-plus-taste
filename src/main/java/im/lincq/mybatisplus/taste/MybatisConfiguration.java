@@ -27,10 +27,16 @@ public class MybatisConfiguration extends Configuration {
      */
     public static boolean DB_COLUMN_UNDERLINE = false;
 
-    /*
+    /**
      * SQL 注入器，实现 ISqlInjector 或继承 AutoSqlInjector 自定义方法
      */
     public static ISqlInjector SQL_INJECTOR  = new AutoSqlInjector();;
+
+
+    /**
+     * 元对象字段填充控制器
+     */
+    public static MybatisMetaObjectHandler META_OBJECT_HANDLER = null;
 
     /*
 	 * 是否刷新mapper

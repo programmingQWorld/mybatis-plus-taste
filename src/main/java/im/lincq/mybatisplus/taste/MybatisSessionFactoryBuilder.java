@@ -74,4 +74,9 @@ public class MybatisSessionFactoryBuilder extends SqlSessionFactoryBuilder {
     public void setSqlInjector(ISqlInjector sqlInjector) {
         MybatisConfiguration.SQL_INJECTOR = sqlInjector;
     }
+
+    // TODO 注入 元对象字段填充控制器
+    public void setMetaObjectHandler(MybatisMetaObjectHandler metaObjectHandler) {
+        MybatisConfiguration.META_OBJECT_HANDLER = metaObjectHandler;
+    }
 }

@@ -1,9 +1,17 @@
 package im.lincq.mybatisplus.taste.test;
 
+import im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder;
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
+import im.lincq.mybatisplus.taste.test.mapper.UserMapper;
+import im.lincq.mybatisplus.taste.test.mysql.MyMetaObjectHandler;
 import im.lincq.mybatisplus.taste.test.mysql.entity.User;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.log4j.BasicConfigurator;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.InputStream;
 
 /**
  * @author lincq
@@ -152,6 +160,24 @@ public class EntityWrapperTest {
         String sqlPart = ew.getSqlSegment();
         System.out.println("sql ==> " + sqlPart);
         Assert.assertEquals("WHERE (id='11' AND name=22)", sqlPart);
+    }
+
+    @Test
+    public void testInsertFill () {
+        BasicConfigurator.configure();
+
+        InputStream in = getClass().getClassLoader().getResourceAsStream("mybatis-config.xml");
+        MybatisSessionFactoryBuilder mf = new MybatisSessionFactoryBuilder();
+
+        mf.setMetaObjectHandler(new MyMetaObjectHandler());
+        SqlSessionFactory sqlSessionFactory = mf.build(in);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        User user = new User();
+        user.setAge(101);
+        //user.setId(8796);
+        System.out.println(userMapper.insert(user));
     }
 
 }

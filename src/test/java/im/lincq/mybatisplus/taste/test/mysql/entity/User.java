@@ -26,6 +26,10 @@ public class User {
 
     public User () {
     }
+    public User(Long id , Integer testType) {
+        this.id = id;
+        this.testType = testType;
+    }
     public User(Integer testType) {
         this.testType = testType;
     }

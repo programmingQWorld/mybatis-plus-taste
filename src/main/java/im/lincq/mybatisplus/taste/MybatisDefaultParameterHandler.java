@@ -32,6 +32,10 @@ public class MybatisDefaultParameterHandler extends DefaultParameterHandler {
     /**
      * <p>
      *     批量（填充主键ID）
+     *
+     *     变量 parameterObject： 方法参数，可能代表集合，也可能代表单独的表实体对象
+     *     变量 parameters：           如多parameterObject是集合类型，则将其转为Collection<Object>类型
+     *     变量 parameter：             循环中的变量，代表集合元素
      * </p>
      * @param ms
      * @param parameterObject  插入数据库对象
@@ -47,12 +51,12 @@ public class MybatisDefaultParameterHandler extends DefaultParameterHandler {
             // 是集合，遍历集合，为对象填充主键ID.
             if (parameters != null) {
                 List<Object> objectList = new ArrayList<>();
-                for (Object param : parameters) {
-                    if (param instanceof Map) {
+                for (Object parameter : parameters) {
+                    if (parameter instanceof Map) {
                         /* map 插入不处理 */
-                        objectList.add(param);
+                        objectList.add(parameter);
                     } else {
-                        objectList.add(populateKeys(ms, parameterObject));
+                        objectList.add(populateKeys(ms, parameter));
                     }
                 }
                 return objectList;
@@ -92,16 +96,21 @@ public class MybatisDefaultParameterHandler extends DefaultParameterHandler {
         if (ms.getSqlCommandType() == SqlCommandType.INSERT) {
             TableInfo tableInfo = TableInfoHelper.getTableInfo(parameterObject.getClass());
             if (tableInfo != null && tableInfo.getIdType() != null && tableInfo.getIdType().getKey() >= 2) {
-                MetaObject metaParam = ms.getConfiguration().newMetaObject(parameterObject);
-                Object idValue = metaParam.getValue(tableInfo.getKeyProperty());
+                MetaObject metaObject = ms.getConfiguration().newMetaObject(parameterObject);
+                Object idValue = metaObject.getValue(tableInfo.getKeyProperty());
                 if (idValue == null || "".equals(idValue) ) {
                     if ( tableInfo.getIdType() == IdType.ID_WORKER ) {
-                        metaParam.setValue(tableInfo.getKeyProperty(), IdWorker.getId());
+                        metaObject.setValue(tableInfo.getKeyProperty(), IdWorker.getId());
                     } else if ( tableInfo.getIdType() == IdType.UUID ) {
-                        metaParam.setValue(tableInfo.getKeyProperty(), get32UUID());
+                        metaObject.setValue(tableInfo.getKeyProperty(), get32UUID());
                     }
                 }
-                return metaParam.getOriginalObject();
+                /* 自定义元对象填充控制器 */
+                MybatisMetaObjectHandler metaObjectHandler =  MybatisConfiguration.META_OBJECT_HANDLER;
+                if (null != metaObjectHandler) {
+                    metaObjectHandler.insertFill(metaObject);
+                }
+                return metaObject.getOriginalObject();
             }
         }
         return parameterObject;
