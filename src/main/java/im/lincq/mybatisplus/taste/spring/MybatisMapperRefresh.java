@@ -80,8 +80,9 @@ public class MybatisMapperRefresh implements Runnable {
      */
     @Override
     public void run() {
-        beforeTime = System.currentTimeMillis();
+        /* 启用热加载 */
         if (enabled) {
+            beforeTime = System.currentTimeMillis();
             final MybatisMapperRefresh runnable = this;
             new Thread(new Runnable() {
                 @Override

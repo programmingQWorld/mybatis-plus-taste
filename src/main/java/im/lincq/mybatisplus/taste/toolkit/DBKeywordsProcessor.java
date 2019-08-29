@@ -14,23 +14,25 @@ import java.util.logging.Logger;
  */
 public class DBKeywordsProcessor {
     protected static final Logger logger = Logger.getLogger("DBKeywordsProcessor");
-    private static final String ESCAPE_CHARACTER = "`";
-    private static final Set<String> KEYWORDS = new HashSet<String>();
+    private static Set<String> KEYWORDS = null;
 
     static {
         BufferedReader br = null;
         try {
             InputStream in = DBKeywordsProcessor.class.getClassLoader().getResourceAsStream("database_keywords.dic");
             br = new BufferedReader(new InputStreamReader(in));
+            if (KEYWORDS == null) {
+                KEYWORDS = new HashSet<String>();
+            }
             String keyword = null;
             while ((keyword = br.readLine()) != null) {
                 KEYWORDS.add(keyword);
             }
         } catch (IOException e) {
-            logger.warning("If you want to support the keyword query, must have database_keywords.dic \n"
+            logger.warning("If you want to support the keyword query, must have database_keywords.dic. \n"
                     + e.getMessage());
         } finally {
-            if (br != null) {
+            if (null != br) {
                 try {
                     br.close();
                 } catch (IOException e) {
@@ -40,9 +42,18 @@ public class DBKeywordsProcessor {
         }
     }
 
+    /**
+     * <p>
+     * 数据库关键词加反引号
+     * </p>
+     *
+     * @param keyword
+     *            数据库关键词
+     * @return
+     */
     public static String convert(String keyword) {
         if (KEYWORDS.contains(keyword)) {
-            return new StringBuffer().append(ESCAPE_CHARACTER).append(keyword).append(ESCAPE_CHARACTER).toString();
+            return String.format("`%s`", keyword);
         }
         return keyword;
     }
