@@ -597,7 +597,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         // # cm 是Map对象，keys代表 Map对象的键集合，foreach标签遍历到每个键，键名称代表 表字段名称
         StringBuilder where = new StringBuilder();
         where.append("\n<foreach collection=\"cm.keys\" item=\"k\" separator=\"AND\"> ");
-        where.append("\n<if test=\"cm[k]!=null\">").append("${k}=#{cm[${k}]}").append("</if>");
+        where.append("${k}=#{cm[${k}]}");
         where.append("\n</foreach>");
         return where.toString();
     }
