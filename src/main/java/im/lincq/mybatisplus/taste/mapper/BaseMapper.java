@@ -12,7 +12,7 @@ import java.util.Map;
  * </p>
  * @Date 20190617
  */
-public interface BaseMapper<T, I> {
+public interface BaseMapper<T, PK> {
 
     /**
      * <p>
@@ -47,7 +47,7 @@ public interface BaseMapper<T, I> {
      * @param id 主键ID
      * @return       int
      * */
-    int deleteById(I id);
+    int deleteById(PK id);
 
     /**
      *<p>据 columnMap 条件，删除记录</p>
@@ -120,7 +120,7 @@ public interface BaseMapper<T, I> {
      * param idList 主键ID列表
      * @return List<T>
      */
-    int deleteBatchIds(List<I> idList);
+    int deleteBatchIds(List<PK> idList);
 
 
     /**
@@ -130,7 +130,7 @@ public interface BaseMapper<T, I> {
      * @param idList 主键ID列表
      * @return List<T>
      */
-    List<T> selectBatchIds(List<I> idList);
+    List<T> selectBatchIds(List<PK> idList);
 
     /**
      * <p>
@@ -148,7 +148,7 @@ public interface BaseMapper<T, I> {
      * @param id 主键ID
      * @return List<T>
      * */
-    public T selectById(I id);
+    public T selectById(PK id);
 
 
     /**

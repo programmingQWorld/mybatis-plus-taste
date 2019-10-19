@@ -11,7 +11,7 @@ import java.util.Map;
  * @author lincq
  * @date 2019/6/29 12:58
  */
-public interface IService<T, I> {
+public interface IService<T, PK> {
 
     /**
      * 插入一条记录
@@ -43,7 +43,7 @@ public interface IService<T, I> {
      * @param id 主键ID
      * @return boolean
      */
-    boolean deleteById( I id );
+    boolean deleteById( PK id );
 
     /**
      *<p>根据 columnMap 条件，删除记录</p>
@@ -66,7 +66,7 @@ public interface IService<T, I> {
      * @param idList 主键ID集合
      * @return boolean
      */
-    boolean deleteBatchIds(List<I> idList);
+    boolean deleteBatchIds(List<PK> idList);
 
     /**
      * <p>
@@ -117,7 +117,7 @@ public interface IService<T, I> {
      * @param id 主键ID
      * @return boolean
      */
-    T selectById(I id);
+    T selectById(PK id);
 
     /**
      * 查询（根据ID 批量查询）
@@ -125,7 +125,7 @@ public interface IService<T, I> {
      * @param idList 主键ID列表
      * @return boolean
      */
-    List<T> selectBatchIds( List<I> idList );
+    List<T> selectBatchIds( List<PK> idList );
 
     /**
      * <p>查询（根据 columnMap 条件）</p>
