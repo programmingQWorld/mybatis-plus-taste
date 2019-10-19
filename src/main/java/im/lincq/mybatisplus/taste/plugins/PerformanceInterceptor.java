@@ -114,6 +114,9 @@ public class PerformanceInterceptor implements Interceptor {
         } else {
             result = "null";
         }
+        if ( null != result && result.contains("$") ) {
+            return sql.replaceFirst("\\?", "[?]").replace("[?]", result);
+        }
         return sql.replaceFirst("\\?", result);
     }
 
