@@ -22,6 +22,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * <p>
@@ -29,6 +30,7 @@ import java.util.Map;
  * </p>
  */
 public class AutoSqlInjector  implements  ISqlInjector {
+    private final Logger logger = Logger.getLogger("AutoSqlInjector");
 
     /** mybatis配置类对象， 还有一个小助理*/
     protected Configuration configuration;
@@ -55,10 +57,10 @@ public class AutoSqlInjector  implements  ISqlInjector {
 
 
         Class<?> modelClass  = extractModelClass(mapperClass);
-        TableInfo table = TableInfoHelper.getTableInfo(modelClass);
+        TableInfo table = TableInfoHelper.initTableInfo(modelClass);
 
-        /* 没有指定主键，默认方法不能使用(lincq: 没有主键，不给这个mapperClass增强) */
-        if (table.getKeyProperty() != null) {
+        /* 没有指定主键，默认方法不能使用(lcq: 没有主键，不给这个mapperClass增强) */
+        if (null != table && null != table.getKeyProperty()) {
 
             /* 插入 */
             // todo : 补充注释
@@ -95,10 +97,9 @@ public class AutoSqlInjector  implements  ISqlInjector {
 
         } else {
             /*
-             *  提示:主键属性未知
+             *  警告：主键属性未知，不进行mybatis-plus增强
              *  */
-            System.err.println(String.format("%s, The unknown primary key, cannot use the generic method",
-                    mapperClass.toString()));
+            logger.warning(String.format("%s, Not found @TableId annotation, cannot use the mybatis-plus method", mapperClass.toString()));
         }
 
     }

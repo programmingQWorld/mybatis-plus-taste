@@ -50,20 +50,24 @@ public class MybatisDefaultParameterHandler extends DefaultParameterHandler {
             * */
             Collection<Object> parameters = getParameters(parameterObject);
             // 是集合，遍历集合，为对象填充主键ID.
-            if (parameters != null) {
+            if (null != parameters) {
                 List<Object> objectList = new ArrayList<>();
                 for (Object parameter : parameters) {
-                    if (parameter instanceof Map) {
-                        /* map 插入不处理 */
-                        objectList.add(parameter);
+                    TableInfo tableInfo = TableInfoHelper.getTableInfo(parameter.getClass());
+                    if (null != tableInfo) {
+                        objectList.add(populateKeys(tableInfo, ms, parameter));
                     } else {
-                        objectList.add(populateKeys(ms, parameter));
+                        /**
+                         * 非表映射类不处理
+                         */
+                        objectList.add(parameter);
                     }
                 }
                 return objectList;
             } else {
                 // 不是集合，直接为其填充主键ID
-                return populateKeys(ms, parameterObject);
+                TableInfo tableInfo = TableInfoHelper.getTableInfo(parameterObject.getClass());
+                return populateKeys(tableInfo, ms, parameterObject);
             }
         }
         return parameterObject;
@@ -93,9 +97,8 @@ public class MybatisDefaultParameterHandler extends DefaultParameterHandler {
      * @param parameterObject 插入数据库对象
      * @return
      */
-    protected static Object populateKeys (MappedStatement ms, Object parameterObject) {
+    protected static Object populateKeys (TableInfo tableInfo, MappedStatement ms, Object parameterObject) {
         if (ms.getSqlCommandType() == SqlCommandType.INSERT) {
-            TableInfo tableInfo = TableInfoHelper.getTableInfo(parameterObject.getClass());
             if (tableInfo != null && tableInfo.getIdType() != null && tableInfo.getIdType().getKey() >= 2) {
                 MetaObject metaObject = ms.getConfiguration().newMetaObject(parameterObject);
                 Object idValue = metaObject.getValue(tableInfo.getKeyProperty());

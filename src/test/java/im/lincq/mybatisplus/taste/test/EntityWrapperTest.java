@@ -12,6 +12,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.InputStream;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author lincq
@@ -179,5 +181,39 @@ public class EntityWrapperTest {
         //user.setId(8796);
         System.out.println(userMapper.insert(user));
     }
+
+    @Test
+    public void testPlus () {
+        System.out.println(1 * 0.5 == 0.5);
+    }
+
+    @Test
+    public void testSet () {
+        Set<String> set = new TreeSet<>((o1, o2) -> {
+            return -o1.compareTo(o2);
+        });
+        set.add("A");
+        set.add("G");
+        set.add("E");
+        set.add("C");
+
+        for(String s:set) {
+            System.out.println(s);
+        }
+    }
+
+    @Test
+    public void testString () {
+        String s1 = "a" + "c";
+        String s2 = new String(s1);
+        if (s2 == "ac") {
+            System.out.println("==");
+        }
+        if (s2.equals("ac")) {
+            System.out.println("equals");
+        }
+    }
+
+
 
 }

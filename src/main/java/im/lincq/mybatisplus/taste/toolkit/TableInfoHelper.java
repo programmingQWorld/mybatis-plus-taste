@@ -32,11 +32,19 @@ public class TableInfoHelper {
      * @return            tableInfo
      */
     public synchronized static TableInfo getTableInfo(Class<?> clazz) {
+        return tableInfoCache.get(clazz.getName());
+    }
+
+    /**
+     *实体类反射获取表信息【初始化】
+     * @param clazz  反射实体类
+     * @return 表信息
+     */
+    public synchronized static TableInfo initTableInfo(Class<?> clazz) {
         TableInfo ti = tableInfoCache.get(clazz.getName());
         if (ti != null) {
             return ti;
         }
-        List<Field> list = getAllFields(clazz);
         TableInfo tableInfo = new TableInfo();
 
         /* 表名 */
@@ -48,6 +56,7 @@ public class TableInfoHelper {
         }
 
         List<TableFieldInfo> fieldList = new ArrayList<TableFieldInfo>();
+        List<Field> list = getAllFields(clazz);
         for (Field field : list) {
             /* 主键ID */
             TableId tableId = field.getAnnotation(TableId.class);
@@ -98,11 +107,12 @@ public class TableInfoHelper {
         /* 字段列表 */
         tableInfo.setFieldList(fieldList);
 
-        /* 未发现主键注解，抛出异常 */
-        if (tableInfo.getKeyColumn() == null) {
-            throw new MybatisPlusException("Not found @TableId annotation in " + clazz);
+        /* 未发现主键注解，在 SqlInjector 中调用 InitTableInfo ，在这里得到  null , 跳过注入 */
+        if (null == tableInfo.getKeyColumn()) {
+            return null;
         }
 
+        /* 执行注入，将表对象信息缓存起来，之后还可以继续使用 */
       tableInfoCache.put(clazz.getName(), tableInfo);
         return tableInfo;
     }
