@@ -31,7 +31,7 @@ public class TableInfoHelper {
      * @param clazz  反射对象
      * @return            tableInfo
      */
-    public synchronized static TableInfo getTableInfo(Class<?> clazz) {
+    public static TableInfo getTableInfo(Class<?> clazz) {
         return tableInfoCache.get(clazz.getName());
     }
 
