@@ -25,16 +25,14 @@ public class TransactionalTest {
         /* 加载配置文件 */
         InputStream in = TransactionalTest.class.getClassLoader().getResourceAsStream("mybatis-config.xml");
         MybatisSessionFactoryBuilder mf = new MybatisSessionFactoryBuilder();
-        mf.setSqlInjector(new MySqlInjector());
         SqlSessionFactory sessionFactory = mf.build(in);
         SqlSession session = sessionFactory.openSession();
         UserMapper userMapper = session.getMapper(UserMapper.class);
-        userMapper.deleteAll();
 
         /* 插入 */
         int rlt = userMapper.insertInjector(new User(IdWorker.getId(), "1", 1, 1));
         System.err.print("--------- insert injector -------------");
-        session.commit();
-
+        // session.commit();
+        session.close();
     }
 }

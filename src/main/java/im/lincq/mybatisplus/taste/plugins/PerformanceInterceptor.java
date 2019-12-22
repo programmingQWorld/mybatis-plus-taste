@@ -53,7 +53,7 @@ public class PerformanceInterceptor implements Interceptor {
         Object result  = invocation.proceed();
         long end  = System.currentTimeMillis();
         long timing = end - start;
-        System.err.println(" Time: " + timing + " ms" + " - ID: " + statementId + "\n Executor SQL: " + sql.replaceAll("\n", ""));
+        System.err.println(" Time: " + timing + " ms" + " - ID: " + statementId + "\n Executor SQL: " + sql.replaceAll("\n", "") + "\n");
 
         if (maxTime >= 1 && timing > maxTime) {
             throw new MybatisPlusException(" The SQL execution time is too large, please optimize !");
