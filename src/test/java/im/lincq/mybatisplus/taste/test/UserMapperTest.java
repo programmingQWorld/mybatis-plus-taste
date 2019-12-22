@@ -19,6 +19,11 @@ import java.util.List;
 /**
  *
  * RUN 测试
+ * <p>
+ * 自动提交了事务问题：<br>
+ * http://www.mybatis.org/spring/transactions.html#programmatic<br>
+ * https://github.com/mybatis/spring/issues/39<br>
+ * </p>
  *
  * <p>
  * MybatisPlus 加载 SQL 顺序：
