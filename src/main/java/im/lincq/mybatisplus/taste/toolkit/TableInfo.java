@@ -19,6 +19,12 @@ public class TableInfo {
     private String tableName;
 
     /**
+     * 表映射结果集
+     */
+    private String resultMap;
+
+
+    /**
      * <p>
      * 主键是否有存在 && 字段名与属性名关联
      * </p>
@@ -85,5 +91,13 @@ public class TableInfo {
 
     public void setKeyRelated(boolean keyRelated) {
         this.keyRelated = keyRelated;
+    }
+
+    public String getResultMap() {
+        return resultMap;
+    }
+
+    public void setResultMap(String resultMap) {
+        this.resultMap = resultMap;
     }
 }

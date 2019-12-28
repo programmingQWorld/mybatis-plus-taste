@@ -49,12 +49,15 @@ public class TableInfoHelper {
 
         /* 表名 */
         TableName table = clazz.getAnnotation(TableName.class);
-        if (table != null && table.value().trim().length() > 0) {
+        if (table != null && StringUtils.isNotEmpty(table.value())) {
             tableInfo.setTableName(table.value());
         } else {
             tableInfo.setTableName(StringUtils.camelToUnderline(clazz.getSimpleName()));
         }
-
+        /* 表结果集映射 */
+        if (table != null && StringUtils.isNotEmpty(table.resultMap())) {
+            tableInfo.setResultMap(table.resultMap());
+        }
         List<TableFieldInfo> fieldList = new ArrayList<TableFieldInfo>();
         List<Field> list = getAllFields(clazz);
         for (Field field : list) {

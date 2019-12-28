@@ -23,6 +23,6 @@ public class MySqlInjector  extends AutoSqlInjector {
         /* mapper 接口 方法名一直 */
         String method = "deleteAll";
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
-        this.addMappedStatement(mapperClass, method, sqlSource, SqlCommandType.DELETE, Integer.class);
+        this.addDeleteMappedStatement(mapperClass, method, sqlSource);
     }
 }
