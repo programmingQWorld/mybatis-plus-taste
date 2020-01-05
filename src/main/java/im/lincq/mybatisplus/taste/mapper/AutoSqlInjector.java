@@ -63,7 +63,6 @@ public class AutoSqlInjector  implements  ISqlInjector {
         if (null != table && null != table.getKeyProperty()) {
 
             /* 插入 */
-            // todo : 补充注释
             this.injectInsertOneSql(false, mapperClass, modelClass, table);
             this.injectInsertOneSql(true, mapperClass, modelClass, table);
             this.injectInsertBatchSql(mapperClass, modelClass, table);
@@ -186,7 +185,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         List<TableFieldInfo> fieldList = table.getFieldList();
         for (TableFieldInfo fieldInfo : fieldList) {
             where.append("\n\t\t\t").append("<if test = \"ew.entity.").append(fieldInfo.getProperty()).append("!= null\">");
-            where.append("\t\t\t").append("  AND ").append(fieldInfo.getColumn()).append("=#{ew.entity.").append(fieldInfo.getProperty()).append("}");
+            where.append("\t\t\t").append("  AND ").append(fieldInfo.getColumn()).append("=#{ew.entity.").append(fieldInfo.getEl()).append("}");
             where.append("\t\t").append("</if>");
         }
 
@@ -279,7 +278,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
             }
 
             fieldBuilder.append(fieldInfo.getColumn()).append(",");
-            placeholderBuilder.append("#{").append(fieldInfo.getProperty()).append("},");
+            placeholderBuilder.append("#{").append(fieldInfo.getEl()).append("},");
 
             if (selective) {
                 fieldBuilder
@@ -339,7 +338,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         List<TableFieldInfo> fieldList = table.getFieldList();
         for (TableFieldInfo fieldInfo : fieldList) {
             fieldBuilder.append(fieldInfo.getColumn()).append(",");
-            placeholderBuilder.append("#{item.").append(fieldInfo.getProperty()).append("}").append(",");
+            placeholderBuilder.append("#{item.").append(fieldInfo.getEl()).append("}").append(",");
         }
         fieldBuilder.append("\n</trim>");
         placeholderBuilder.append("\n</trim>");
@@ -366,9 +365,9 @@ public class AutoSqlInjector  implements  ISqlInjector {
 
     /**
      * 注入 entity 条件删除 SQL 语句
-     * @param mapperClass
-     * @param modelClass
-     * @param table
+     * @param mapperClass       mapperClass
+     * @param modelClass        modelClass
+     * @param table             table
      */
     protected void injectDeleteSelectiveSql (Class<?> mapperClass, Class<?> modelClass, TableInfo table) {
         SqlMethod sqlMethod = SqlMethod.DELETE_SELECTIVE;
@@ -378,6 +377,11 @@ public class AutoSqlInjector  implements  ISqlInjector {
         this.addDeleteMappedStatement(mapperClass, sqlMethod.getMethod(), sqlSource);
     }
 
+    /**
+     * 删除by map
+     * @param mapperClass mapperClass
+     * @param table       table
+     */
     protected void injectDeleteByMapSql(Class<?> mapperClass, TableInfo table) {
         SqlMethod sqlMethod = SqlMethod.DELETE_BY_MAP;
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhereByMap());
@@ -396,7 +400,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
             sqlMethod = SqlMethod.UPDATE_BATCH_BY_ID_ORACLE;
             List<TableFieldInfo> fieldList = table.getFieldList();
             for (TableFieldInfo fieldInfo : fieldList) {
-                set.append(fieldInfo.getColumn()).append("=#{item.").append(fieldInfo.getProperty()).append("},");
+                set.append(fieldInfo.getColumn()).append("=#{item.").append(fieldInfo.getEl()).append("},");
             }
         } else if (DBType.MYSQL == dbType) {
             List<TableFieldInfo> fieldList = table.getFieldList();
@@ -406,7 +410,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
                 set.append("\n<foreach collection=\"list\" item=\"i\" index=\"index\">");
                 set.append("\n<if test=\"i.").append(fieldInfo.getProperty()).append("!=null\">");
                 set.append("\nWHEN ").append("#{i.").append(table.getKeyProperty());
-                set.append("} THEN #{i.").append(fieldInfo.getProperty()).append("}");
+                set.append("} THEN #{i.").append(fieldInfo.getEl()).append("}");
                 set.append("\n</if>");
                 set.append("\n</foreach>");
                 set.append("\n</trim>");
@@ -454,7 +458,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
             if (selective) {
                 set.append("<if test=\"et.").append(fieldInfo.getProperty()).append(" != null\">");
             }
-            set.append(fieldInfo.getColumn()).append("=#{et.").append(fieldInfo.getProperty()).append("}").append(",");
+            set.append(fieldInfo.getColumn()).append("=#{et.").append(fieldInfo.getEl()).append("}").append(",");
             if (selective) {
                 set.append("</if>\n");
             }
@@ -618,7 +622,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         List<TableFieldInfo> fieldList = table.getFieldList();
         for (TableFieldInfo fieldInfo : fieldList) {
             where.append("\n\t<if test=\"ew.").append(fieldInfo.getProperty()).append(" != null\">");
-            where.append("\t\t\tAND  ").append(fieldInfo.getColumn()).append(" = #{ew.").append(fieldInfo.getProperty()).append("}");
+            where.append("\t\t\tAND  ").append(fieldInfo.getColumn()).append(" = #{ew.").append(fieldInfo.getEl()).append("}");
             where.append("</if>");
         }
         where.append("\n</where>");

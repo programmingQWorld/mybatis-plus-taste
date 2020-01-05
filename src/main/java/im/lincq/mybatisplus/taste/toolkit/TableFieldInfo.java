@@ -19,15 +19,31 @@ public class TableFieldInfo {
      */
     private String property;
 
+    /**
+     * 属性表达式#{property}, 可以指定jdbcType, typeHandler等
+     */
+    private String el;
+
+
+    public TableFieldInfo(boolean related, String column, String property, String el) {
+        this.related = related;
+        this.column = DBKeywordsProcessor.convert(column);
+        this.property = property;
+        this.el = el;
+    }
+
     public TableFieldInfo(boolean related, String column, String property) {
         this.related = related;
         this.column = DBKeywordsProcessor.convert(column);
         this.property = property;
+        this.el = property;
     }
+
     public TableFieldInfo(String column) {
         this.related = false;
         this.property = column;
         this.column = DBKeywordsProcessor.convert(column);
+        this.el = column;
     }
 
     public boolean isRelated() {
@@ -52,5 +68,13 @@ public class TableFieldInfo {
 
     public void setProperty(String property) {
         this.property = property;
+    }
+
+    public String getEl() {
+        return el;
+    }
+
+    public void setEl(String el) {
+        this.el = el;
     }
 }

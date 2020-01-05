@@ -23,6 +23,8 @@ public class User {
     @TableField(value = "test_type")
     private Integer testType;
 
+    @TableField(value = "roleId,roleName", el = "role.id,role.name")
+    private Role role;
 
     public User () {
     }
@@ -104,6 +106,14 @@ public class User {
 
     public void setTestType(Integer testType) {
         this.testType = testType;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     /**

@@ -33,4 +33,9 @@ public @interface TableField {
 	 */
 	boolean exist() default true;
 
+	/**
+	 * 当该Field为类对象时, 可使用#{对象.属性}来映射到数据表.
+	 */
+	String el() default "";
+
 }

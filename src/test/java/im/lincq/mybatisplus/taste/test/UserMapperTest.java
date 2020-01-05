@@ -4,6 +4,7 @@ import im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder;
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import im.lincq.mybatisplus.taste.plugins.Page;
 import im.lincq.mybatisplus.taste.test.mysql.MyMetaObjectHandler;
+import im.lincq.mybatisplus.taste.test.mysql.entity.Role;
 import im.lincq.mybatisplus.taste.test.mysql.entity.User;
 import im.lincq.mybatisplus.taste.test.mapper.UserMapper;
 import im.lincq.mybatisplus.taste.toolkit.IdWorker;
@@ -72,10 +73,28 @@ public class UserMapperTest {
         System.err.println(" debug run 查询执行 user 表数据变化！ ");
         //session.delete("deleteAll");
 
+
+
         userMapper.deleteSelective(new User());
         System.err.println("deleteAll --data-- ");
 
-        int rlt = userMapper.insertInjector(new User(1L, "1", 1, 1));
+        Role role = new Role();
+        role.setId(IdWorker.getId());
+        role.setName("admin");
+
+        User userA = new User();
+        userA.setId(IdWorker.getId());
+        userA.setName("junyu_shi");
+        userA.setRole(role);
+
+        int rlt = userMapper.insert(userA);
+        User whereUser = userMapper.selectOne(userA);
+        userA.setAge(18);
+        userMapper.updateById(userA);
+        userMapper.deleteSelective(userA);
+        System.err.println("--------- @TableField el() --------- " + rlt);
+
+        rlt = userMapper.insertInjector(new User(1L, "1", 1, 1));
         System.err.println("-----------------insertInjector------------------------" + rlt);
 
 

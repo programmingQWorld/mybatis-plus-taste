@@ -24,7 +24,7 @@ public class TableInfoHelper {
     /**
      * 缓存反射类表信息
      */
-    private static Map<String, TableInfo> tableInfoCache = new ConcurrentHashMap<String, TableInfo>();
+    private static Map<String, TableInfo> tableInfoCache = new ConcurrentHashMap<>();
 
     /**
      * 根据实体类反射获取表信息
@@ -58,7 +58,7 @@ public class TableInfoHelper {
         if (table != null && StringUtils.isNotEmpty(table.resultMap())) {
             tableInfo.setResultMap(table.resultMap());
         }
-        List<TableFieldInfo> fieldList = new ArrayList<TableFieldInfo>();
+        List<TableFieldInfo> fieldList = new ArrayList<>();
         List<Field> list = getAllFields(clazz);
         for (Field field : list) {
             /* 主键ID */
@@ -87,17 +87,35 @@ public class TableInfoHelper {
             /* 字段 也支持通过注解自定义映射表字段 */
             TableField tableField = field.getAnnotation(TableField.class);
 
-            if (tableField != null && StringUtils.isNotEmpty(tableField.value())) {
+            if (tableField != null) {
                 /* TableFieldInfo 第二个参数,
                    前面一直认为这里需要对column字段进行驼峰转下划线格式才行,
                    现在想来是不用的,在注解上完成正确的字段名称填写即可.
                    在后面的版本中,好像也是按照这样的方式进行的,无需转换就不用做处理,
                    属性名和字段名对应不上就在注解上填写正确的字段名称.
                    */
-                fieldList.add(new TableFieldInfo(true, tableField.value(), field.getName()));
+
+                String columnName = field.getName();
+                if (StringUtils.isNotEmpty(tableField.value())) {
+                    columnName = tableField.value();
+                }
+                String el = field.getName();
+				if (StringUtils.isNotEmpty(tableField.el())) {
+					el = tableField.el();
+                }
+                // 可以传入多个参数以逗号分开
+                String[] columns = columnName.split(",");
+                String[] els = el.split(",");
+                for (int i = 0; i < columns.length; i++) {
+					fieldList.add(new TableFieldInfo(true, columns[i], field.getName(), els[i]));
+				}
+
                 continue;
             }
 
+            /**
+			 * 字段, 使用camelToUnderline转换驼峰写法为下划线分割法, 如果已制定TableField, 便不会执行这里
+			 */
             if (MybatisConfiguration.DB_COLUMN_UNDERLINE) {
                 fieldList.add(new TableFieldInfo(true, StringUtils.camelToUnderline(field.getName()), field.getName()));
             } else {
@@ -126,7 +144,7 @@ public class TableInfoHelper {
      * @return            List<Field>
      */
     private static List<Field> getAllFields(Class<?> clazz) {
-        List<Field> result = new LinkedList<Field>();
+        List<Field> result = new LinkedList<>();
         Field[] fields = clazz.getDeclaredFields();
 
         for (Field field : fields) {
