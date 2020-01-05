@@ -27,14 +27,14 @@ public class TableFieldInfo {
 
     public TableFieldInfo(boolean related, String column, String property, String el) {
         this.related = related;
-        this.column = DBKeywordsProcessor.convert(column);
+        this.setColumn( column );
         this.property = property;
         this.el = el;
     }
 
     public TableFieldInfo(boolean related, String column, String property) {
         this.related = related;
-        this.column = DBKeywordsProcessor.convert(column);
+        this.setColumn(column);
         this.property = property;
         this.el = property;
     }
@@ -59,7 +59,7 @@ public class TableFieldInfo {
     }
 
     public void setColumn(String column) {
-        this.column = column;
+        this.column = DBKeywordsProcessor.convert(column);
     }
 
     public String getProperty() {

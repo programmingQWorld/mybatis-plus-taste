@@ -99,22 +99,31 @@ public class TableInfoHelper {
                 if (StringUtils.isNotEmpty(tableField.value())) {
                     columnName = tableField.value();
                 }
+                /*
+                el语法支持，可以传入多个参数，以逗号隔开
+                 * */
                 String el = field.getName();
 				if (StringUtils.isNotEmpty(tableField.el())) {
 					el = tableField.el();
                 }
-                // 可以传入多个参数以逗号分开
+
+
                 String[] columns = columnName.split(",");
                 String[] els = el.split(",");
-                for (int i = 0; i < columns.length; i++) {
-					fieldList.add(new TableFieldInfo(true, columns[i], field.getName(), els[i]));
-				}
 
+                if (columns.length == els.length) {
+                    for (int i = 0; i < columns.length; i++) {
+                        fieldList.add(new TableFieldInfo(true, columns[i], field.getName(), els[i]));
+                    }
+                } else {
+                    String errMsg = "Class %s, Field %s, 'value' 'el' length must be consistent.";
+                    throw new MybatisPlusException(String.format(errMsg, clazz.getName(), field.getName()));
+                }
                 continue;
             }
 
-            /**
-			 * 字段, 使用camelToUnderline转换驼峰写法为下划线分割法, 如果已制定TableField, 便不会执行这里
+            /*
+			 * 字段, 使用 camelToUnderline 转换驼峰写法为下划线分割法, 如果已指定 TableField, 便不会执行这里
 			 */
             if (MybatisConfiguration.DB_COLUMN_UNDERLINE) {
                 fieldList.add(new TableFieldInfo(true, StringUtils.camelToUnderline(field.getName()), field.getName()));

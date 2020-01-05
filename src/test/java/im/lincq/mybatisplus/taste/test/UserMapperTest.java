@@ -78,6 +78,10 @@ public class UserMapperTest {
         userMapper.deleteSelective(new User());
         System.err.println("deleteAll --data-- ");
 
+        /*
+         * sjy
+         * 测试@TableField的el属性
+         */
         Role role = new Role();
         role.setId(IdWorker.getId());
         role.setName("admin");
@@ -85,10 +89,14 @@ public class UserMapperTest {
         User userA = new User();
         userA.setId(IdWorker.getId());
         userA.setName("junyu_shi");
+        userA.setAge(1);
+        userA.setTestType(1);
         userA.setRole(role);
 
         int rlt = userMapper.insert(userA);
         User whereUser = userMapper.selectOne(userA);
+        print(whereUser);
+
         userA.setAge(18);
         userMapper.updateById(userA);
         userMapper.deleteSelective(userA);
