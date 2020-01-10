@@ -106,7 +106,7 @@ public class UserMapperTest {
         System.err.println("-----------------insertInjector------------------------" + rlt);
 
 
-        /**
+        /*
          * ehcache 缓存测试
          */
         User cacheUserQuery = new User();

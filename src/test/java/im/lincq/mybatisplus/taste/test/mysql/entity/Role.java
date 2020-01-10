@@ -2,6 +2,7 @@ package im.lincq.mybatisplus.taste.test.mysql.entity;
 
 import im.lincq.mybatisplus.taste.annotations.TableField;
 import im.lincq.mybatisplus.taste.annotations.TableId;
+import im.lincq.mybatisplus.taste.annotations.TableName;
 
 import java.io.Serializable;
 
@@ -9,6 +10,7 @@ import java.io.Serializable;
  * @author lincq
  * @date 2019/12/29 22:08
  */
+@TableName(value = "role", resultMap = "RoleMap")
 public class Role implements Serializable {
 
     @TableField(exist = false)
@@ -61,5 +63,15 @@ public class Role implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", sort=" + sort +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

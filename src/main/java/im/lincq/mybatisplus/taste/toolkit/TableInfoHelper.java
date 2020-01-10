@@ -108,8 +108,8 @@ public class TableInfoHelper {
                 }
 
 
-                String[] columns = columnName.split(",");
-                String[] els = el.split(",");
+                String[] columns = columnName.split(";");
+                String[] els = el.split(";");
 
                 if (columns.length == els.length) {
                     for (int i = 0; i < columns.length; i++) {

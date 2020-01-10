@@ -17,6 +17,10 @@
         <result column="name" property="name"/>
         <result column="age" property="age"/>
         <result column="test_type" property="testType"/>
+        <result column="phone" property = "phone" typeHandler = "im.lincq.mybatisplus.taste.test.mysql.typehandler.PhoneTypeHandler" />
+
+        <association column = "role" property = "role" select = "im.lincq.mybatisplus.taste.test.mapper.RoleMapper.selectById" />
+
     </resultMap>
 
 </mapper>

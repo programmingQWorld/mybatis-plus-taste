@@ -6,6 +6,7 @@ import im.lincq.mybatisplus.taste.annotations.TableId;
 import im.lincq.mybatisplus.taste.annotations.TableName;
 
 import java.lang.reflect.Field;
+
 /* 表名 value 注解【 驼峰命名可无 】, resultMap 注解测试【 映射 xml 的 resultMap 内容 】 */
 @TableName(resultMap = "userMap")
 public class User {
@@ -23,8 +24,12 @@ public class User {
     @TableField(value = "test_type")
     private Integer testType;
 
-    @TableField(value = "roleId,roleName", el = "role.id,role.name")
+    @TableField(el = "role.id")
     private Role role;
+
+    //或@TableField(el = "role,jdbcType=BIGINT)
+    @TableField(el = "phone, typeHandler=im.lincq.mybatisplus.taste.test.mysql.typehandler.PhoneTypeHandler")
+    private PhoneNumber phone;
 
     public User () {
     }
@@ -116,9 +121,29 @@ public class User {
         this.role = role;
     }
 
-    /**
-     * 测试类型
-     */
+    public PhoneNumber getPhone() {
+        return phone;
+    }
+
+    public void setPhone(PhoneNumber phone) {
+        this.phone = phone;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", testType=" + testType +
+                ", role=" + role +
+                ", phone=" + phone +
+                '}';
+    }
+
+        /**
+         * 测试类型
+         */
     public static void main(String[] args) throws IllegalAccessException {
         User user = new User();
         user.setName("123456");

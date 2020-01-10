@@ -1,5 +1,9 @@
 package im.lincq.mybatisplus.taste.test;
 
+import im.lincq.mybatisplus.taste.test.mapper.UserMapper;
+import im.lincq.mybatisplus.taste.test.mysql.entity.User;
+
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,8 +14,10 @@ public class OtherTest {
 
 
 
-    public static void main(String[] args) throws InterruptedException {
-        test();
+    public static void main(String[] args) throws InterruptedException, NoSuchMethodException {
+        //test();
+        Method insertMethod = UserMapper.class.getDeclaredMethod("insertInjector", User.class);
+        System.out.println(insertMethod.getDeclaringClass().equals(Object.class));
     }
     public static void test () throws InterruptedException {
         //TableInfo table = TableInfoHelper.getTableInfo(User.class);
