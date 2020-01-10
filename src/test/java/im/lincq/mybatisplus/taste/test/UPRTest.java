@@ -67,7 +67,8 @@ public class UPRTest {
         User whereUser = userMapper.selectOne(userA);
         System.err.println("--------- select user --------- " + whereUser.toString());
 
-        //如果不使用el表达式, User类中就同时需要roleId用于对应User表中的字段, 和Role属性用于保存resultmap的级联查询. 在插入时, 就需要写user.setRoleId(), 然后updateUser.
+        //如果不使用el表达式, User类中就同时需要roleId用于对应User表中的字段, 和Role属性用于保存resultmap的级联查询.
+        // 在插入时, 就需要写user.setRoleId(), 然后updateUser.
         role = new Role();
         role.setId(IdWorker.getId());
         role.setName("root");

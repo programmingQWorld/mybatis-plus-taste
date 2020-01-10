@@ -22,6 +22,10 @@ public @interface TableField {
 	 */
 	String value() default "";
 
+	/**
+	 * 当该Field为类对象时, 可使用#{对象.属性}来映射到数据表.
+	 */
+	String el() default "";
 
 	/**
 	 * 
@@ -34,8 +38,13 @@ public @interface TableField {
 	boolean exist() default true;
 
 	/**
-	 * 当该Field为类对象时, 可使用#{对象.属性}来映射到数据表.
+	 * <p>
+	 * 字段验证
+	 * </p>
+	 * <p>
+	 * 默认 非 null 判断
+	 * </p>
 	 */
-	String el() default "";
+	FieldStrategy validate () default FieldStrategy.NOT_EMPTY;
 
 }

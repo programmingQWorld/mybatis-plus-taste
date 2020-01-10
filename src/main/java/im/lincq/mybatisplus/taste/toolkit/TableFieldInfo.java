@@ -1,5 +1,7 @@
 package im.lincq.mybatisplus.taste.toolkit;
 
+import im.lincq.mybatisplus.taste.annotations.FieldStrategy;
+
 /**
  * 数据库表字段反射信息
  */
@@ -23,6 +25,11 @@ public class TableFieldInfo {
      * 属性表达式#{property}, 可以指定jdbcType, typeHandler等
      */
     private String el;
+
+    /**
+     * 字段策略
+     */
+    private FieldStrategy fieldStrategy;
 
 
     public TableFieldInfo(boolean related, String column, String property, String el) {
@@ -76,5 +83,13 @@ public class TableFieldInfo {
 
     public void setEl(String el) {
         this.el = el;
+    }
+
+    public FieldStrategy getFieldStrategy() {
+        return fieldStrategy;
+    }
+
+    public void setFieldStrategy(FieldStrategy fieldStrategy) {
+        this.fieldStrategy = fieldStrategy;
     }
 }
