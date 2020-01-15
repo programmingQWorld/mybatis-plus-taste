@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste.mapper;
 
 import im.lincq.mybatisplus.taste.MybatisConfiguration;
+import im.lincq.mybatisplus.taste.annotations.FieldStrategy;
 import im.lincq.mybatisplus.taste.annotations.IdType;
 import im.lincq.mybatisplus.taste.toolkit.TableFieldInfo;
 import im.lincq.mybatisplus.taste.toolkit.TableInfo;
@@ -190,9 +191,9 @@ public class AutoSqlInjector  implements  ISqlInjector {
         // # 对象属性  条件拼接
         List<TableFieldInfo> fieldList = table.getFieldList();
         for (TableFieldInfo fieldInfo : fieldList) {
-            where.append("\n\t\t\t").append("<if test = \"ew.entity.").append(fieldInfo.getProperty()).append("!= null\">");
+            where.append("\n\t\t\t").append(convertIfTag(fieldInfo, "ew.entity", false));
             where.append("\t\t\t").append("  AND ").append(fieldInfo.getColumn()).append("=#{ew.entity.").append(fieldInfo.getEl()).append("}");
-            where.append("\t\t").append("</if>");
+            where.append("\t\t").append(convertIfTag(fieldInfo, true));
         }
 
         where.append("\n\t\t").append("</where>");
@@ -278,10 +279,10 @@ public class AutoSqlInjector  implements  ISqlInjector {
             if (selective) {
                 // # 字段
                 fieldBuilder
-                        .append("\n<if test=\"").append(fieldInfo.getProperty()).append(" != null\">");
+                        .append(convertIfTag(fieldInfo, false));
                 // # 占位符
                 placeholderBuilder
-                        .append("\n<if test=\"").append(fieldInfo.getProperty()).append(" != null\">");
+                        .append(convertIfTag(fieldInfo, false));
             }
 
             fieldBuilder.append(fieldInfo.getColumn()).append(",");
@@ -289,9 +290,9 @@ public class AutoSqlInjector  implements  ISqlInjector {
 
             if (selective) {
                 fieldBuilder
-                        .append("</if>");
+                        .append(convertIfTag(fieldInfo, true));
                 placeholderBuilder
-                        .append("</if>");
+                        .append(convertIfTag(fieldInfo, true));
             }
 
         }
@@ -422,10 +423,10 @@ public class AutoSqlInjector  implements  ISqlInjector {
                 set.append("\n<trim prefix=\"").append(fieldInfo.getColumn()).append("=CASE ");
                 set.append(table.getKeyColumn()).append("\" suffix=\"END,\">");
                 set.append("\n<foreach collection=\"list\" item=\"i\" index=\"index\">");
-                set.append("\n<if test=\"i.").append(fieldInfo.getProperty()).append("!=null\">");
+                set.append(convertIfTag(fieldInfo, "i.", false));
                 set.append("\nWHEN ").append("#{i.").append(table.getKeyProperty());
                 set.append("} THEN #{i.").append(fieldInfo.getEl()).append("}");
-                set.append("\n</if>");
+                set.append(convertIfTag(fieldInfo, true));
                 set.append("\n</foreach>");
                 set.append("\n</trim>");
             }
@@ -473,11 +474,11 @@ public class AutoSqlInjector  implements  ISqlInjector {
         List<TableFieldInfo> fieldList = table.getFieldList();
         for (TableFieldInfo fieldInfo : fieldList) {
             if (selective) {
-                set.append("<if test=\"et.").append(fieldInfo.getProperty()).append(" != null\">");
+                set.append( convertIfTag(fieldInfo, "et.", false ));
             }
             set.append(fieldInfo.getColumn()).append("=#{et.").append(fieldInfo.getEl()).append("}").append(",");
             if (selective) {
-                set.append("</if>\n");
+                set.append( convertIfTag( fieldInfo, true ));
             }
         }
         set.append("\n</trim>");
@@ -620,6 +621,34 @@ public class AutoSqlInjector  implements  ISqlInjector {
         return where.toString();
     }
 
+    protected String convertIfTag (TableFieldInfo fieldInfo, String prefix, boolean close) {
+        /* 前缀处理 */
+        String property = fieldInfo.getProperty();
+        if (null != prefix) {
+            property = prefix + property;
+        }
+
+        /* 判断策略 */
+        if (fieldInfo.getFieldStrategy() == FieldStrategy.NOT_NULL) {
+            if (close) {
+                return "</if>";
+            } else {
+                return String.format("\n\t<if test = \"%s != null\">", property);
+            }
+        } else if (fieldInfo.getFieldStrategy() == FieldStrategy.NOT_EMPTY) {
+            if (close) {
+                return "</if>";
+            } else {
+                return String.format("\n\t<if test = \"%s != null and %s != ''\">", property, property);
+            }
+        }
+        return "";
+    }
+
+    protected String convertIfTag (TableFieldInfo fieldInfo, boolean close) {
+        return convertIfTag(fieldInfo, null, close);
+    }
+
     /**
      * SQL 查询条件
      * @param space 该变量标记是否拼接 ew 参数的空判断.
@@ -638,9 +667,9 @@ public class AutoSqlInjector  implements  ISqlInjector {
         // 其它成员
         List<TableFieldInfo> fieldList = table.getFieldList();
         for (TableFieldInfo fieldInfo : fieldList) {
-            where.append("\n\t<if test=\"ew.").append(fieldInfo.getProperty()).append(" != null\">");
+            where.append(convertIfTag(fieldInfo, "ew.", false));
             where.append("\t\t\tAND  ").append(fieldInfo.getColumn()).append(" = #{ew.").append(fieldInfo.getEl()).append("}");
-            where.append("</if>");
+            where.append(convertIfTag(fieldInfo, true));
         }
         where.append("\n</where>");
         if ( space ) {

@@ -8,9 +8,9 @@ package im.lincq.mybatisplus.taste.annotations;
 public enum FieldStrategy {
 
     /** */
-    IGNORED(0, "忽略"),
-    NOT_NULL(1, "非 null"),
-    NOT_EMPTY(0, "非空"),
+    IGNORED(  0,  "ignored"),
+    NOT_NULL( 1,  "not null"),
+    NOT_EMPTY(0,  "not empty"),
     ;
 
     /** 主键 */

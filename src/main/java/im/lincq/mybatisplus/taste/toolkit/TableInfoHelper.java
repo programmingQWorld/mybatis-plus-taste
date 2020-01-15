@@ -113,7 +113,7 @@ public class TableInfoHelper {
 
                 if (columns.length == els.length) {
                     for (int i = 0; i < columns.length; i++) {
-                        fieldList.add(new TableFieldInfo(true, columns[i], field.getName(), els[i]));
+                        fieldList.add(new TableFieldInfo(true, columns[i], field.getName(), els[i], tableField.validate()));
                     }
                 } else {
                     String errMsg = "Class %s, Field %s, 'value' 'el' length must be consistent.";

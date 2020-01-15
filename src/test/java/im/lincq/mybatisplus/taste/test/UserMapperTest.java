@@ -128,6 +128,10 @@ public class UserMapperTest {
         System.err.println("\n--------------insertSelective-------" + rlt);
         sleep();
 
+        rlt = userMapper.insertSelective(new User(18));
+        System.err.println("\n----------测试 name 字段忽略验证----insertSelective-------" + rlt);
+        sleep();
+
 
         List<User> ul = new ArrayList<User>();
         ul.add(new User("insert-batch-1", 12, 1));

@@ -1,9 +1,6 @@
 package im.lincq.mybatisplus.taste.test.mysql.entity;
 
-import im.lincq.mybatisplus.taste.annotations.IdType;
-import im.lincq.mybatisplus.taste.annotations.TableField;
-import im.lincq.mybatisplus.taste.annotations.TableId;
-import im.lincq.mybatisplus.taste.annotations.TableName;
+import im.lincq.mybatisplus.taste.annotations.*;
 
 import java.lang.reflect.Field;
 
@@ -17,7 +14,11 @@ public class User {
     /* 主键ID， auto属性true自增 false非自增 默认true */
     @TableId(value="test_id", type = IdType.ID_WORKER)
     private Long id;
+
+    /* 测试忽略验证 */
+    @TableField(validate = FieldStrategy.IGNORED)
     private String name;
+
     private Integer age;
 
     /* 测试下划线字段命名类型 */
