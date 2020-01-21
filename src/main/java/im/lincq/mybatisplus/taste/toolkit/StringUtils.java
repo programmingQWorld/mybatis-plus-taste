@@ -11,6 +11,11 @@ public class StringUtils {
     public static final char UNDERLINE = '_';
 
     /**
+     * 空字符串
+     */
+    public static String EMPTY_String = "";
+
+    /**
      * 判断字符串是否为空
      * @param str 需要判断字符串
      * @return 判断结果
@@ -96,5 +101,25 @@ public class StringUtils {
 
     public static String quotaMark(String srcStr) {
         return isEmpty(srcStr) ? "" : "\'" + srcStr + "\'";
+    }
+
+    /**
+     * 获取对象字符串
+     * @param obj obj
+     * @return String
+     */
+    public static String getString(Object obj) {
+        return getString (obj, EMPTY_String);
+    }
+
+
+    /**
+     * 获取对象字符串
+     * @param obj       obj
+     * @param defaults  默认值
+     * @return 对象字符串
+     */
+    public static String getString(Object obj, String defaults) {
+        return obj == null ? defaults : obj.toString().trim();
     }
 }
