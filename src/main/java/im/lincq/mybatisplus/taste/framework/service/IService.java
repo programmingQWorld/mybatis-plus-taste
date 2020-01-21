@@ -13,6 +13,16 @@ import java.util.Map;
  */
 public interface IService<T, PK> {
 
+
+    /**
+     * <p>
+     *     TableId 主键存在则更新记录，否则插入一条记录.
+     *     关键点在于主键是否有值
+     * </p>
+     * @param entity 实体对象
+     * @return boolean
+     */
+    boolean insertOrUpdate (T entity);
     /**
      * 插入一条记录
      *

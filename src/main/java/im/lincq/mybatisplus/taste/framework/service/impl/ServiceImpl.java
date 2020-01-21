@@ -5,8 +5,12 @@ import im.lincq.mybatisplus.taste.mapper.AutoMapper;
 import im.lincq.mybatisplus.taste.mapper.BaseMapper;
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import im.lincq.mybatisplus.taste.plugins.Page;
+import im.lincq.mybatisplus.taste.toolkit.TableInfo;
+import im.lincq.mybatisplus.taste.toolkit.TableInfoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +25,30 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
 
     public boolean retBool (int result) {
         return result >= 1;
+    }
+
+    @Override
+    public boolean insertOrUpdate (T entity) {
+        if (null != entity) {
+            Class<?> cls = entity.getClass();
+            TableInfo tableInfo = TableInfoHelper.getTableInfo(cls);
+
+            if (null != tableInfo) {
+                try {
+                    Method m = cls.getMethod("get" + tableInfo.getKeyProperty());
+                    Object idVal = m.invoke(entity);
+                    if (null != idVal) {
+                        return updateById(entity);
+                    } else {
+                        return insert(entity);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+        return false;
     }
 
     @Override
