@@ -16,6 +16,7 @@ public class TSqlPlus extends MybatisAbstractSQL<TSqlPlus> {
 
     private final String IS_NOT_NULL = " IS NOT NULL";
     private final String IS_NULL = " IS NULL";
+    private final String SQL_LIKE = " LIKE CONCAT({0}, {1}, {2})";
 
     @Override
     public TSqlPlus getSelf () {
@@ -64,14 +65,15 @@ public class TSqlPlus extends MybatisAbstractSQL<TSqlPlus> {
         return this;
     }
 
-    private void handlerLike (String column,   String value, boolean isNot) {
-        if (StringUtils.isNotEmpty(column)) {
-            String likeSql = " LIKE CONCAT(CONCAT({0}, {1}), {2})";
+    private void handlerLike (String column,  String value, boolean isNot) {
+        if (StringUtils.isNotEmpty(column) && StringUtils.isNotEmpty(value)) {
+            StringBuilder inSql = new StringBuilder();
+            inSql.append(column);
             if (isNot) {
-                likeSql = " NOT" + likeSql;
+                inSql.append(" NOT");
             }
-            String percent = StringUtils.quotaMark("%");
-            WHERE(column + MessageFormat.format(likeSql, percent, StringUtils.quotaMark(value), percent));
+            inSql.append(MessageFormat.format(SQL_LIKE, "%", StringUtils.quotaMark(value), "%"));
+            WHERE(inSql.toString());
         }
     }
 
@@ -150,11 +152,12 @@ public class TSqlPlus extends MybatisAbstractSQL<TSqlPlus> {
      */
     private void handlerExists (String value, boolean isNot) {
         if (StringUtils.isNotEmpty(value)) {
-            String inSql = " EXISTS ( %s )";
+            StringBuilder inSql = new StringBuilder();
             if (isNot) {
-                inSql = " NOT" + inSql;
+                inSql.append(" NOT");
             }
-            WHERE(String.format(inSql, value));
+            inSql.append(" EXISTS (").append(value).append(")");
+            WHERE(inSql.toString());
         }
     }
 
@@ -164,27 +167,30 @@ public class TSqlPlus extends MybatisAbstractSQL<TSqlPlus> {
      * @param value   集合List
      * @param isNot   是否为NOT IN操作
      */
-    private void handlerIn (String column, List value, boolean isNot) {
+    private void handlerIn (String column, List<?> value, boolean isNot) {
         if (StringUtils.isNotEmpty(column) && CollectionUtil.isNotEmpty(value)) {
-            String inSql = " IN ( %s )";
+            StringBuilder inSql = new StringBuilder();
+            inSql.append(column);
             if (isNot) {
-                inSql = " NOT" + inSql;
+                inSql.append(" NOT");
             }
-            StringBuilder inValue = new StringBuilder();
-            for (int i = 0; i < value.size(); i++) {
+            inSql.append(" IN(");
+            int _size = value.size();
+            for (int i = 0; i < _size; i++) {
                 Object tempVal = value.get(i);
                 // 如果tempVal 是 String, 且为拼接 单引号
                 if (tempVal instanceof String && !String.valueOf(tempVal).matches("\'(.+)\'")) {
                     tempVal = StringUtils.quotaMark(String.valueOf(tempVal));
                 }
-                if (i + 1 == value.size()) {
-                    inValue.append(tempVal);
+                if (i + 1 == _size) {
+                    inSql.append(tempVal);
                 } else {
-                    inValue.append(tempVal);
-                    inValue.append(",");
+                    inSql.append(tempVal);
+                    inSql.append(",");
                 }
             }
-            WHERE(column + String.format(inSql, inValue.toString()));
+            inSql.append(")");
+            WHERE(inSql.toString());
         }
     }
 
@@ -196,11 +202,13 @@ public class TSqlPlus extends MybatisAbstractSQL<TSqlPlus> {
      */
     private void handlerIn (String column, String value, boolean isNot) {
         if (StringUtils.isNotEmpty(column) && StringUtils.isNotEmpty(value)) {
-            String inSql = " IN (%s)";
+            StringBuilder inSql = new StringBuilder();
+            inSql.append(column);
             if (isNot) {
-                inSql = " NOT" + inSql;
+                inSql.append(" NOT");
             }
-            WHERE(column + String.format(inSql, value));
+            inSql.append(" IN (").append(value).append(")");
+            WHERE(inSql.toString());
         }
     }
 

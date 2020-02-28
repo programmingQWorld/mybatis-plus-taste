@@ -14,7 +14,7 @@ public class CollectionUtil {
      * @param coll 集合对象
      * @return      boolean
      */
-    public static boolean isEmpty (Collection coll) {
+    public static boolean isEmpty (Collection<?> coll) {
         return ((coll == null) || coll.isEmpty());
     }
 
@@ -23,7 +23,7 @@ public class CollectionUtil {
      * @param coll 集合对象
      * @return      boolean
      */
-    public static boolean isNotEmpty (Collection coll) {
+    public static boolean isNotEmpty (Collection<?> coll) {
         return !isEmpty(coll);
     }
 

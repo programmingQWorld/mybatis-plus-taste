@@ -99,27 +99,11 @@ public class StringUtils {
         return matcher.matches();
     }
 
-    public static String quotaMark(String srcStr) {
-        return isEmpty(srcStr) ? "" : "\'" + srcStr + "\'";
-    }
-
-    /**
-     * 获取对象字符串
-     * @param obj obj
-     * @return String
-     */
-    public static String getString(Object obj) {
-        return getString (obj, EMPTY_String);
-    }
-
-
-    /**
-     * 获取对象字符串
-     * @param obj       obj
-     * @param defaults  默认值
-     * @return 对象字符串
-     */
-    public static String getString(Object obj, String defaults) {
-        return obj == null ? defaults : obj.toString().trim();
+    public static String quotaMark(Object obj) {
+        String srcStr = String.valueOf(obj);
+        if (obj instanceof String && !srcStr.matches("/'(.+)/'")) {
+            return "\'" + srcStr + "\'";
+        }
+        return srcStr;
     }
 }

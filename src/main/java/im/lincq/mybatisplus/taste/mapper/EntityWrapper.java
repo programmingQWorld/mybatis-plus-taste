@@ -303,7 +303,7 @@ public class EntityWrapper<T> implements Serializable {
      * @param value  匹配值 List集合
      * @return this
      */
-    public EntityWrapper<T> in (String column, List value) {
+    public EntityWrapper<T> in (String column, List<?> value) {
         sql.IN(column, value);
         return this;
     }
@@ -315,7 +315,7 @@ public class EntityWrapper<T> implements Serializable {
      * @param value  匹配值 List集合
      * @return this
      */
-    public EntityWrapper<T> notIn (String column, List value) {
+    public EntityWrapper<T> notIn (String column, List<?> value) {
         sql.NOT_IN(column, value);
         return this;
     }
@@ -398,9 +398,12 @@ public class EntityWrapper<T> implements Serializable {
         if (!need || StringUtils.isEmpty(sqlStr)) {
             return null;
         }
-        if (null != params && params.length > 0) {
-            dealParams(params);
-            sqlStr = MessageFormat.format(sqlStr, params);
+        if (null != params) {
+            int length = params.length;
+            if (length > 1) {
+                dealParams(params, length);
+                sqlStr = MessageFormat.format(sqlStr, params);
+            }
         }
         return sqlStr;
     }
@@ -415,14 +418,9 @@ public class EntityWrapper<T> implements Serializable {
      *
      * @param params 参数集
      */
-    protected void dealParams (Object[] params) {
+    protected void dealParams (Object[] params, int length) {
         for (int i = 0; i < params.length; i++) {
-            Object tempVal = params[i];
-            if (tempVal instanceof String && !String.valueOf(tempVal).matches("\'(.+)\'")) {
-                params[i] = StringUtils.quotaMark(String.valueOf(tempVal));
-            } else {
-                params[i] = StringUtils.getString(tempVal);
-            }
+            params[i] = StringUtils.quotaMark( params[i] );
         }
     }
 }

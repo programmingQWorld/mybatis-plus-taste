@@ -175,7 +175,7 @@ public class EntityWrapperTest {
         ew.notExists("(select * from User)");
         String sqlPart = ew.getSqlSegment();
         System.out.println("sql ==> " + sqlPart);
-        Assert.assertEquals("WHERE ( NOT EXISTS ( (select * from User) ))", sqlPart);
+        Assert.assertEquals("WHERE (NOT EXISTS ((select * from User)))", sqlPart);
     }
 
     /**
@@ -183,7 +183,7 @@ public class EntityWrapperTest {
      */
     @Test
     public void testNul17 () {
-        List list = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         list.add("'1'");
         list.add("'2'");
         list.add("'3'");
@@ -191,20 +191,20 @@ public class EntityWrapperTest {
         ew.notIn("test_type", list);
         String sqlPart = ew.getSqlSegment();
         System.out.println("sql ==> " + sqlPart);
-        Assert.assertEquals("WHERE (test_type NOT IN ( '1','2','3','4' ))", sqlPart);
+        Assert.assertEquals("WHERE (test_type NOT IN ('1','2','3','4'))", sqlPart);
     }
 
     @Test
     public void testNul18 () {
-        List list = new ArrayList<>();
-        list.add("'11111111'");
-        list.add("'22222222'");
-        list.add("'33333333'");
-        list.add("'44444444'");
+        List<Long> list = new ArrayList<>();
+        list.add(11111111L);
+        list.add(22222222L);
+        list.add(33333333L);
+        list.add(44444444L);
         ew.in("test_type", list);
         String sqlPart = ew.getSqlSegment();
         System.out.println("sql ==> " + sqlPart);
-        Assert.assertEquals("WHERE (test_type IN ( ( 11111111,22222222,33333333,44444444 ))", sqlPart);
+        Assert.assertEquals("WHERE (test_type IN (11111111,22222222,33333333,44444444))", sqlPart);
     }
 
     @Test
