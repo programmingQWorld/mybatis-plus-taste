@@ -144,7 +144,7 @@ public class TableInfoHelper {
 
         /* 执行注入，将表对象信息缓存起来，之后还可以继续使用 */
       tableInfoCache.put(clazz.getName(), tableInfo);
-        return tableInfo;
+      return tableInfo;
     }
 
     /**

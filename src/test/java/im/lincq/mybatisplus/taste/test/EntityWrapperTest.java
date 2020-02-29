@@ -5,6 +5,7 @@ import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import im.lincq.mybatisplus.taste.test.mapper.UserMapper;
 import im.lincq.mybatisplus.taste.test.mysql.MyMetaObjectHandler;
 import im.lincq.mybatisplus.taste.test.mysql.entity.User;
+import im.lincq.mybatisplus.taste.toolkit.TableInfoHelper;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.log4j.BasicConfigurator;
@@ -27,6 +28,10 @@ public class EntityWrapperTest {
     * User 查询包装器
     * */
     private EntityWrapper<User> ew = new EntityWrapper<User>();
+
+    static {
+        TableInfoHelper.initTableInfo(User.class);
+    }
 
     @Test
     public void test () {

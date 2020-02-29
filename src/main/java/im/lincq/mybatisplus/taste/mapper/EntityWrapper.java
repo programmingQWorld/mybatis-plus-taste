@@ -1,5 +1,6 @@
 package im.lincq.mybatisplus.taste.mapper;
 
+import im.lincq.mybatisplus.taste.toolkit.ReflectionKit;
 import im.lincq.mybatisplus.taste.toolkit.StringUtils;
 
 import java.io.Serializable;
@@ -67,8 +68,10 @@ public class EntityWrapper<T> implements Serializable {
             return null;
         }
 
-        // 根据当前实体判断是哦夫需要将WHERE 替换成 AND
-        sqlWhere = (null != entity) ? sqlWhere.replaceFirst("WHERE", "AND") : sqlWhere;
+        // 根据当前实体判断是否需要将WHERE 替换成 AND
+        sqlWhere = ((null != entity) && ReflectionKit.checkFieldValueNull(entity))
+                ? sqlWhere.replaceFirst("WHERE", "AND")
+                : sqlWhere;
 
         // 使用防SQL注入处理后返回
         return stripSqlInjection(sqlWhere);

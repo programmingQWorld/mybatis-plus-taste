@@ -34,24 +34,23 @@ public class ServiceImpl<M extends BaseMapper<T, PK>, T, PK extends Serializable
     /**
      * TableId 注解存在 → 更新记录， 否则插入一条记录
      * @param entity 实体对象
-     * @param selective true → 选择非null值字段 | false → 不选择字段
+     * @param isSelective true → 选择非null值字段 | false → 不选择字段
      * @return boolean
      */
     @Transactional(rollbackFor = Exception.class)
-    private boolean insertOrUpdate (T entity, boolean selective) {
+    private boolean insertOrUpdate (T entity, boolean isSelective) {
         if (null != entity) {
             Class<?> cls = entity.getClass();
             TableInfo tableInfo = TableInfoHelper.getTableInfo(cls);
 
             if (null != tableInfo) {
                 try {
-                    // 没有 @TableId 是否应该抛出异常?
-                    Method m = cls.getMethod("get" + StringUtils.capitalize(tableInfo.getKeyProperty()));
+                    Method m = cls.getMethod(StringUtils.concatCapitalize("get", tableInfo.getKeyProperty()));
                     Object idVal = m.invoke(entity);
                     if (null != idVal) {
-                        return selective ? updateSelectiveById(entity) : updateById(entity);
+                        return isSelective ? updateSelectiveById(entity) : updateById(entity);
                     } else {
-                        return selective ? insertSelective(entity) : insert(entity);
+                        return isSelective ? insertSelective(entity) : insert(entity);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
