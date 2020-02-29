@@ -8,6 +8,7 @@ import im.lincq.mybatisplus.taste.plugins.Page;
 import im.lincq.mybatisplus.taste.toolkit.TableInfo;
 import im.lincq.mybatisplus.taste.toolkit.TableInfoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -28,6 +29,7 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean insertOrUpdate (T entity) {
         if (null != entity) {
             Class<?> cls = entity.getClass();
@@ -52,61 +54,73 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean insert(T entity) {
         return retBool(baseMapper.insert(entity));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean insertBatch (List<T> entityList) {
         return retBool(baseMapper.insertBatch(entityList));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean insertSelective(T entity) {
         return retBool(baseMapper.insertSelective(entity));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteById(I id) {
         return retBool(baseMapper.deleteById(id));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteByMap(Map<String, Object> columnMap) {
         return retBool(baseMapper.deleteByMap(columnMap));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteSelective(T entity) {
         return retBool(baseMapper.deleteSelective(entity));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean deleteBatchIds(List<I> idList) {
         return retBool(baseMapper.deleteBatchIds(idList));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateById (T entity) {
         return retBool(baseMapper.updateById(entity));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateSelectiveById(T entity) {
         return retBool(baseMapper.updateSelectiveById(entity));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean update(T entity, T whereEntity) {
         return retBool(baseMapper.update(entity, whereEntity));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateSelective(T entity, T whereEntity) {
         return retBool(baseMapper.updateSelective(entity, whereEntity));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean updateBatchById(List<T> entityList) {
         return retBool(baseMapper.updateBatchById(entityList));
     }
