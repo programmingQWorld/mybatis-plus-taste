@@ -46,11 +46,7 @@ public class ServiceImpl<M extends BaseMapper<T, PK>, T, PK extends Serializable
             if (null != tableInfo) {
                 try {
                     // 没有 @TableId 是否应该抛出异常?
-                    String keyProperty = tableInfo.getKeyProperty();
-                    if (keyProperty == null) {
-                        throw new MybatisPlusException("Error: Cannot execute. Could not find @TableId");
-                    }
-                    Method m = cls.getMethod("get" + StringUtils.capitalize(keyProperty));
+                    Method m = cls.getMethod("get" + StringUtils.capitalize(tableInfo.getKeyProperty()));
                     Object idVal = m.invoke(entity);
                     if (null != idVal) {
                         return selective ? updateSelectiveById(entity) : updateById(entity);
@@ -60,6 +56,8 @@ public class ServiceImpl<M extends BaseMapper<T, PK>, T, PK extends Serializable
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            } else {
+                throw new MybatisPlusException("Error: Cannot execute. Could not find @TableId");
             }
 
         }
