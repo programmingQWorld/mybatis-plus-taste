@@ -15,15 +15,6 @@ public interface IService<T, PK> {
 
 
     /**
-     * <p>
-     *     TableId 主键存在则更新记录，否则插入一条记录.
-     *     关键点在于主键是否有值
-     * </p>
-     * @param entity 实体对象
-     * @return boolean
-     */
-    boolean insertOrUpdate (T entity);
-    /**
      * 插入一条记录
      *
      * @param entity  实体对象
@@ -46,6 +37,26 @@ public interface IService<T, PK> {
      * @return boolean
      */
     boolean insertSelective(T entity);
+
+    /**
+     * <p>
+     *     TableId 主键存在则更新记录，否则插入一条记录.
+     *     关键点在于主键是否有值
+     * </p>
+     * @param entity 实体对象
+     * @return boolean
+     */
+    boolean insertOrUpdate (T entity);
+
+    /**
+     * <p>
+     *     TableId 主键存在则更新记录，否则插入一条记录. （选择字段，值为null时该字段不插入）
+     *     关键点在于主键是否有值
+     * </p>
+     * @param entity 实体对象
+     * @return boolean
+     */
+    boolean insertOrUpdateSelective (T entity);
 
     /**
      * 根据ID删除

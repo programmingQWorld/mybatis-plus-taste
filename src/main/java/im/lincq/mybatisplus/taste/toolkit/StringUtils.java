@@ -106,4 +106,21 @@ public class StringUtils {
         }
         return srcStr;
     }
+
+    public static String capitalize(final String str) {
+        int strLen;
+        if (str == null || (strLen = str.length()) == 0) {
+            return str;
+        }
+
+        final char firstChar = str.charAt(0);
+        if (Character.isTitleCase(firstChar)) {
+            // already capitalized
+            return str;
+        }
+
+        return Character.toUpperCase(firstChar) + str.substring(1);
+    }
+
+
 }

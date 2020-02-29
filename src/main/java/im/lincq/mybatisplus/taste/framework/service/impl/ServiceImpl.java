@@ -1,15 +1,18 @@
 package im.lincq.mybatisplus.taste.framework.service.impl;
 
+import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import im.lincq.mybatisplus.taste.framework.service.IService;
 import im.lincq.mybatisplus.taste.mapper.AutoMapper;
 import im.lincq.mybatisplus.taste.mapper.BaseMapper;
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import im.lincq.mybatisplus.taste.plugins.Page;
+import im.lincq.mybatisplus.taste.toolkit.StringUtils;
 import im.lincq.mybatisplus.taste.toolkit.TableInfo;
 import im.lincq.mybatisplus.taste.toolkit.TableInfoHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -19,7 +22,7 @@ import java.util.Map;
  * @author lincq
  * @date 2019/6/29 13:05
  */
-public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T, I> {
+public class ServiceImpl<M extends BaseMapper<T, PK>, T, PK extends Serializable> implements IService<T, PK> {
 
     @Autowired
     protected M baseMapper;
@@ -28,21 +31,31 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
         return result >= 1;
     }
 
-    @Override
+    /**
+     * TableId 注解存在 → 更新记录， 否则插入一条记录
+     * @param entity 实体对象
+     * @param selective true → 选择非null值字段 | false → 不选择字段
+     * @return boolean
+     */
     @Transactional(rollbackFor = Exception.class)
-    public boolean insertOrUpdate (T entity) {
+    private boolean insertOrUpdate (T entity, boolean selective) {
         if (null != entity) {
             Class<?> cls = entity.getClass();
             TableInfo tableInfo = TableInfoHelper.getTableInfo(cls);
 
             if (null != tableInfo) {
                 try {
-                    Method m = cls.getMethod("get" + tableInfo.getKeyProperty());
+                    // 没有 @TableId 是否应该抛出异常?
+                    String keyProperty = tableInfo.getKeyProperty();
+                    if (keyProperty == null) {
+                        throw new MybatisPlusException("Error: Cannot execute. Could not find @TableId");
+                    }
+                    Method m = cls.getMethod("get" + StringUtils.capitalize(keyProperty));
                     Object idVal = m.invoke(entity);
                     if (null != idVal) {
-                        return updateById(entity);
+                        return selective ? updateSelectiveById(entity) : updateById(entity);
                     } else {
-                        return insert(entity);
+                        return selective ? insertSelective(entity) : insert(entity);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -51,6 +64,16 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
 
         }
         return false;
+    }
+
+    @Override
+    public boolean insertOrUpdate (T entity) {
+        return insertOrUpdate(entity, false);
+    }
+
+    @Override
+    public boolean insertOrUpdateSelective(T entity) {
+        return insertOrUpdate(entity, true);
     }
 
     @Override
@@ -73,7 +96,7 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteById(I id) {
+    public boolean deleteById(PK id) {
         return retBool(baseMapper.deleteById(id));
     }
 
@@ -91,7 +114,7 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean deleteBatchIds(List<I> idList) {
+    public boolean deleteBatchIds(List<PK> idList) {
         return retBool(baseMapper.deleteBatchIds(idList));
     }
 
@@ -126,12 +149,12 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
     }
 
     @Override
-    public T selectById(I id) {
+    public T selectById(PK id) {
         return baseMapper.selectById(id);
     }
 
     @Override
-    public List<T> selectBatchIds(List<I> idList) {
+    public List<T> selectBatchIds(List<PK> idList) {
         return baseMapper.selectBatchIds(idList);
     }
 
@@ -163,20 +186,6 @@ public class ServiceImpl<M extends BaseMapper<T, I>, T, I> implements IService<T
         }
         page.setRecords(baseMapper.selectPage(page, entityWrapper));
         return page;
-    }
-
-    protected String convertSqlSegment(String sqlSegment, String orderByField, boolean isAsc) {
-        StringBuffer segment = new StringBuffer();
-        if (null != sqlSegment) {
-            segment.append(sqlSegment);
-        }
-        if (null != orderByField) {
-            segment.append(" ORDER BY  ").append(orderByField);
-            if (!isAsc) {
-                segment.append(" DESC ");
-            }
-        }
-        return segment.toString();
     }
 
 }
