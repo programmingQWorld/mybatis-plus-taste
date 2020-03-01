@@ -6,6 +6,7 @@ import im.lincq.mybatisplus.taste.mapper.AutoMapper;
 import im.lincq.mybatisplus.taste.mapper.BaseMapper;
 import im.lincq.mybatisplus.taste.mapper.EntityWrapper;
 import im.lincq.mybatisplus.taste.plugins.Page;
+import im.lincq.mybatisplus.taste.toolkit.ReflectionKit;
 import im.lincq.mybatisplus.taste.toolkit.StringUtils;
 import im.lincq.mybatisplus.taste.toolkit.TableInfo;
 import im.lincq.mybatisplus.taste.toolkit.TableInfoHelper;
@@ -44,16 +45,11 @@ public class ServiceImpl<M extends BaseMapper<T, PK>, T, PK extends Serializable
             TableInfo tableInfo = TableInfoHelper.getTableInfo(cls);
 
             if (null != tableInfo) {
-                try {
-                    Method m = cls.getMethod(StringUtils.concatCapitalize("get", tableInfo.getKeyProperty()));
-                    Object idVal = m.invoke(entity);
-                    if (null != idVal) {
-                        return isSelective ? updateSelectiveById(entity) : updateById(entity);
-                    } else {
-                        return isSelective ? insertSelective(entity) : insert(entity);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                Object idVal = ReflectionKit.getMethodValue(cls, entity, tableInfo.getKeyProperty());
+                if (null != idVal) {
+                    return isSelective ? updateSelectiveById(entity) : updateById(entity);
+                } else {
+                    return isSelective ? insertSelective(entity) : insert(entity);
                 }
             } else {
                 throw new MybatisPlusException("Error: Cannot execute. Could not find @TableId");

@@ -68,8 +68,8 @@ public class EntityWrapper<T> implements Serializable {
             return null;
         }
 
-        // 根据当前实体判断是否需要将WHERE 替换成 AND
-        sqlWhere = ((null != entity) && ReflectionKit.checkFieldValueNull(entity))
+        // 根据当前实体判断是否需要将WHERE 替换成 AND，增加实体不为空但是所有属性为空的情况.
+        sqlWhere = ReflectionKit.checkFieldValueNotNull(entity)
                 ? sqlWhere.replaceFirst("WHERE", "AND")
                 : sqlWhere;
 

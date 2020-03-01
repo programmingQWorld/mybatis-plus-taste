@@ -22,7 +22,7 @@ public class StringUtils {
      * @return 判断结果
      */
     public static boolean isEmpty(String str) {
-        return str == null || "".equals(str.trim());
+        return str == null || EMPTY_String.equals(str.trim());
     }
 
     /**
@@ -32,7 +32,7 @@ public class StringUtils {
      * @return 判断结果
      */
     public static boolean isNotEmpty(String str) {
-        return (str != null) && !"".equals(str.trim());
+        return !isEmpty(str);
     }
 
 
@@ -44,7 +44,7 @@ public class StringUtils {
      */
     public static String camelToUnderline(String param) {
         if (isEmpty(param)) {
-            return "";
+            return EMPTY_String;
         }
         int len = param.length();
         StringBuilder sb = new StringBuilder(len);
@@ -63,7 +63,7 @@ public class StringUtils {
 
     public static String underlineToCamel(String param) {
         if (isEmpty((param))) {
-            return "";
+            return EMPTY_String;
         }
         int len = param.length();
         StringBuilder sb = new StringBuilder(len);
