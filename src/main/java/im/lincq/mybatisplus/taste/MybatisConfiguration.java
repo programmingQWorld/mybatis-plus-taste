@@ -4,9 +4,14 @@ import im.lincq.mybatisplus.taste.mapper.AutoSqlInjector;
 import im.lincq.mybatisplus.taste.mapper.DBType;
 import im.lincq.mybatisplus.taste.mapper.IMetaObjectHandler;
 import im.lincq.mybatisplus.taste.mapper.ISqlInjector;
+import org.apache.ibatis.binding.MapperRegistry;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSession;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.logging.Logger;
 
 /**
@@ -32,6 +37,11 @@ public class MybatisConfiguration extends Configuration {
      */
     public static ISqlInjector SQL_INJECTOR  = new AutoSqlInjector();;
 
+    /**
+     * Mapper 注册
+     */
+    public final MybatisPlusMapperRegistry mybatisPlusMapperRegistry = new MybatisPlusMapperRegistry(this);
+
 
     /**
      * 元对象字段填充控制器
@@ -42,6 +52,11 @@ public class MybatisConfiguration extends Configuration {
 	 * 是否刷新mapper
 	 */
     public static boolean IS_REFRESH = false;
+
+    /**
+     * 缓存注册标识
+     */
+    public static Set<String> MAPPER_REGISTRY_CACHE = new ConcurrentSkipListSet<>();
 
     /**
      * 初始化调用
@@ -84,6 +99,41 @@ public class MybatisConfiguration extends Configuration {
             driver = MybatisXmlLanguageDriver.class;
         }
         super.setDefaultScriptingLanguage(driver);
+    }
+
+
+
+    /**
+     * Mapper注册
+     */
+    @Override
+    public MapperRegistry getMapperRegistry() {
+        return mybatisPlusMapperRegistry;
+    }
+
+    @Override
+    public <T> void addMapper(Class<T> type) {
+        mybatisPlusMapperRegistry.addMapper(type);
+    }
+
+    @Override
+    public void addMappers(String packageName, Class<?> superType) {
+        mybatisPlusMapperRegistry.addMappers(packageName, superType);
+    }
+
+    @Override
+    public void addMappers(String packageName) {
+        mybatisPlusMapperRegistry.addMappers(packageName);
+    }
+
+    @Override
+    public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
+        return mybatisPlusMapperRegistry.getMapper(type, sqlSession);
+    }
+
+    @Override
+    public boolean hasMapper(Class<?> type) {
+        return mybatisPlusMapperRegistry.hasMapper(type);
     }
 
 }
