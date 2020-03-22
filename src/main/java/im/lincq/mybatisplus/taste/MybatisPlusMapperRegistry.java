@@ -26,7 +26,7 @@ public class MybatisPlusMapperRegistry extends MapperRegistry {
     public <T> T getMapper (Class<T> type, SqlSession sqlSession) {
         final MapperProxyFactory<T> mapperProxyFactory = (MapperProxyFactory<T>) knownMappers.get(type);
         if (mapperProxyFactory == null) {
-            throw new BindingException("Type" + type + "is not known to the MapperRegistry");
+            throw new BindingException("Type" + type + " is not known to the MapperRegistry");
         }
         try {
             return mapperProxyFactory.newInstance(sqlSession);

@@ -113,6 +113,9 @@
     package 指向可以找到Mapper接口的包名
     -->
     <mappers>
+        <mapper class="im.lincq.mybatisplus.taste.test.mapper.UserMapper" />
+        <mapper class="im.lincq.mybatisplus.taste.test.mapper.RoleMapper" />
+        <mapper class="im.lincq.mybatisplus.taste.test.mysql.TestMapper" />
         <mapper resource="mysql/UserMapper.xml"/>
         <mapper resource="mysql/RoleMapper.xml"/>
     </mappers>
