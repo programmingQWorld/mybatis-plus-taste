@@ -56,7 +56,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         String className = mapperClass.toString();
         Set<String> mapperRegistryCache = MybatisConfiguration.MAPPER_REGISTRY_CACHE;
         if (!mapperRegistryCache.contains(className)) {
-            inject(configuration, builderAssistant, mapperClass);
+            inject(configuration, mapperBuilderAssistant, mapperClass);
             mapperRegistryCache.add(className);
         }
     }
@@ -148,7 +148,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
             sqlSource = new RawSqlSource(configuration, sql, mapperClass);
         }
         System.err.println("inject select(batch) sql: ");
-        System.out.println( sql );
+        System.out.println( sql.replaceAll("\n", "") );
         this.addSelectMappedStatement(mapperClass, sqlMethod.getMethod(), sqlSource, modelClass, table);
     }
 
@@ -159,7 +159,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         SqlMethod sqlMethod = SqlMethod.SELECT_BY_MAP;
         String sql = String.format(sqlMethod.getSql(),  sqlSelectColumns(table, false), table.getTableName(), sqlWhereByMap());
         System.err.println("inject select by map sql");
-        System.out.println( sql );
+        System.out.println( sql.replaceAll("\n", "") );
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, Map.class);
         this.addSelectMappedStatement(mapperClass, sqlMethod.getMethod(), sqlSource, modelClass, table);
     }
@@ -171,7 +171,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         SqlMethod sqlMethod = SqlMethod.SELECT_ONE;
         String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table, false), table.getTableName(), sqlWhere(table, false));
         System.err.println("inject select (one) sql("+ sqlMethod.getMethod() +")：");
-        System.out.println( sql );
+        System.out.println( sql.replaceAll("\n", "") );
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addSelectMappedStatement(mapperClass, sqlMethod.getMethod(), sqlSource, modelClass, table);
     }
@@ -183,7 +183,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         SqlMethod sqlMethod = SqlMethod.SELECT_COUNT;
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhere(table, true));
         System.err.println("inject select count sql : ");
-        System.out.println( sql );
+        System.out.println( sql.replaceAll("\n", "") );
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addSelectMappedStatement(mapperClass, sqlMethod.getMethod(), sqlSource, Integer.class, null);
     }
@@ -222,7 +222,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         String sql = String.format(sqlMethod.getSql(), sqlSelectColumns(table, true), table.getTableName(), where.toString());
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         System.err.println("inject select (list by ew) : ");
-        System.out.println( sql );
+        System.out.println( sql.replaceAll("\n", "") );
         this.addSelectMappedStatement(mapperClass, sqlMethod.getMethod(), sqlSource, modelClass, table);
 
     }
@@ -319,7 +319,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
 
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), fieldBuilder.toString(), placeholderBuilder.toString());
         System.err.println("inject insert(batch) sql: \n");
-        System.out.println( sql );
+        System.out.println( sql.replaceAll("\n", "") );
         SqlSource sqlSource  = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addInsertMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource, keyGenerator, keyProperty, keyColumn);
     }
@@ -371,7 +371,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), fieldBuilder.toString(), placeholderBuilder.toString());
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         System.err.println("inject insert batch sql : ");
-        System.out.println( sql );
+        System.out.println( sql.replaceAll("\n", "") );
         this.addInsertMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource, keyGenerator,
                 keyProperty, keyColumn);
     }
@@ -387,7 +387,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         SqlMethod sqlMethod = (selective) ? SqlMethod.UPDATE_SELECTIVE_BY_ID : SqlMethod.UPDATE_BY_ID;
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlSet(selective, table), table.getKeyColumn(), table.getKeyProperty());
         System.err.println("\ninject "+ sqlMethod.getMethod() +" ("+ (selective ? "" : " not ") +"selective) sql ");
-        System.out.println( sql );
+        System.out.println( sql.replaceAll("\n", "") );
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
     }
@@ -402,7 +402,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         SqlMethod sqlMethod = SqlMethod.DELETE_SELECTIVE;
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhere(table, false));
         System.err.println("inject delete selective sql : ");
-        System.out.println( sql );
+        System.out.println( sql.replaceAll("\n", "") );
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addDeleteMappedStatement(mapperClass, sqlMethod.getMethod(), sqlSource);
     }
@@ -416,7 +416,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         SqlMethod sqlMethod = SqlMethod.DELETE_BY_MAP;
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlWhereByMap());
         System.err.println("inject delete by map sql : ");
-        System.out.println( sql );
+        System.out.println( sql.replaceAll("\n", "") );
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, Map.class);
         this.addDeleteMappedStatement(mapperClass, sqlMethod.getMethod(), sqlSource);
     }
@@ -453,7 +453,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), set.toString(), table.getKeyColumn(),
                 table.getKeyProperty());
         System.err.println("inject sql (updateBatchById) - "+ dbType.name()  + " : ");
-        System.out.println( sql );
+        System.out.println( sql.replaceAll("\n", "") );
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
     }
@@ -469,7 +469,7 @@ public class AutoSqlInjector  implements  ISqlInjector {
         SqlMethod sqlMethod = (selective) ? SqlMethod.UPDATE_SELECTIVE : SqlMethod.UPDATE;
         String sql = String.format(sqlMethod.getSql(), table.getTableName(), sqlSet(selective, table), sqlWhere(table, true));
         System.err.println("inject update sql : ");
-        System.out.println( sql );
+        System.out.println( sql.replaceAll("\n", "") );
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
     }

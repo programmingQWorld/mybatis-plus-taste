@@ -61,22 +61,22 @@ public class MybatisSessionFactoryBuilder extends SqlSessionFactoryBuilder {
         }
     }
 
-    //TODO 注入数据库类型
+    //注入数据库类型
     public void setDbType( String dbType ) {
         MybatisConfiguration.DB_TYPE = DBType.getDBType(dbType);
     }
 
-    // TODO 注入表字段使用下划线命名
+    // 注入表字段使用下划线命名
     public void  setDbColumnUnderline(boolean dbColumnUnderline) {
         MybatisConfiguration.DB_COLUMN_UNDERLINE = dbColumnUnderline;
     }
 
-    //TODO 注入 SQL注入器
+    // 注入 SQL注入器
     public void setSqlInjector(ISqlInjector sqlInjector) {
         MybatisConfiguration.SQL_INJECTOR = sqlInjector;
     }
 
-    // TODO 注入 元对象字段填充控制器
+    // 注入 元对象字段填充控制器
     public void setMetaObjectHandler(IMetaObjectHandler metaObjectHandler) {
         MybatisConfiguration.META_OBJECT_HANDLER = metaObjectHandler;
     }

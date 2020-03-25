@@ -23,6 +23,30 @@ public class MybatisPlusMapperRegistry extends MapperRegistry {
         this.config = config;
     }
 
+    public <T> void addMapper(Class<T> type) {
+        if (type.isInterface()) {
+            if (hasMapper(type)) {
+                throw new BindingException("Type " + type + " is already known to the MapperRegistry.");
+            }
+            boolean loadCompleted = false;
+            try {
+                knownMappers.put(type, new MapperProxyFactory<T>(type));
+                // It's important that the type is added before the parser is
+                // run
+                // otherwise the binding may automatically be attempted by the
+                // mapper parser. If the type is already known, it won't try.
+
+                MybatisPlusMapperBuilder parser = new MybatisPlusMapperBuilder(config, type);
+                parser.parse();
+                loadCompleted = true;
+            } finally {
+                if (!loadCompleted) {
+                    knownMappers.remove(type);
+                }
+            }
+        }
+    }
+
     public <T> T getMapper (Class<T> type, SqlSession sqlSession) {
         final MapperProxyFactory<T> mapperProxyFactory = (MapperProxyFactory<T>) knownMappers.get(type);
         if (mapperProxyFactory == null) {

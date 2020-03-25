@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @author lincq
  * @date 2019/12/29 22:08
  */
-@TableName(value = "role", resultMap = "RoleMap")
+@TableName(value = "role")
 public class Role implements Serializable {
 
     @TableField(exist = false)

@@ -476,17 +476,22 @@ public class MybatisXMLConfigBuilder extends BaseBuilder {
                     String resource = child.getStringAttribute("resource");
                     String url = child.getStringAttribute("url");
                     String mapperClass = child.getStringAttribute("class");
+                    // resource != null
                     if (resource != null && url == null && mapperClass == null) {
                         ErrorContext.instance().resource(resource);
                         InputStream inputStream = Resources.getResourceAsStream(resource);
                         MybatisXMLMapperBuilder mapperParser = new MybatisXMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
                         mapperParser.parse();
                     } else if (resource == null && url != null && mapperClass == null) {
+                        // url != null
+
                         ErrorContext.instance().resource(url);
                         InputStream inputStream = Resources.getUrlAsStream(url);
                         MybatisXMLMapperBuilder mapperParser = new MybatisXMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
                         mapperParser.parse();
                     } else if (resource == null && url == null && mapperClass != null) {
+                        // mapperClass != null
+
                         Class<?> mapperInterface = Resources.classForName(mapperClass);
                         configuration.addMapper(mapperInterface);
                     } else {

@@ -92,7 +92,6 @@ public class MybatisPlusMapperBuilder extends MapperAnnotationBuilder {
             MybatisConfiguration.SQL_INJECTOR.inspectInject(configuration, assistant, type);
             // 循环接口方法.
             for (Method method : methods) {
-                // todo 断点查看方法的信息，重点关注type属性是何人组成
                 try {
                     // mybatis issue # 247
                     // 什么是桥接方法 { 泛型方法，字节码中方法声明位置的标记中会出现 ACC_BRIDGE }

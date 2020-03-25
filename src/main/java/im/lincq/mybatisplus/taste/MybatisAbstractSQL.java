@@ -158,7 +158,7 @@ public abstract class MybatisAbstractSQL<T>  implements Serializable {
                     String part = parts.get(i);
                     if (i > 0) {
                         // 若当前 part 是 关键字，则拼接关键字. 继续下一层循环
-                        // 若不是，如 part = "stauts=1"，同样要拼接关键字(调用sqlCause方法时指定的关键字conjunction)，再拼接part.
+                        // 若不是，如 part = "status=1"，同样要拼接关键字(调用sqlCause方法时指定的关键字conjunction)，再拼接part.
                         if (andOr.contains(part) || andOr.contains(last)) {
                             builder.append(part);
                             last = part;

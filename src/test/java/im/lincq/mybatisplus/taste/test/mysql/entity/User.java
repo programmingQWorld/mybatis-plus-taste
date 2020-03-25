@@ -5,7 +5,7 @@ import im.lincq.mybatisplus.taste.annotations.*;
 import java.lang.reflect.Field;
 
 /* 表名 value 注解【 驼峰命名可无 】, resultMap 注解测试【 映射 xml 的 resultMap 内容 】 */
-@TableName(resultMap = "userMap")
+@TableName("user")
 public class User {
     /* 表字段 主键，false 表中不存在的字段，可无该注解 默认 true */
     @TableField(exist = false)
