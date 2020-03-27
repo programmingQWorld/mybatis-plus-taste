@@ -17,6 +17,7 @@ public class TSqlPlus extends MybatisAbstractSQL<TSqlPlus> {
     private final String IS_NOT_NULL = " IS NOT NULL";
     private final String IS_NULL = " IS NULL";
     private final String SQL_LIKE = " LIKE CONCAT({0}, {1}, {2})";
+    private final String SQL_BETWEEN_AND = " BETWEEN {0} AND {1}";
 
     @Override
     public TSqlPlus getSelf () {
@@ -210,6 +211,16 @@ public class TSqlPlus extends MybatisAbstractSQL<TSqlPlus> {
             inSql.append(" IN (").append(value).append(")");
             WHERE(inSql.toString());
         }
+    }
+
+    public TSqlPlus BETWEEN_AND (String column, String val1, String val2) {
+        if (StringUtils.isNotEmpty(column) && StringUtils.isNotEmpty(val1) && StringUtils.isNotEmpty(val2)) {
+            StringBuilder betweenSql = new StringBuilder();
+            betweenSql.append(column);
+            betweenSql.append(MessageFormat.format(SQL_BETWEEN_AND, val1, val2));
+            WHERE(betweenSql.toString());
+        }
+        return this;
     }
 
     /**

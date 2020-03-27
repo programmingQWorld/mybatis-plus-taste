@@ -323,6 +323,10 @@ public class EntityWrapper<T> implements Serializable {
         return this;
     }
 
+    public EntityWrapper<T> between (String column, String val1, String val2) {
+        sql.BETWEEN_AND(column, val1, val2);
+        return this;
+    }
 
     /**
      * 为了兼容之前的版本，可使用where()或and()替代
