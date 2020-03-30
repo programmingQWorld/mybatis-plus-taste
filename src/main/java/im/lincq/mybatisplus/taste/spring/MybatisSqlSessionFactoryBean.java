@@ -13,12 +13,12 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import im.lincq.mybatisplus.taste.MybatisConfiguration;
-import im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder;
-import im.lincq.mybatisplus.taste.MybatisXMLMapperBuilder;
 import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import im.lincq.mybatisplus.taste.mapper.DBType;
 import im.lincq.mybatisplus.taste.mapper.ISqlInjector;
 import im.lincq.mybatisplus.taste.toolkit.PackageHelper;
+import org.apache.ibatis.builder.xml.XMLConfigBuilder;
+import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.io.VFS;
@@ -410,8 +410,8 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
 
         Configuration configuration;
 
-        /** TODO 加载自定义 MybatisXMLConfigBuilder */
-        MybatisXMLConfigBuilder xmlConfigBuilder = null;
+        XMLConfigBuilder xmlConfigBuilder = null;
+
         if (this.configuration != null) {
             configuration = this.configuration;
             if (configuration.getVariables() == null) {
@@ -420,7 +420,7 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
                 configuration.getVariables().putAll(this.configurationProperties);
             }
         } else if ( this.configLocation != null ) {
-            xmlConfigBuilder = new MybatisXMLConfigBuilder(this.configLocation.getInputStream(), null,
+            xmlConfigBuilder = new XMLConfigBuilder(this.configLocation.getInputStream(), null,
                     this.configurationProperties);
             configuration = xmlConfigBuilder.getConfiguration();
         } else {
@@ -549,7 +549,7 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
                 }
 
                 try {
-                    MybatisXMLMapperBuilder xmlMapperBuilder = new MybatisXMLMapperBuilder(mapperLocation.getInputStream(),
+                    XMLMapperBuilder xmlMapperBuilder = new XMLMapperBuilder(mapperLocation.getInputStream(),
                             configuration, mapperLocation.toString(), configuration.getSqlFragments());
                     xmlMapperBuilder.parse();
                 } catch ( Exception e ) {

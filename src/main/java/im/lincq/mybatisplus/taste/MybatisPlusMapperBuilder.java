@@ -1,5 +1,6 @@
 package im.lincq.mybatisplus.taste;
 
+import im.lincq.mybatisplus.taste.mapper.BaseMapper;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.binding.BindingException;
@@ -88,8 +89,8 @@ public class MybatisPlusMapperBuilder extends MapperAnnotationBuilder {
             parseCache();
             parseCacheRef();
             Method[] methods = type.getMethods();
-            // 注入增删改查方法 (突然想起来，在项目中能够通过sql注入，来代替代码生成。通过分页插件来完全代替代码生成.)
-            MybatisConfiguration.SQL_INJECTOR.inspectInject(configuration, assistant, type);
+            inspectInject();
+
             // 循环接口方法.
             for (Method method : methods) {
                 try {
@@ -104,6 +105,15 @@ public class MybatisPlusMapperBuilder extends MapperAnnotationBuilder {
             }
         }
         parsePendingMethods();
+    }
+
+    /**
+     * 注入CRUD 动态 SQL
+     */
+    private void inspectInject () {
+        if (BaseMapper.class.isAssignableFrom(type)) {
+            MybatisConfiguration.SQL_INJECTOR.inject(configuration, assistant, type);
+        }
     }
 
     private void parsePendingMethods() {
