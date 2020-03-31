@@ -1,6 +1,7 @@
 package im.lincq.mybatisplus.taste.test.mysql;
 
 import im.lincq.mybatisplus.taste.MybatisSessionFactoryBuilder;
+import im.lincq.mybatisplus.taste.test.mysql.entity.Test;
 import im.lincq.mybatisplus.taste.test.mysql.entity.User;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -19,7 +20,9 @@ public class NoXMLTest {
         SqlSessionFactory sessionFactory = mf.build(in);
         SqlSession sqlSession = sessionFactory.openSession();
         TestMapper testMapper = sqlSession.getMapper(TestMapper.class);
-        List<User> users = testMapper.selectList(null);
-        System.out.println(users);
+        List<Test> testList = testMapper.selectList(null);
+        if (null != testList) {
+            testList.forEach(System.out::println);
+        }
     }
 }
