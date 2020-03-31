@@ -13,6 +13,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import im.lincq.mybatisplus.taste.MybatisConfiguration;
+import im.lincq.mybatisplus.taste.MybatisXMLConfigBuilder;
 import im.lincq.mybatisplus.taste.exceptions.MybatisPlusException;
 import im.lincq.mybatisplus.taste.mapper.DBType;
 import im.lincq.mybatisplus.taste.mapper.ISqlInjector;
@@ -410,7 +411,7 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
 
         Configuration configuration;
 
-        XMLConfigBuilder xmlConfigBuilder = null;
+        MybatisXMLConfigBuilder xmlConfigBuilder = null;
 
         if (this.configuration != null) {
             configuration = this.configuration;
@@ -420,7 +421,7 @@ public class MybatisSqlSessionFactoryBean implements FactoryBean<SqlSessionFacto
                 configuration.getVariables().putAll(this.configurationProperties);
             }
         } else if ( this.configLocation != null ) {
-            xmlConfigBuilder = new XMLConfigBuilder(this.configLocation.getInputStream(), null,
+            xmlConfigBuilder = new MybatisXMLConfigBuilder(this.configLocation.getInputStream(), null,
                     this.configurationProperties);
             configuration = xmlConfigBuilder.getConfiguration();
         } else {

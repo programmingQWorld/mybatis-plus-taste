@@ -82,14 +82,13 @@ public class MybatisPlusMapperBuilder extends MapperAnnotationBuilder {
         String resource = type.toString();
 
         if (!configuration.isResourceLoaded(resource)) {
-            loadXmlResource();
+            boolean existXml = loadXmlResource();
             configuration.isResourceLoaded(resource);
             assistant.setCurrentNamespace(type.getName());
             // 两个准备工作（没有看出什么意义. 现在也没有网络，不方便查找）
             parseCache();
             parseCacheRef();
             Method[] methods = type.getMethods();
-            inspectInject();
 
             // 循环接口方法.
             for (Method method : methods) {
@@ -103,15 +102,18 @@ public class MybatisPlusMapperBuilder extends MapperAnnotationBuilder {
                     configuration.addIncompleteMethod(new MethodResolver(this, method));
                 }
             }
+
+            inspectInject(existXml);
+
         }
         parsePendingMethods();
     }
 
     /**
-     * 注入CRUD 动态 SQL
+     * 注入CRUD 动态 SQL （XML不存在时注入）
      */
-    private void inspectInject () {
-        if (BaseMapper.class.isAssignableFrom(type)) {
+    private void inspectInject (boolean flag) {
+        if (!flag && BaseMapper.class.isAssignableFrom(type)) {
             MybatisConfiguration.SQL_INJECTOR.inject(configuration, assistant, type);
         }
     }
@@ -214,10 +216,11 @@ public class MybatisPlusMapperBuilder extends MapperAnnotationBuilder {
     /**
      * 加载 XML 资源，没有资源也不会报错.
      */
-    private void loadXmlResource () {
+    private boolean loadXmlResource () {
+        boolean flag = true;
         // Spring may not know the real resource name so we check a flag
         // to prevent loading again a resource twice  (避免在Spring应用初始化阶段重复加载)
-        // this flag is set at XMLMapperBuilder#bindMapperForNamespace
+        // this flag is set at MybatisXMLMapperBuilder#bindMapperForNamespace
         if (!configuration.isResourceLoaded("namespace:" + type.getName())) {
             String xmlResource = type.getName().replace('.', '/') + ".xml";
             InputStream inputStream = null;
@@ -226,16 +229,17 @@ public class MybatisPlusMapperBuilder extends MapperAnnotationBuilder {
                 inputStream = Resources.getResourceAsStream(type.getClassLoader(), xmlResource);
             } catch (IOException e) {
                 // ignore,resource is not required
+                flag = false;
             }
 
             if (inputStream != null) {
-                XMLMapperBuilder xmlParser = new XMLMapperBuilder(inputStream, assistant.getConfiguration(), xmlResource,
+                MybatisXMLMapperBuilder xmlParser = new MybatisXMLMapperBuilder(inputStream, assistant.getConfiguration(), xmlResource,
                         configuration.getSqlFragments(), type.getName());
                 xmlParser.parse();
             }
 
         }
-
+        return flag;
     }
 
     private void parseCache () {

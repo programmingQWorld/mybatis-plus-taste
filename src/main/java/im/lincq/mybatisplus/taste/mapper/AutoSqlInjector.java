@@ -46,6 +46,21 @@ public class AutoSqlInjector  implements  ISqlInjector {
         this.dbType = dbType;
     }
 
+    /**
+     * CRUD注入后给予标识 注入过后不再注入
+     *
+     * @param configuration     configuration
+     * @param builderAssistant     builderAssistant
+     * @param mapperClass     mapperClass
+     */
+    public void inspectInject(Configuration configuration, MapperBuilderAssistant builderAssistant, Class<?> mapperClass) {
+        String className = mapperClass.toString();
+        Set<String> mapperRegistryCache = MybatisConfiguration.MAPPER_REGISTRY_CACHE;
+        if (!mapperRegistryCache.contains(className)) {
+            inject(configuration, builderAssistant, mapperClass);
+            mapperRegistryCache.add(className);
+        }
+    }
 
     /**
      * 注入单点SQL

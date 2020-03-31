@@ -42,6 +42,10 @@ public class MybatisConfiguration extends Configuration {
      */
     public final MybatisPlusMapperRegistry mybatisPlusMapperRegistry = new MybatisPlusMapperRegistry(this);
 
+    /**
+     * 缓存注册标识
+     */
+    public static Set<String> MAPPER_REGISTRY_CACHE = new ConcurrentSkipListSet<String>();
 
     /**
      * 元对象字段填充控制器
