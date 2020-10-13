@@ -70,7 +70,7 @@
         <ojdbc14.version>10.2.0.5.0</ojdbc14.version>
         <logback-classic.version>1.1.7</logback-classic.version>
         <mybatis-ehcache.version>1.0.3</mybatis-ehcache.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <contiperf.version>2.3.4</contiperf.version>
     </properties>
 
